@@ -1,65 +1,104 @@
-import Image from "next/image";
+import AnnouncementBar from "@/components/AnnoucementBar/AnnouncementBar";
+import Navbar from "@/components/Navbar/Navbar";
+import HeroSection from "@/components/HeroSection/HeroSection";
+import WaveDivider from "@/components//WaveDivider/WaveDivider";
+import SchoolsSection from "@/components/SchoolsSection/SchoolsSection";
+import StatsStrip from "@/components/StatsStrip/StatsStrip";
+import AboutSection from "@/components/AboutSection/AboutSection";
+import DonateSection from "@/components/DonateSection/DonateSection";
+import StoriesSection from "@/components/StoriesSection/StoriesSection";
+import BlogSection from "@/components/BlogSection/BlogSection";
+import ContactSection from "@/components/ContactSection/ContactSection";
+import Footer from "@/components/Footer/Footer";
+import ScrollAnimations from "@/components/ScrollAnimation/ScrollAnimations";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <>
+      {/* Global scroll fade-in observer */}
+      <ScrollAnimations />
+
+      {/* 1. Announcement bar */}
+      <AnnouncementBar />
+
+      {/* 2. Navigation */}
+      <Navbar />
+
+      {/* 3. Hero */}
+      <HeroSection />
+
+      {/* Wave: hero → schools */}
+      <WaveDivider
+        fromColor="var(--teal-dark)"
+        toColor="var(--bg)"
+        path="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z"
+      />
+
+      {/* 4. School selection */}
+      <SchoolsSection />
+
+      {/* Wave: schools → stats */}
+      <WaveDivider
+        fromColor="var(--bg)"
+        toColor="var(--teal-light)"
+        path="M0,20 C400,60 1040,0 1440,40 L1440,60 L0,60 Z"
+      />
+
+      {/* 5. Mission stats */}
+      <StatsStrip />
+
+      {/* Wave: stats → about */}
+      <WaveDivider
+        fromColor="var(--teal-light)"
+        toColor="var(--bg)"
+        path="M0,40 C360,0 1080,60 1440,20 L1440,60 L0,60 Z"
+      />
+
+      {/* 6. About */}
+      <AboutSection />
+
+      {/* Wave: about → donate */}
+      <WaveDivider
+        fromColor="var(--bg)"
+        toColor="var(--amber-pale)"
+        path="M0,10 C480,60 960,0 1440,50 L1440,60 L0,60 Z"
+      />
+
+      {/* 7. Donation module */}
+      <DonateSection />
+
+      {/* Wave: donate → stories */}
+      <WaveDivider
+        fromColor="var(--amber-pale)"
+        toColor="var(--bg)"
+        path="M0,30 C360,0 1080,60 1440,20 L1440,60 L0,60 Z"
+      />
+
+      {/* 8. Impact stories */}
+      <StoriesSection />
+
+      {/* Wave: stories → blog */}
+      <WaveDivider
+        fromColor="var(--bg)"
+        toColor="var(--teal-light)"
+        path="M0,50 C480,0 960,60 1440,10 L1440,60 L0,60 Z"
+      />
+
+      {/* 9. Blog / News */}
+      <BlogSection />
+
+      {/* Wave: blog → contact */}
+      <WaveDivider
+        fromColor="var(--teal-light)"
+        toColor="#F5F0EB"
+        path="M0,20 C360,60 1080,0 1440,40 L1440,60 L0,60 Z"
+      />
+
+      {/* 10. Contact */}
+      <ContactSection />
+
+      {/* 11. Footer */}
+      <Footer />
+    </>
   );
 }
