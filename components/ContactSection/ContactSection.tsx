@@ -133,6 +133,7 @@ export default function ContactSection() {
           {/* Right: Form */}
           <div className="fade-in fade-in-delay-2">
             <div
+              className="contact-form-card"
               style={{
                 background: "var(--surface)",
                 borderRadius: "var(--radius)",

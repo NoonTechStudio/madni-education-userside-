@@ -491,6 +491,95 @@ body {
   opacity: 0.85;
 }
 
+/* ─────────────────────────────────────────
+   MOBILE RESPONSIVE — Global overrides
+   (applied ≤ 768px unless otherwise noted)
+   ───────────────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* ── Section padding: 96px → 64px on mobile ── */
+  #hero, #schools, #stats-strip, #about,
+  #donate, #stories, #blog, #contact {
+    padding-top:    64px !important;
+    padding-bottom: 64px !important;
+  }
+
+  /* ── Announcement bar: wrap text gracefully ── */
+  #announcement-bar p {
+    font-size: 12px !important;
+    text-align: center;
+  }
+
+  /* ── Navbar: tighten horizontal padding on mobile ── */
+  #navbar > div {
+    padding-left:  16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* ── Reduce logo text sizes on very small screens ── */
+  /* (Navbar logo handled via responsive font-size below) */
+
+  /* ── Hero stat pills: smaller padding & font ── */
+  .hero-stat-pill {
+    padding: 8px 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* ── Pill buttons: full-width inside hero CTAs ── */
+  #hero .pill-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+    min-width: 140px;
+  }
+
+  /* ── Stats watermark: shrink the giant text ── */
+  .stats-watermark {
+    font-size: 100px !important;
+  }
+
+  /* ── Card lift: disable hover transform on touch ── */
+  @media (hover: none) {
+    .card-lift:hover {
+      transform: none !important;
+    }
+    .school-card:hover {
+      transform: none !important;
+    }
+    .pill-btn-amber:hover,
+    .pill-btn-teal:hover {
+      transform: none !important;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  /* ── Further reduce section padding on very small phones ── */
+  #hero, #schools, #stats-strip, #about,
+  #donate, #stories, #blog, #contact {
+    padding-top:    48px !important;
+    padding-bottom: 48px !important;
+  }
+
+  /* ── Reduce inner container horizontal padding ── */
+  #hero > div > div,
+  #schools > div,
+  #stats-strip > div > div,
+  #about > div,
+  #donate > div,
+  #stories > div,
+  #blog > div,
+  #contact > div {
+    padding-left:  16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* ── Form card padding ── */
+  .contact-form-card {
+    padding: 28px 20px !important;
+  }
+}
+
 /* ─── Social icon — footer ─── */
 .social-icon {
   width: 40px;

@@ -98,7 +98,7 @@ export default function StoriesSection() {
             }}
           />
           <div className="story-bg-overlay" aria-hidden="true" />
-          <div style={{ position: "relative", zIndex: 2, padding: "40px 48px", maxWidth: 680 }}>
+          <div className="story-featured-inner" style={{ position: "relative", zIndex: 2, padding: "40px 48px", maxWidth: 680 }}>
             <span
               style={{
                 display: "inline-block",
@@ -116,6 +116,7 @@ export default function StoriesSection() {
               Sabri High School
             </span>
             <h3
+              className="story-featured-h3"
               style={{
                 fontFamily: "var(--font-epilogue-var), sans-serif",
                 fontWeight: 800,
@@ -266,6 +267,13 @@ export default function StoriesSection() {
         @media (max-width: 768px) {
           .stories-grid-responsive { grid-template-columns: 1fr !important; }
           .projects-grid-responsive { grid-template-columns: repeat(2, 1fr) !important; }
+          /* Featured story — tighten padding on mobile */
+          .story-featured-inner {
+            padding: 28px 20px !important;
+          }
+          .story-featured-h3 {
+            font-size: 22px !important;
+          }
         }
       `}</style>
     </section>

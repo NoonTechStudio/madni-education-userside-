@@ -66,7 +66,7 @@ export default function HeroSection() {
           className="hero-grid"
         >
           {/* Text side */}
-          <div style={{ padding: "80px 0" }}>
+          <div className="hero-text-col" style={{ padding: "80px 0" }}>
             {/* Badge */}
             <div
               className="fade-in"
@@ -195,9 +195,8 @@ export default function HeroSection() {
 
           {/* Visual side */}
           <div
-            className="fade-in fade-in-delay-3 hidden md:flex"
+            className="fade-in fade-in-delay-3 hero-visual-col"
             style={{
-              display: "flex",
               alignItems: "center",
               justifyContent: "center",
               position: "relative",
@@ -261,6 +260,41 @@ export default function HeroSection() {
           </div>
         </div>
       </div>
+      {/* ── Responsive styles ── */}
+      <style>{`
+        .hero-visual-col {
+          display: flex;
+        }
+
+        /* Stat pills — ensure they wrap nicely on mobile */
+        .hero-stat-pill {
+          flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+          /* Collapse the two-column grid to single column */
+          .hero-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0 !important;
+          }
+
+          /* Hide the right-side image panel on mobile */
+          .hero-visual-col {
+            display: none !important;
+          }
+
+          /* Reduce tall top/bottom padding for the text block */
+          .hero-text-col {
+            padding: 52px 0 40px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .hero-text-col {
+            padding: 40px 0 32px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

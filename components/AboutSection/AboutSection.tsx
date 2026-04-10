@@ -39,6 +39,7 @@ export default function AboutSection() {
 
             {/* Est badge */}
             <div
+              className="about-est-badge"
               style={{
                 position: "absolute",
                 bottom: 32,
@@ -160,7 +161,19 @@ export default function AboutSection() {
 
       <style>{`
         @media (max-width: 768px) {
-          .about-grid-responsive { grid-template-columns: 1fr !important; gap: 40px !important; }
+          .about-grid-responsive {
+            grid-template-columns: 1fr !important;
+            gap: 48px !important;
+          }
+          /* Keep badge inside the image container on mobile */
+          .about-est-badge {
+            right: 12px !important;
+            bottom: 16px !important;
+            padding: 12px 16px !important;
+          }
+          .about-est-badge > div:first-child {
+            font-size: 22px !important;
+          }
         }
       `}</style>
     </section>

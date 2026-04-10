@@ -83,6 +83,7 @@ export default function BlogSection() {
         >
           {/* Image */}
           <div
+            className="featured-post-img-div"
             style={{
               minHeight: 300,
               backgroundImage:
@@ -95,6 +96,7 @@ export default function BlogSection() {
           />
           {/* Body */}
           <div
+            className="featured-post-body"
             style={{
               padding: "44px 40px",
               display: "flex",
@@ -233,6 +235,10 @@ export default function BlogSection() {
         @media (max-width: 768px) {
           .featured-post-responsive { grid-template-columns: 1fr !important; }
           .blog-grid-responsive { grid-template-columns: 1fr !important; }
+          /* Reduce featured post image height and body padding on mobile */
+          .featured-post-img-div { min-height: 200px !important; }
+          .featured-post-body { padding: 28px 24px !important; }
+          .featured-post-body h3 { font-size: 20px !important; }
         }
       `}</style>
     </section>

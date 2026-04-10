@@ -95,6 +95,7 @@ export default function Footer() {
         }}
       >
         <div
+          className="footer-cta-inner"
           style={{
             maxWidth: 1200,
             margin: "0 auto",
@@ -330,6 +331,7 @@ export default function Footer() {
 
       {/* ── Bottom bar ── */}
       <div
+        className="footer-bottom-bar"
         style={{
           borderTop: "1px solid rgba(255,255,255,0.08)",
           padding: "20px 32px",
@@ -366,6 +368,24 @@ export default function Footer() {
           .footer-grid-responsive {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
+          }
+          /* Reduce CTA band padding and stack the button */
+          .footer-cta-inner {
+            padding: 0 20px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          .footer-cta-inner .pill-btn {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          /* Reduce main grid horizontal padding */
+          .footer-grid-responsive {
+            padding: 48px 0 40px !important;
+          }
+          /* Compact bottom bar */
+          .footer-bottom-bar {
+            padding: 16px 20px !important;
           }
         }
       `}</style>

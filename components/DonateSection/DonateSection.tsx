@@ -264,7 +264,7 @@ export default function DonateSection() {
 
         {/* CTA banner */}
         <div
-          className="fade-in"
+          className="fade-in donate-cta-banner"
           style={{
             background: "var(--teal)",
             borderRadius: "var(--radius)",
@@ -295,6 +295,17 @@ export default function DonateSection() {
         @media (max-width: 768px) {
           .donate-grid-responsive { grid-template-columns: 1fr 1fr !important; }
           .donate-bottom-responsive { max-width: 100% !important; }
+          /* Reduce CTA banner padding and stack vertically on mobile */
+          .donate-cta-banner {
+            padding: 24px 20px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+          }
+          .donate-cta-banner .pill-btn {
+            width: 100% !important;
+            justify-content: center !important;
+          }
         }
         @media (max-width: 480px) {
           .donate-grid-responsive { grid-template-columns: 1fr !important; }
