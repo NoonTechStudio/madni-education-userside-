@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 
 /* ─── Desktop nav links ─── */
@@ -50,7 +51,7 @@ const primaryTabs = [
         <path d="M12 9v4M10 11h4" />
       </svg>
     ),
-    special: true, // amber highlight
+    special: true,
   },
   {
     label: "Insights",
@@ -117,8 +118,14 @@ const moreTabs = [
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [activeTab, setActiveTab] = useState("Home");
   const [moreOpen, setMoreOpen] = useState(false);
+  const pathname = usePathname();
+
+  /* helper — true when this href matches current route */
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(href + "/");
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -210,8 +217,8 @@ export default function Navbar() {
               <li key={link.label}>
                 <a
                   href={link.href}
-                  className={`nav-link${activeTab === link.label ? " nav-link-active" : ""}${link.href === "/donate" ? " nav-link-donate" : ""}`}
-                  onClick={() => setActiveTab(link.label)}
+                  className={`nav-link${isActive(link.href) ? " nav-link-active" : ""}${link.href === "/donate" ? " nav-link-donate" : ""}`}
+                  aria-current={isActive(link.href) ? "page" : undefined}
                 >
                   <span className="nav-flip-box">
                     <span className="nav-flip-front">{link.label}</span>
@@ -238,8 +245,8 @@ export default function Navbar() {
               <a
                 key={item.label}
                 href={item.href}
-                className="more-tray-item"
-                onClick={() => { setActiveTab(item.label); setMoreOpen(false); }}
+                className={`more-tray-item${isActive(item.href) ? " more-tray-item-active" : ""}`}
+                onClick={() => setMoreOpen(false)}
               >
                 <span className="more-tray-icon">{item.icon}</span>
                 <span className="more-tray-label">{item.label}</span>
@@ -256,19 +263,17 @@ export default function Navbar() {
         {/* Tab bar itself */}
         <div className="bottom-tab-row">
           {primaryTabs.map((tab) => {
-            const isActive = activeTab === tab.label;
+            const active = isActive(tab.href);
             return (
               <a
                 key={tab.label}
                 href={tab.href}
-                className={`bottom-tab${isActive ? " bottom-tab-active" : ""}${tab.special ? " bottom-tab-special" : ""}`}
-                onClick={() => setActiveTab(tab.label)}
+                className={`bottom-tab${active ? " bottom-tab-active" : ""}${tab.special ? " bottom-tab-special" : ""}`}
                 aria-label={tab.label}
-                aria-current={isActive ? "page" : undefined}
+                aria-current={active ? "page" : undefined}
               >
-                {/* Floating pill behind active icon */}
-                {isActive && <span className="tab-pill" />}
-                <span className="tab-icon">{tab.icon(isActive)}</span>
+                {active && <span className="tab-pill" />}
+                <span className="tab-icon">{tab.icon(active)}</span>
                 <span className="tab-label">{tab.label}</span>
               </a>
             );
@@ -363,7 +368,6 @@ export default function Navbar() {
           box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
         }
 
-        /* Each tab */
         .bottom-tab {
           position: relative;
           display: flex;
@@ -383,17 +387,14 @@ export default function Navbar() {
           min-height: 52px;
         }
 
-        /* Active tab — teal */
         .bottom-tab-active {
           color: var(--teal, #1A6B5A) !important;
           transform: translateY(-3px);
         }
 
-        /* Donate tab — amber */
         .bottom-tab-special           { color: #9a9a9a; }
         .bottom-tab-special.bottom-tab-active { color: var(--amber, #F5A623) !important; }
 
-        /* Floating pill indicator (iOS style) */
         .tab-pill {
           position: absolute;
           top: 2px;
@@ -422,9 +423,7 @@ export default function Navbar() {
           justify-content: center;
           transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .bottom-tab-active .tab-icon {
-          transform: scale(1.12);
-        }
+        .bottom-tab-active .tab-icon { transform: scale(1.12); }
 
         .tab-label {
           position: relative;
@@ -436,9 +435,7 @@ export default function Navbar() {
           white-space: nowrap;
           transition: font-weight 0.2s ease, opacity 0.2s ease;
         }
-        .bottom-tab-active .tab-label {
-          font-weight: 700;
-        }
+        .bottom-tab-active .tab-label { font-weight: 700; }
 
         /* ── More tray ──────────────────────── */
         .more-tray-backdrop {
@@ -514,9 +511,9 @@ export default function Navbar() {
           transition: background 0.2s ease, transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
           -webkit-tap-highlight-color: transparent;
         }
-        .more-tray-item:active {
+        .more-tray-item:active,
+        .more-tray-item-active {
           background: rgba(26,107,90,0.12);
-          transform: scale(0.95);
         }
 
         .more-tray-icon {
@@ -546,7 +543,6 @@ export default function Navbar() {
         @media (max-width: 768px) {
           .nav-links-desktop   { display: none !important; }
           .mobile-bottom-bar   { display: block !important; }
-          /* push page content above the tab bar */
           body { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
         }
       `}</style>

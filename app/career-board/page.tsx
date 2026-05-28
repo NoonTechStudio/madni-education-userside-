@@ -564,6 +564,7 @@ export default function CareerBoardClient() {
 
         /* Responsive */
         @media (max-width: 1023px) {
+          .why-grid { grid-template-columns: 1fr 1fr !important; }
           .two-col-grid { grid-template-columns: 1fr 1fr !important; }
           .three-col-grid { grid-template-columns: 1fr 1fr !important; }
           .drawer { width: 100vw; height: 85vh; top: auto; bottom: 0;
@@ -574,6 +575,7 @@ export default function CareerBoardClient() {
           }
         }
         @media (max-width: 767px) {
+          .why-grid { grid-template-columns: 1fr 1fr !important; }
           .two-col-grid { grid-template-columns: 1fr !important; }
           .three-col-grid { grid-template-columns: 1fr !important; }
           .hero-headline { font-size: 36px !important; }
@@ -691,6 +693,37 @@ export default function CareerBoardClient() {
                 </div>
             </section>
 
+            {/* ── WHY JOIN US STRIP ── */}
+            <section style={{ padding: "64px 32px", background: "white", borderBottom: "1px solid #EAF4F0" }}>
+                <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 28, textAlign: "center" }} className="why-grid">
+                        {[
+                            { icon: "❤️", title: "Purpose-Driven Work", desc: "Every role directly impacts 650+ students from underprivileged families." },
+                            { icon: "🕌", title: "Faith-Centred Culture", desc: "A workplace built on Islamic values — respect, trust, and brotherhood." },
+                            { icon: "📈", title: "Grow Your Career", desc: "Training, mentorship, and career growth opportunities for every team member." },
+                            { icon: "🤲", title: "Sadqa Jaariya", desc: "Your work here is an ongoing charity — reward that continues beyond this life." },
+                        ].map((item) => (
+                            <div key={item.title} style={{ padding: "24px 16px" }}>
+                                <div style={{
+                                    width: 60, height: 60, borderRadius: "50%",
+                                    background: "var(--teal-light)",
+                                    display: "flex", alignItems: "center", justifyContent: "center",
+                                    fontSize: 26, margin: "0 auto 16px",
+                                }}>
+                                    {item.icon}
+                                </div>
+                                <h4 style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 700, fontSize: 16, color: "var(--text-head)", margin: "0 0 8px" }}>
+                                    {item.title}
+                                </h4>
+                                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: "var(--text-body)", lineHeight: 1.65, margin: 0 }}>
+                                    {item.desc}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* ── SECTION 2: JOB LISTINGS ── */}
             <section style={{ padding: "100px 32px", background: "var(--bg)" }}>
                 <div className="reveal" style={{ textAlign: "center", marginBottom: "48px" }}>
@@ -717,62 +750,58 @@ export default function CareerBoardClient() {
 
                 {/* Job cards */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "860px", margin: "0 auto" }}>
-                    {filteredJobs.map((job) => (
-                        <div key={job.id} className="job-card reveal">
+                    {filteredJobs.map((job) => {
+                        const catMeta: Record<string, { icon: string; color: string; light: string }> = {
+                            Teaching:       { icon: "📖", color: "#1A6B5A", light: "#EAF4F0" },
+                            Technical:      { icon: "💻", color: "#2563EB", light: "#EFF6FF" },
+                            Administration: { icon: "📋", color: "#7C3AED", light: "#F5F3FF" },
+                        };
+                        const meta = catMeta[job.category] ?? { icon: "💼", color: "#1A6B5A", light: "#EAF4F0" };
+                        return (
+                        <div key={job.id} className="job-card reveal" style={{ borderLeftColor: "transparent" }}>
+                            {/* Category accent bar at top */}
+                            <div style={{ height: 4, background: meta.color, margin: "-28px -32px 20px", borderRadius: "20px 20px 0 0" }} />
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px" }}>
                                 <div style={{ flex: 1 }}>
-                                    {job.urgent && (
-                                        <span
-                                            style={{
-                                                display: "inline-block",
-                                                background: "rgba(220,50,50,0.1)",
-                                                color: "#DC3232",
-                                                fontSize: "11px",
-                                                fontWeight: 700,
-                                                padding: "4px 12px",
-                                                borderRadius: "999px",
-                                                marginBottom: "10px",
-                                            }}
-                                        >
-                                            🔴 Urgent Hiring
-                                        </span>
-                                    )}
-                                    <h3
-                                        style={{
-                                            fontFamily: "'Epilogue', sans-serif",
-                                            fontWeight: 700,
-                                            fontSize: "20px",
-                                            color: "var(--text-head)",
-                                        }}
-                                    >
-                                        {job.title}
-                                    </h3>
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "10px",
-                                            marginTop: "8px",
-                                            flexWrap: "wrap",
-                                        }}
-                                    >
-                                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "var(--muted)" }}>
-                                            📍 {job.location} · {job.school}
-                                        </span>
-                                        <span
-                                            style={{
-                                                background: "var(--teal-light)",
-                                                color: "var(--teal)",
-                                                fontSize: "12px",
-                                                fontWeight: 600,
-                                                padding: "3px 10px",
-                                                borderRadius: "999px",
-                                            }}
-                                        >
-                                            {job.type}
-                                        </span>
-                                    </div>
-                                </div>
+                                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                                        <div style={{
+                                            width: 44, height: 44, borderRadius: 12,
+                                            background: meta.light,
+                                            display: "flex", alignItems: "center", justifyContent: "center",
+                                            fontSize: 20, flexShrink: 0,
+                                        }}>
+                                            {meta.icon}
+                                        </div>
+                                        <div>
+                                            {job.urgent && (
+                                                <span style={{
+                                                    display: "inline-block",
+                                                    background: "rgba(220,50,50,0.1)",
+                                                    color: "#DC3232",
+                                                    fontSize: "11px", fontWeight: 700,
+                                                    padding: "3px 10px", borderRadius: "999px",
+                                                    marginBottom: "6px",
+                                                }}>
+                                                    🔴 Urgent Hiring
+                                                </span>
+                                            )}
+                                            <h3 style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 700, fontSize: "20px", color: "var(--text-head)", margin: 0 }}>
+                                                {job.title}
+                                            </h3>
+                                            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px", flexWrap: "wrap" }}>
+                                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "var(--muted)" }}>
+                                                    📍 {job.location} · {job.school}
+                                                </span>
+                                                <span style={{ background: meta.light, color: meta.color, fontSize: "12px", fontWeight: 600, padding: "3px 10px", borderRadius: "999px" }}>
+                                                    {job.type}
+                                                </span>
+                                                <span style={{ background: "var(--teal-light)", color: "var(--teal)", fontSize: "12px", fontWeight: 600, padding: "3px 10px", borderRadius: "999px" }}>
+                                                    {job.category}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>{/* close icon+title row */}
+                                </div>{/* close flex:1 */}
                                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                                     <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "var(--muted)" }}>
                                         Posted {job.posted}
@@ -802,9 +831,10 @@ export default function CareerBoardClient() {
                                         Apply Now →
                                     </button>
                                 </div>
-                            </div>
+                            </div>{/* close footer row */}
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </section>
 

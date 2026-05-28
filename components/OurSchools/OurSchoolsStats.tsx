@@ -3,10 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 const stats = [
-  { end: 650, suffix: "+", label: "Total Students Enrolled" },
-  { end: 2, suffix: "", label: "Schools Currently Running" },
-  { end: 28, suffix: "+", label: "Years • Longest Running School" },
-  { end: 4, suffix: "", label: "Schools Under Development" },
+  { end: 1100, suffix: "+", label: "Total Students Enrolled" },
+  { end: 3, suffix: "", label: "Schools Currently Running" },
+  { end: 30, suffix: "+", label: "Years • Longest Running School" },
 ];
 
 function useCountUp(end: number, duration = 1800, started: boolean) {
@@ -112,7 +111,7 @@ export default function OurSchoolsStats() {
           maxWidth: 1100,
           margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
+          gridTemplateColumns: "repeat(3, 1fr)",
           gap: 0,
         }}
         className="stats-strip-grid"

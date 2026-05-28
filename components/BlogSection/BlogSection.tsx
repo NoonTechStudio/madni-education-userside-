@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 // Server Component
 interface BlogPost {
   category: string;
@@ -6,8 +8,8 @@ interface BlogPost {
   title: string;
   excerpt: string;
   school: string;
-  emoji: string;
-  emojiColor: string;
+  imgSrc: string;
+  imgAlt: string;
 }
 
 const posts: BlogPost[] = [
@@ -19,8 +21,8 @@ const posts: BlogPost[] = [
     excerpt:
       "Our Class 12 team brought home the gold at the Vadodara District Science Championship for the second consecutive year.",
     school: "🏫 Sabri High School",
-    emoji: "🏆",
-    emojiColor: "linear-gradient(135deg,#c5e8df,#8dcfc0)",
+    imgSrc: "/images/img-101.jpg",
+    imgAlt: "Sabri High School Science Championship",
   },
   {
     category: "Announcement",
@@ -30,8 +32,8 @@ const posts: BlogPost[] = [
     excerpt:
       "As Ramadan approaches, we open our annual Zakat drive with a goal of ₹25 Lac to fund the next academic year for 300+ children.",
     school: "🏛️ All Schools",
-    emoji: "🕌",
-    emojiColor: "linear-gradient(135deg,#fde8c0,#f5c972)",
+    imgSrc: "/images/img-102.jpg.avif",
+    imgAlt: "Ramadan Zakat Drive 2026",
   },
   {
     category: "School News",
@@ -41,8 +43,8 @@ const posts: BlogPost[] = [
     excerpt:
       "Thanks to generous donor contributions, Noor Academy now has a fully equipped library and reading room, open to all 310 students.",
     school: "🏫 Noor Academy, Surat",
-    emoji: "📖",
-    emojiColor: "linear-gradient(135deg,#d8e8ff,#a0c0f0)",
+    imgSrc: "/images/img-103.jpg",
+    imgAlt: "Digital Library Wing inauguration",
   },
 ];
 
@@ -60,7 +62,7 @@ export default function BlogSection() {
               color: "var(--text-h)",
             }}
           >
-            Latest from Madni Education
+            Latest from Madni Islamic Study Centre
           </h2>
           <p style={{ fontFamily: "var(--font-caveat-var), cursive", fontSize: 22, color: "var(--amber)", marginTop: 6 }}>
             News, events, and achievements.
@@ -86,14 +88,18 @@ export default function BlogSection() {
             className="featured-post-img-div"
             style={{
               minHeight: 300,
-              backgroundImage:
-                "url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&q=80')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
+              position: "relative",
+              overflow: "hidden",
             }}
-            role="img"
-            aria-label="Students at annual day ceremony"
-          />
+          >
+            <Image
+              src="/images/img1.jpeg"
+              alt="Students at annual day ceremony"
+              fill
+              style={{ objectFit: "cover" }}
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
           {/* Body */}
           <div
             className="featured-post-body"
@@ -162,13 +168,18 @@ export default function BlogSection() {
                 flexDirection: "column",
               }}
             >
-              {/* Thumb */}
+              {/* Thumb — real image */}
               <div
-                style={{ width: "100%", aspectRatio: "16/9", background: post.emojiColor, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40 }}
-                role="img"
-                aria-label={post.title}
+                style={{ width: "100%", aspectRatio: "16/9", position: "relative", overflow: "hidden" }}
               >
-                {post.emoji}
+                <Image
+                  src={post.imgSrc}
+                  alt={post.imgAlt}
+                  fill
+                  style={{ objectFit: "cover", transition: "transform 0.4s ease" }}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="blog-card-img"
+                />
               </div>
 
               {/* Body */}
@@ -232,10 +243,11 @@ export default function BlogSection() {
 
       <style>{`
         .featured-post-responsive { grid-template-columns: 1fr 1fr; }
+        .blog-card-img { transform: scale(1); }
+        .card-lift:hover .blog-card-img { transform: scale(1.05); }
         @media (max-width: 768px) {
           .featured-post-responsive { grid-template-columns: 1fr !important; }
           .blog-grid-responsive { grid-template-columns: 1fr !important; }
-          /* Reduce featured post image height and body padding on mobile */
           .featured-post-img-div { min-height: 200px !important; }
           .featured-post-body { padding: 28px 24px !important; }
           .featured-post-body h3 { font-size: 20px !important; }

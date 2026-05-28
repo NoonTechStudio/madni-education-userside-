@@ -300,6 +300,77 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* ═══ SECTION 2b: THREE DECADES ══════════════════════════════════════ */}
+      <section className="reveal" style={{ padding: "80px 32px", background: "#F0F7F4" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+          <div style={{
+            background: "white",
+            borderRadius: 28,
+            padding: "52px 56px",
+            boxShadow: "0 8px 40px rgba(26,107,90,0.10)",
+            borderLeft: "6px solid #1A6B5A",
+            position: "relative",
+            overflow: "hidden",
+          }}>
+            <span aria-hidden="true" style={{
+              position: "absolute", top: -10, left: 40,
+              fontFamily: "Georgia, serif", fontSize: 160, lineHeight: 1,
+              color: "rgba(26,107,90,0.05)", pointerEvents: "none", userSelect: "none",
+            }}>&ldquo;</span>
+
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <span style={chipStyle("#1A6B5A", "#fff")}>30 Years of Service</span>
+
+              <h2 style={{
+                fontFamily: "var(--font-epilogue-var), sans-serif",
+                fontWeight: 800,
+                fontSize: "clamp(18px, 2.8vw, 28px)",
+                color: "#1A6B5A",
+                lineHeight: 1.25,
+                margin: "18px 0 28px",
+              }}>
+                Three Decades of Free Islamic Education &amp; Character Building –<br />
+                The Story of Madrasa Ashrafia Talimul Islam
+              </h2>
+
+              {[
+                "Madrasa Ashrafia Talimul Islam, under the Madani Islamic Study Center and Education Trust in Karjan and surrounding areas, was established in 1996 with a heartfelt mission: to provide Muslim children with religious education alongside worldly learning. We wanted to raise a generation with strong morals—children who respect their elders, show love from a young age, feel an unbreakable bond with their country, and move forward in life by earning a lawful livelihood.",
+                "Since our beginning, we have provided this religious training completely free of charge. Over the years, the impact has been beautiful to see. Muslim children are now serving their parents, showing respect, and embracing love and brotherhood. They pray regularly, recite the Quran, and have left behind bad habits like fighting and using foul language. A gentle, cultured atmosphere now surrounds them.",
+                "In the past 30 years, many children have completed courses in Qari and Imamat with us, starting from the very basics of religious training. Every year, we hold exams for the children, and on the holy night of Eid Milad, we invite all Muslims from the community to a public ceremony where certificates and prizes are given to the children. So far, nearly 7,000 children have benefited from this training—and this has only been possible through the help and support of our Muslim brothers.",
+              ].map((para, i) => (
+                <p key={i} style={{
+                  fontFamily: "var(--font-dm-sans-var), sans-serif",
+                  fontSize: 16, color: "#4A4A4A", lineHeight: 1.85,
+                  margin: "0 0 18px",
+                }}>
+                  {para}
+                </p>
+              ))}
+
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 8 }}>
+                {[
+                  { icon: "📅", text: "Est. 1996" },
+                  { icon: "👦", text: "~7,000 Children" },
+                  { icon: "🆓", text: "Completely Free" },
+                  { icon: "🎓", text: "Qari & Imamat Courses" },
+                  { icon: "🌙", text: "Annual Eid Milad Ceremony" },
+                ].map(({ icon, text }) => (
+                  <span key={text} style={{
+                    display: "inline-flex", alignItems: "center", gap: 7,
+                    background: "#EAF4F0", color: "#1A6B5A",
+                    fontFamily: "var(--font-dm-sans-var), sans-serif",
+                    fontWeight: 600, fontSize: 13,
+                    padding: "7px 16px", borderRadius: 9999,
+                  }}>
+                    {icon} {text}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ SECTION 3: VISION, MISSION & VALUES ════════════════════════════ */}
       <section className="reveal" style={{ padding: "100px 32px", background: "#EAF4F0" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>

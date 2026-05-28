@@ -259,6 +259,11 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           {/* Description */}
           <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 16, color: "rgba(255,255,255,0.82)", maxWidth: 520, lineHeight: 1.7, margin: "0 0 28px" }}>
             {d.classes} · {d.streams.join(" & ")} · {d.medium_of_instruction} Medium
+            {d.yearsOfService <= 2 && (
+              <span style={{ display: "block", marginTop: 8, fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "rgba(255,255,255,0.65)", fontStyle: "italic" }}>
+                Newly established {d.established} — your donation builds this school from the ground up.
+              </span>
+            )}
           </p>
 
           {/* Stat pills */}
@@ -414,31 +419,59 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           <h2 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: "clamp(24px, 4vw, 36px)", color: "#1C1C1C", margin: "0 0 10px" }}>Academic Results &amp; Achievements</h2>
           <p style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 20, color: "#F5A623", margin: "0 0 40px" }}>Our students don't just pass — they excel.</p>
 
-          {/* Results table */}
-          <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 4px 20px rgba(26,107,90,0.08)", marginBottom: 48 }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "var(--font-dm-sans-var),sans-serif" }}>
-              <thead>
-                <tr style={{ background: "#1A6B5A" }}>
-                  {["Year", "SSC Appeared", "SSC Passed", "SSC %", "HSC Appeared", "HSC Passed", "HSC %"].map((col) => (
-                    <th key={col} style={{ padding: "14px 16px", color: "#fff", fontSize: 12, fontWeight: 600, textAlign: "center", textTransform: "uppercase", letterSpacing: "0.05em" }}>{col}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {d.results.map((row, i) => (
-                  <tr key={row.year} style={{ background: i === 0 ? "#FFF8EC" : i % 2 === 0 ? "#FAF8F4" : "#fff", borderLeft: i === 0 ? "4px solid #F5A623" : "4px solid transparent" }}>
-                    <td style={{ padding: "13px 16px", fontSize: 14, fontWeight: 600, color: "#1C1C1C", textAlign: "center" }}>{row.year}</td>
-                    <td style={{ padding: "13px 16px", fontSize: 14, color: "#4A4A4A", textAlign: "center" }}>{row.sscAppeared}</td>
-                    <td style={{ padding: "13px 16px", fontSize: 14, color: "#4A4A4A", textAlign: "center" }}>{row.sscPassed}</td>
-                    <td style={{ padding: "13px 16px", fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 600, fontSize: 15, color: "#1A6B5A", textAlign: "center" }}>{row.sscRate}</td>
-                    <td style={{ padding: "13px 16px", fontSize: 14, color: "#4A4A4A", textAlign: "center" }}>{row.hscAppeared}</td>
-                    <td style={{ padding: "13px 16px", fontSize: 14, color: "#4A4A4A", textAlign: "center" }}>{row.hscPassed}</td>
-                    <td style={{ padding: "13px 16px", fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 600, fontSize: 15, color: "#1A6B5A", textAlign: "center" }}>{row.hscRate}</td>
+          {/* Results table — only show when the school has actual board exam data */}
+          {d.results[0]?.sscAppeared > 0 ? (
+            <div style={{ borderRadius: 16, overflow: "hidden", boxShadow: "0 4px 20px rgba(26,107,90,0.08)", marginBottom: 48 }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "var(--font-dm-sans-var),sans-serif" }}>
+                <thead>
+                  <tr style={{ background: "#1A6B5A" }}>
+                    {["Year", "SSC Appeared", "SSC Passed", "SSC %", "HSC Appeared", "HSC Passed", "HSC %"].map((col) => (
+                      <th key={col} style={{ padding: "14px 16px", color: "#fff", fontSize: 12, fontWeight: 600, textAlign: "center", textTransform: "uppercase", letterSpacing: "0.05em" }}>{col}</th>
+                    ))}
                   </tr>
+                </thead>
+                <tbody>
+                  {d.results.map((row, i) => (
+                    <tr key={row.year} style={{ background: i === 0 ? "#FFF8EC" : i % 2 === 0 ? "#FAF8F4" : "#fff", borderLeft: i === 0 ? "4px solid #F5A623" : "4px solid transparent" }}>
+                      <td style={{ padding: "13px 16px", fontSize: 14, fontWeight: 600, color: "#1C1C1C", textAlign: "center" }}>{row.year}</td>
+                      <td style={{ padding: "13px 16px", fontSize: 14, color: "#4A4A4A", textAlign: "center" }}>{row.sscAppeared}</td>
+                      <td style={{ padding: "13px 16px", fontSize: 14, color: "#4A4A4A", textAlign: "center" }}>{row.sscPassed}</td>
+                      <td style={{ padding: "13px 16px", fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 600, fontSize: 15, color: "#1A6B5A", textAlign: "center" }}>{row.sscRate}</td>
+                      <td style={{ padding: "13px 16px", fontSize: 14, color: "#4A4A4A", textAlign: "center" }}>{row.hscAppeared}</td>
+                      <td style={{ padding: "13px 16px", fontSize: 14, color: "#4A4A4A", textAlign: "center" }}>{row.hscPassed}</td>
+                      <td style={{ padding: "13px 16px", fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 600, fontSize: 15, color: "#1A6B5A", textAlign: "center" }}>{row.hscRate}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            /* First-year school — show a compelling milestone card instead of an empty table */
+            <div style={{ background: "#fff", borderRadius: 24, padding: "40px 36px", boxShadow: "0 4px 20px rgba(26,107,90,0.10)", marginBottom: 48, display: "flex", gap: 32, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ width: 80, height: 80, borderRadius: "50%", background: "#F5A623", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, flexShrink: 0 }}>🌱</div>
+              <div style={{ flex: 1, minWidth: 220 }}>
+                <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 22, color: "#1C1C1C", marginBottom: 8 }}>
+                  First Batch — SSC {d.results[0]?.sscRate}
+                </div>
+                <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 15, color: "#4A4A4A", lineHeight: 1.7, margin: "0 0 16px" }}>
+                  {d.shortName} is a brand-new school. The first students who joined in {d.established} are working their way up year by year. The inaugural SSC batch is on track and your donation today is directly shaping their results tomorrow.
+                </p>
+                <a href="/donate" className="pill-btn pill-btn-amber" style={{ fontSize: 13 }}>Be Part of This Journey →</a>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12, flexShrink: 0 }}>
+                {[
+                  { label: "Students Enrolled", val: `${d.totalStudents}+` },
+                  { label: "Faculty Members", val: `${d.totalFaculty}` },
+                  { label: "Year Founded", val: `${d.established}` },
+                ].map(({ label, val }) => (
+                  <div key={label} style={{ background: "#EAF4F0", borderRadius: 12, padding: "12px 20px", textAlign: "center" }}>
+                    <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 800, fontSize: 24, color: "#1A6B5A" }}>{val}</div>
+                    <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 11, color: "#4A4A4A", textTransform: "uppercase", letterSpacing: "0.06em", marginTop: 2 }}>{label}</div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            </div>
+          )}
 
           {/* Top achievers */}
           <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 22, color: "#1C1C1C", marginBottom: 20 }}>Top Achievers</h3>

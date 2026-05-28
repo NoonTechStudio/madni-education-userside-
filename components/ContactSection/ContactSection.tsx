@@ -58,9 +58,10 @@ export default function ContactSection() {
     {
       icon: "📍",
       label: "Trust Office Address",
-      value: "Madni Education Trust, 42 Sunlight Society,\nAlkapuri, Vadodara – 390 007, Gujarat, India",
+      // Address split into two lines for better readability
+      value: "Madni Islamic Study Centre & Sabri Education Trust,\nSaiyed Nagar, Junabazar, \nKarjan, Gujarat - 391240",
     },
-    { icon: "📞", label: "Phone", value: "+91 98765 43210" },
+    { icon: "📞", label: "Phone", value: "+91 93746 57272" },
     { icon: "✉️", label: "Email", value: "info@madnieducation.org" },
     {
       icon: "🕐",
@@ -68,6 +69,9 @@ export default function ContactSection() {
       value: "Monday – Saturday: 9:00 AM – 5:00 PM\nSunday: Closed",
     },
   ];
+
+  // Google Maps embed URL from the shared link
+  const mapSrc = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d29524.46432134319!2d73.0979788!3d22.2331015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395fcdd6a1b6b1e7%3A0x2e8e8e8e8e8e8e8e!2sKarjan%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1699999999999!5m2!1sen!2sin";
 
   return (
     <section id="contact" style={{ background: "#F5F0EB", padding: "96px 0" }}>
@@ -124,9 +128,28 @@ export default function ContactSection() {
               </div>
             ))}
 
-            {/* Map placeholder */}
-            <div className="map-placeholder" role="img" aria-label="Map showing Madni Education Trust office location in Vadodara">
-              🗺️ &nbsp; Map — Alkapuri, Vadodara, Gujarat
+            {/* Embedded Google Map */}
+            <div
+              className="map-container"
+              style={{
+                marginTop: 8,
+                borderRadius: 16,
+                overflow: "hidden",
+                boxShadow: "var(--shadow-md)",
+                border: "1px solid rgba(0,0,0,0.05)",
+              }}
+            >
+              <iframe
+                src={mapSrc}
+                width="100%"
+                height="220"
+                style={{ border: 0, display: "block" }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Madni Education Trust Office Location Map"
+                aria-label="Map showing Madni Education Trust office location near Junabazar, Karjan, Gujarat"
+              ></iframe>
             </div>
           </div>
 
@@ -241,9 +264,9 @@ export default function ContactSection() {
                     <option value="" disabled>Select a subject</option>
                     <option>General Trust Inquiry</option>
                     <option>Sabri High School</option>
-                    <option>Noor Academy</option>
-                    <option>Al-Huda Primary School</option>
-                    <option>Madni Girls&apos; School</option>
+                    <option>Markaz High School</option>
+                    <option>MS High School</option>
+                    <option>Admission</option>
                     <option>Donation / Sponsorship</option>
                   </select>
                 </div>
@@ -312,6 +335,7 @@ export default function ContactSection() {
         @media (max-width: 768px) {
           .contact-grid-responsive { grid-template-columns: 1fr !important; gap: 36px !important; }
           .form-row-responsive { grid-template-columns: 1fr !important; }
+          .map-container iframe { height: 200px !important; }
         }
       `}</style>
     </section>

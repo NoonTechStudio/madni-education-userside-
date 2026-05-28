@@ -10,6 +10,8 @@ import CurriculumSection from "@/components/OurSchools/CurriculumSection";
 import TrustsSection from "@/components/OurSchools/TrustsSection";
 import SchoolsContactSection from "@/components/OurSchools/SchoolsContactSection";
 import OurSchoolsCTA from "@/components/OurSchools/OurSchoolsCTA";
+import CertificationsSection from "@/components/OurSchools/CertificationsSection";
+import SchoolPhotoGallery from "@/components/OurSchools/SchoolPhotoGallery";
 
 export const metadata = {
   title: "Our Schools — Madni Education Trust",
@@ -59,11 +61,31 @@ export default function OurSchoolsPage() {
       {/* 4. Medium & curriculum */}
       <CurriculumSection />
 
-      {/* Wave: curriculum → trusts */}
+      {/* Wave: curriculum → certifications */}
       <WaveDivider
         fromColor="var(--bg)"
-        toColor="var(--teal-light)"
+        toColor="#FFF8EC"
         path="M0,10 C480,60 960,0 1440,50 L1440,60 L0,60 Z"
+      />
+
+      {/* 4b. Certifications — 12A & 80G */}
+      <CertificationsSection />
+
+      {/* Wave: certifications → gallery */}
+      <WaveDivider
+        fromColor="#FFF8EC"
+        toColor="#0F3D35"
+        path="M0,30 C360,0 1080,60 1440,20 L1440,60 L0,60 Z"
+      />
+
+      {/* 4c. Pinterest-style photo gallery */}
+      <SchoolPhotoGallery />
+
+      {/* Wave: gallery → trusts */}
+      <WaveDivider
+        fromColor="#0F3D35"
+        toColor="var(--teal-light)"
+        path="M0,20 C400,60 1040,0 1440,40 L1440,60 L0,60 Z"
       />
 
       {/* 5. Charitable trusts */}

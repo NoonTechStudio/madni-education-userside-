@@ -407,6 +407,194 @@ export const MARKAZ_SCHOOL_DATA = {
 };
 
 // ──────────────────────────────────────────────────────────────────────────────
+// M.S. HIGH SCHOOL DATA
+// ──────────────────────────────────────────────────────────────────────────────
+export const MS_HIGH_SCHOOL_DATA = {
+  name: "M.S. High School, Karachiya",
+  shortName: "M.S. High School",
+  tagline: "A new beginning for every child in Karachiya.",
+  medium: "English & Gujarati Medium",
+  established: 2024,
+  type: "Primary & Secondary",
+  trustName: "Madni Islamic Study Centre",
+  slug: "ms-high-school-gujarati",
+
+  address: "Karachiya, Di. Vadodara, Gujarat",
+  mapEmbedUrl: "https://maps.google.com/maps?q=Karachiya+Vadodara+Gujarat&output=embed",
+
+  emails: ["mshighschool786@gmail.com", "mshighschooleng24@gmail.com"],
+  phones: ["9374657272", "8460162126"],
+
+  diseCode: "Registration In Progress",
+  sscIndex: "N/A",
+  hscIndex: "N/A",
+  trustRegNo: "E/4832",
+  board: "GSEB (Gujarat Secondary & Higher Secondary Education Board)",
+
+  classes: "Primary (Std. 1) to Std. 9",
+  streams: ["English Medium", "Gujarati Medium"],
+  medium_of_instruction: "English & Gujarati",
+  streamDetails: [
+    {
+      name: "English Medium",
+      icon: "🌐",
+      grades: "Std. 1–9",
+      subjects: ["English", "Mathematics", "Science", "Social Science", "Gujarati", "Computer Basics"],
+    },
+    {
+      name: "Gujarati Medium",
+      icon: "📖",
+      grades: "Std. 1–9",
+      subjects: ["Gujarati", "Mathematics", "Science", "Social Science", "English", "Hindi"],
+    },
+  ],
+
+  totalStudents: 400,
+  totalFaculty: 18,
+  classrooms: 10,
+  yearsOfService: 1,
+  passingRate: 100,
+  alumniCount: 0,
+
+  results: [
+    { year: "2024–25", sscAppeared: 0, sscPassed: 0, sscRate: "First batch 2026", hscAppeared: 0, hscPassed: 0, hscRate: "N/A" },
+  ],
+
+  achievers: [
+    { name: "Zaid Shaikh", grade: "Std. 8", score: "94%", year: "2025", note: "School Topper" },
+    { name: "Maryam Ansari", grade: "Std. 7", score: "91%", year: "2025", note: "Top Performer" },
+    { name: "Ibrahim Patel", grade: "Std. 9", score: "89%", year: "2025", note: "Class Rank 1" },
+  ],
+
+  facilities: [
+    { icon: "📚", name: "Library", detail: "1,500+ books, growing collection" },
+    { icon: "🔬", name: "Science Lab", detail: "Basic lab for Std. 6–9" },
+    { icon: "💻", name: "Computer Lab", detail: "15 systems, internet access" },
+    { icon: "⚽", name: "Playground", detail: "Open sports ground" },
+    { icon: "🎨", name: "Art Room", detail: "Dedicated creative space" },
+    { icon: "🍽️", name: "Canteen", detail: "Hygienic mid-day meals served" },
+  ],
+
+  activities: [
+    {
+      category: "Sports", icon: "⚽",
+      items: [
+        { name: "Cricket", desc: "Regular practice and inter-class matches" },
+        { name: "Kabaddi", desc: "Traditional sport played across all grades" },
+        { name: "Athletics", desc: "Annual sports day track & field events" },
+        { name: "Badminton", desc: "Indoor recreational sport for all" },
+      ],
+    },
+    {
+      category: "Cultural", icon: "🎭",
+      items: [
+        { name: "Annual Day", desc: "Grand school celebration with cultural performances" },
+        { name: "Quran Recitation", desc: "Monthly Tilawat competitions" },
+        { name: "Drawing & Craft", desc: "Annual art and craft exhibitions" },
+        { name: "Storytelling", desc: "Monthly Gujarati and Urdu storytelling sessions" },
+      ],
+    },
+    {
+      category: "Academic Clubs", icon: "🧠",
+      items: [
+        { name: "Science Club", desc: "Hands-on experiments and school projects" },
+        { name: "Math Circle", desc: "Weekly problem-solving sessions" },
+        { name: "English Speaking", desc: "Spoken English development programme" },
+        { name: "Reading Club", desc: "Weekly reading in Gujarati and English" },
+      ],
+    },
+    {
+      category: "Community", icon: "🤝",
+      items: [
+        { name: "Cleanliness Drive", desc: "Monthly village cleanliness initiative" },
+        { name: "Tree Plantation", desc: "Eco-awareness programme for students" },
+        { name: "Ramadan Drive", desc: "Charity collection for needy families" },
+        { name: "Parent Meets", desc: "Monthly parent-teacher interaction sessions" },
+      ],
+    },
+  ],
+
+  projects: [
+    {
+      name: "School Building Phase 1", status: "Completed", year: "2024", progress: 100,
+      description: "Core classrooms, staff rooms, washrooms, and basic infrastructure — all completed in time for opening day.",
+      icon: "🏗️", color: "#EAF4F0",
+    },
+    {
+      name: "Library Expansion", status: "In Progress", year: "2025", progress: 70,
+      description: "Expanding the library to 3,000 books and upgrading reading tables and shelving units.",
+      icon: "📚", color: "#FFF8EC",
+    },
+    {
+      name: "Science Lab Setup", status: "In Progress", year: "2025", progress: 40,
+      description: "Full science lab for Std. 6–9 with microscopes, chemistry reagents, and safety equipment.",
+      icon: "🔬", color: "#EAF4F0",
+    },
+    {
+      name: "Std. 10 Launch (SSC)", status: "Planned", year: "2026", progress: 5,
+      description: "Extending to Std. 10 with GSEB board affiliation so the first batch can sit for SSC examinations.",
+      icon: "🎓", color: "#FFF8EC",
+    },
+  ],
+
+  galleryImages: [
+    { src: "/images/ms-inauguration.jpg", caption: "School Inauguration 2024", tag: "Events" },
+    { src: "/images/ms-classroom.jpg", caption: "New Classrooms", tag: "Facilities" },
+    { src: "/images/ms-sports.jpg", caption: "First Sports Day", tag: "Activities" },
+    { src: "/images/ms-library.jpg", caption: "School Library", tag: "Facilities" },
+    { src: "/images/ms-annual-day.jpg", caption: "Annual Day 2025", tag: "Events" },
+    { src: "/images/ms-students.jpg", caption: "Students at Work", tag: "Academics" },
+  ],
+
+  faculty: [
+    { name: "Mr. Imran Shaikh", role: "Principal", qualification: "M.A., B.Ed", experience: "15 years", subject: "School Administration" },
+    { name: "Mrs. Noorjahan Patel", role: "Senior Teacher", qualification: "B.Sc., B.Ed", experience: "10 years", subject: "Science & Mathematics" },
+    { name: "Mr. Junaid Ansari", role: "Teacher", qualification: "B.A., B.Ed", experience: "6 years", subject: "Gujarati & Social Science" },
+    { name: "Mrs. Rehana Vohra", role: "Teacher", qualification: "B.A., B.Ed", experience: "4 years", subject: "English & Hindi" },
+  ],
+
+  admissions: {
+    currentlyOpen: true,
+    session: "2025–26",
+    openClasses: ["Nursery (Pre-Primary)", "Std. 1", "Std. 2", "Std. 3", "Std. 4", "Std. 5", "Std. 6"],
+    process: [
+      "Visit the school office or email us to receive the admission form",
+      "Submit the filled form with all required documents",
+      "Attend a brief interaction session for Std. 4 and above",
+      "Scholarship eligibility assessed for underprivileged families",
+      "Admission confirmation issued within 2 working days",
+    ],
+    documents: [
+      "Birth Certificate",
+      "Aadhar Card (Student & Parent)",
+      "Previous School Leaving Certificate (if applicable)",
+      "Last Year's Progress Report (if applicable)",
+      "2 Recent Passport Size Photographs",
+    ],
+    feeNote: "Affordable fees for all families. Full zakat-funded scholarships available for eligible students. Absolutely no capitation or admission fee.",
+    contactEmail: "mshighschool786@gmail.com",
+  },
+
+  testimonials: [
+    { name: "Hamid Shaikh", role: "Parent — Std. 6 Student", quote: "This school in Karachiya is a blessing. My child walks there safely and is learning English — something we could never afford before.", tag: "Parent" },
+    { name: "Zarreen Memon", role: "Parent — Std. 8 Student", quote: "The teachers here are caring and dedicated. My daughter's confidence has grown so much since she joined M.S. High School.", tag: "Parent" },
+    { name: "Aamir Patel", role: "Current — Std. 9 Student", quote: "I never thought I would study in an English-medium school. This place gave me that chance and I want to be an engineer.", tag: "Student" },
+  ],
+
+  donation: {
+    headline: "Help Build M.S. High School, Karachiya",
+    subline: "This school opened in 2024 — and 400 children already call it home. Your donation funds classrooms, science labs, and a future for children who had nowhere else to turn.",
+    ctaPrimary: "Donate to This School →",
+    ctaSecondary: "See How Funds Are Used",
+    amounts: [
+      { label: "Books & Stationery", amount: "₹2,000", icon: "📚" },
+      { label: "Monthly Tuition", amount: "₹400/mo", icon: "🎒" },
+      { label: "Full Year Scholarship", amount: "₹7,000", icon: "🏆" },
+    ],
+  },
+};
+
+// ──────────────────────────────────────────────────────────────────────────────
 // SCHOOLS REGISTRY — Add new schools here
 // ──────────────────────────────────────────────────────────────────────────────
 export type SchoolDataType = typeof SABRI_SCHOOL_DATA;
@@ -414,4 +602,5 @@ export type SchoolDataType = typeof SABRI_SCHOOL_DATA;
 export const SCHOOLS_BY_SLUG: Record<string, SchoolDataType> = {
   "sabri-high-school": SABRI_SCHOOL_DATA,
   "markaz-public-school": MARKAZ_SCHOOL_DATA,
+  "ms-high-school-gujarati": MS_HIGH_SCHOOL_DATA,
 };

@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function AboutSection() {
   const features = [
     { icon: "📚", text: "Subsidised Education Across 4 Schools" },
-    { icon: "🕌", text: "100% Zakat-Compliant Fund Usage" },
+    { icon: "🕌", text: "100% Zakat & Lillah Fund Usage" },
     { icon: "📋", text: "Annually Audited & Transparent Accounts" },
   ];
 
@@ -104,16 +104,13 @@ export default function AboutSection() {
                 margin: "24px 0 32px",
               }}
             >
-              Founded in 2012 by a group of community-minded educators and
-              philanthropists, Madni Education Trust was born from a simple
-              belief: every child, regardless of their family&apos;s financial
-              circumstances, deserves access to quality education.
+              In 1996, a group of community-minded educators and philanthropists founded Madni Islamic Study Centre & Sabri Education Trust on a simple belief : <strong>Every child deserves quality education, regardless of their family's financial circumstances.</strong>
               <br />
               <br />
-              Today, the Trust operates four fully-functioning schools across
+              Today, the Trust operates three fully-functioning schools across
               Gujarat — each one providing subsidised or free education to
               children from underprivileged households. Our schools follow the
-              national curriculum while embedding strong values, character
+              national & state curriculum while embedding strong values, character
               development, and career readiness.
               <br />
               <br />

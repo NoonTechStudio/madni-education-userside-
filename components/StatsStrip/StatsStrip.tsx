@@ -11,11 +11,10 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { target: 1200, suffix: "+", label: "Students Currently Studying", desc: "Across all 4 trust schools" },
-  { target: 4, label: "Schools Under the Trust", desc: "Across 4 cities in Gujarat" },
-  { target: 12, suffix: " Yrs", label: "Of Uninterrupted Service", desc: "Since our founding in 2012" },
-  { target: 32, prefix: "₹", suffix: "Lac+", label: "Total Funds Utilized", desc: "Transparently accounted for" },
-  { target: 200, suffix: "+", label: "Alumni in Careers", desc: "Doctors, engineers & more" },
+  { target: 1100, suffix: "+", label: "Students Currently Studying", desc: "Across all 4 trust schools" },
+  { target: 3, label: "Schools Under the Trust", desc: "Across 2 cities in Gujarat" },
+  { target: 30, suffix: " Yrs", label: "Of Uninterrupted Service", desc: "Since our founding in 1996" },
+  { target: 3000, suffix: "+", label: "Alumni in Careers", desc: "Doctors, engineers & more" },
 ];
 
 function useCounter(target: number, active: boolean, duration = 1800) {
@@ -140,7 +139,7 @@ export default function StatsStrip() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(5, 1fr)",
+            gridTemplateColumns: "repeat(4, 1fr)",
             gap: 20,
             marginTop: 56,
           }}

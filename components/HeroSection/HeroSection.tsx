@@ -90,7 +90,7 @@ export default function HeroSection() {
                   fontWeight: 500,
                 }}
               >
-                Est. 2012 · Charitable Education Trust
+                Est. 1994 · Charitable Education Trust
               </span>
             </div>
 
@@ -106,9 +106,9 @@ export default function HeroSection() {
                 marginBottom: 16,
               }}
             >
-              One Trust.
+              Two Trust.
               <br />
-              Four Schools.
+              Three Schools.
               <br />
               <span style={{ color: "var(--amber)" }}>A Thousand Futures.</span>
             </h1>
@@ -124,7 +124,7 @@ export default function HeroSection() {
                 display: "block",
               }}
             >
-              Powered by your zakat and generosity.
+              Powered by your zakat and generosity. <br /> Open to all communities and religions.
             </span>
 
             {/* Body */}
@@ -135,12 +135,13 @@ export default function HeroSection() {
                 fontSize: 18,
                 color: "rgba(255,255,255,0.82)",
                 lineHeight: 1.75,
+
                 maxWidth: 520,
                 marginBottom: 36,
               }}
             >
-              Madni Education Trust has been transforming lives across 4 schools
-              since 2012. Providing fully subsidised quality education to
+              Madni Islamic Study Centre & Sabri Education Trust has been transforming lives across 3 schools
+              since 1996. Providing fully subsidised quality education to
               children who need it most.
             </p>
 
@@ -168,8 +169,8 @@ export default function HeroSection() {
               style={{ display: "flex", gap: 16, flexWrap: "wrap" }}
             >
               {[
-                { icon: "🎓", num: "1,200+", label: "Students Enrolled" },
-                { icon: "🏫", num: "4", label: "Schools Running" },
+                { icon: "🎓", num: "18,000+", label: "Students Enrolled" },
+                { icon: "🏫", num: "3", label: "Schools Running" },
                 { icon: "🏆", num: "98%", label: "Avg Pass Rate" },
               ].map((s) => (
                 <div key={s.label} className="hero-stat-pill">
@@ -234,7 +235,7 @@ export default function HeroSection() {
                     color: "var(--teal)",
                   }}
                 >
-                  15+
+                  30+
                 </div>
                 <div style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 11, color: "var(--muted)" }}>
                   Years of Service
@@ -251,7 +252,7 @@ export default function HeroSection() {
                   fontSize: 22,
                 }}
               >
-                200+
+                3000+
               </div>
               <div style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 11, opacity: 0.9 }}>
                 Alumni in Careers

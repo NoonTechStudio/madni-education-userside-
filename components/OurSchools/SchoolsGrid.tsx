@@ -9,14 +9,14 @@ const schools = [
     tagline: "Gujarati Medium",
     established: "1996",
     address: "Saiyad Nagar, Junabazar, Karjan, Di. Vadodara, Gujarat",
-    students: "362",
+    students: "400",
     medium: "Gujarati Medium",
     classes: "Pre-Primary to Std. 12",
     streams: "Commerce / Arts",
     dise: "24190403816",
     ssc: "65.393",
     hsc: "15.177",
-    emails: ["sabrischool@gmail.com", "mshighschool786@gmail.com"],
+    emails: ["sabrischool95@gmail.com"],
     image: "/images/schools/school1.jpeg",
     bgColor: "linear-gradient(135deg,#c5e8df,#8dcfc0)",
     comingSoon: false,
@@ -29,14 +29,14 @@ const schools = [
     tagline: "English Medium",
     established: "2007",
     address: "Saiyad Nagar, Junabazar, Karjan, Di. Vadodara, Gujarat",
-    students: "292",
+    students: "300",
     medium: "English Medium",
     classes: "Pre-Primary to Std. 12",
     streams: "Science / Commerce",
     dise: "24190403821",
     ssc: "65.0655",
     hsc: "15.0480",
-    emails: ["mpskarjan1@gmail.com", "mshighschooleng24@gmail.com"],
+    emails: ["mpskarjan1@gmail.com"],
     image: "/images/schools/school2.jpeg",
     bgColor: "linear-gradient(135deg,#fde8c0,#f5c972)",
     comingSoon: false,
@@ -46,39 +46,19 @@ const schools = [
     id: 3,
     slug: "ms-high-school-gujarati",
     name: "M.S. High School",
-    tagline: "Gujarati Medium",
-    established: "2012",
-    address: "Karachiya, Gujarat",
-    students: "280",
-    medium: "Gujarati Medium",
-    classes: "Primary to Std. 12",
-    streams: "Science / Commerce",
+    tagline: "English & Gujarati Medium",
+    established: "2024",
+    address: "Karachiya, Di. Vadodara, Gujarat",
+    students: "400",
+    medium: "English & Gujarati Medium",
+    classes: "Primary to Std. 9",
+    streams: "English & Gujarati",
     dise: "",
     ssc: "",
     hsc: "",
-    emails: [],
+    emails: ["mshighschool786@gmail.com", "mshighschooleng24@gmail.com"],
     image: "/images/schools/school3.png",
     bgColor: "linear-gradient(135deg,#d8e8ff,#a0c0f0)",
-    comingSoon: false,
-    accentColor: "#1A6B5A",
-  },
-  {
-    id: 4,
-    slug: "ms-high-school-english",
-    name: "M.S. High School",
-    tagline: "English Medium",
-    established: "2012",
-    address: "Karachiya, Gujarat",
-    students: "280",
-    medium: "English Medium",
-    classes: "Primary to Std. 12",
-    streams: "Science / Commerce",
-    dise: "",
-    ssc: "",
-    hsc: "",
-    emails: [],
-    image: "/images/schools/school3.png",
-    bgColor: "linear-gradient(135deg,#fce8f0,#f0a0c8)",
     comingSoon: false,
     accentColor: "#1A6B5A",
   },
@@ -162,6 +142,30 @@ function ActiveSchoolCard({ school }: { school: typeof schools[0] }) {
         >
           Est. {school.established}
         </span>
+
+        {/* "New School" badge for recently opened schools */}
+        {parseInt(school.established) >= 2024 && (
+          <span
+            style={{
+              position: "absolute",
+              top: 18,
+              left: 18,
+              background: "#F5A623",
+              color: "#fff",
+              fontSize: 10,
+              fontFamily: "var(--font-dm-sans-var), sans-serif",
+              fontWeight: 700,
+              padding: "3px 10px",
+              borderRadius: 9999,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              zIndex: 2,
+              boxShadow: "0 2px 8px rgba(245,166,35,0.5)",
+            }}
+          >
+            ✦ New School
+          </span>
+        )}
 
         {/* Bottom text block — sits above gradient */}
         <div
@@ -376,10 +380,13 @@ export default function SchoolsGrid() {
       <style>{`
         .schools-detail-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
+          grid-template-columns: repeat(3, 1fr);
           gap: 32px;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 1023px) {
+          .schools-detail-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 640px) {
           .schools-detail-grid { grid-template-columns: 1fr; }
         }
 

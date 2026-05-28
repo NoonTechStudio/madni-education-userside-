@@ -104,7 +104,7 @@ export default function OurSchoolsHero() {
             fontWeight: 500,
           }}
         >
-          Four schools. One mission. A thousand futures.
+          Three schools. One mission. A thousand futures.
         </p>
 
         {/* Body copy */}
@@ -118,9 +118,9 @@ export default function OurSchoolsHero() {
             maxWidth: 640,
           }}
         >
-          Madni Education Trust currently operates 2 schools in Karjan, Vadodara — providing
-          quality education from Pre-Primary to Std. 12 to over 650 students across Gujarati
-          and English mediums. Two more schools are coming soon.
+          Madni Islamic Study Centre & Sabri Education Trust currently operates 2 schools in Karjan and 1 school in Karachiya — providing
+          quality education from Pre-Primary to Std. 12 to over 1100 students across Gujarati
+          and English mediums.
         </p>
 
         {/* Stat pills */}
@@ -133,9 +133,9 @@ export default function OurSchoolsHero() {
           }}
         >
           {[
-            { icon: "🏫", label: "2 Schools Running" },
-            { icon: "👨‍🎓", label: "650+ Students Enrolled" },
-            { icon: "📅", label: "Since 1994" },
+            { icon: "🏫", label: "3 Schools Running" },
+            { icon: "👨‍🎓", label: "18,000+ Students Enrolled" },
+            { icon: "📅", label: "Since 1996" },
           ].map(({ icon, label }) => (
             <div
               key={label}

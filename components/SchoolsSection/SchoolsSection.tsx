@@ -14,35 +14,28 @@ const schools: School[] = [
   {
     name: "Sabri High School (Gujarati Medium)",
     location: "📍 Junabazar, Karjan, Gujarat",
-    desc: "Classes Pre-Primary to Std.12 (Commerce & Arts) | 362 students | Est. 1996",
-    chips: ["380 Students", "97% Pass Rate", "Est. 2012"],
+    desc: "Classes Pre-Primary to Std.12 (Commerce & Arts) | 400 students | Est. 1996",
+    chips: ["400 Students", "97% Pass Rate", "Est. 1996"],
     bgColor: "linear-gradient(135deg,#c5e8df,#8dcfc0)",
     image: "/images/schools/school1.jpeg",
   },
   {
-    name: "Markaz Public High School (English Medium)",
+    name: "Markaz Public School (English Medium)",
     location: "📍 Junabazar, Karjan, Gujarat",
-    desc: "Classes Pre-Primary to Std.12 (Science & Commerce)| 292 students | Est. 2007",
-    chips: ["310 Students", "98% Pass Rate", "Est. 2015"],
+    desc: "Classes Pre-Primary to Std.12 (Science & Commerce)| 300 students | Est. 2007",
+    chips: ["300 Students", "98% Pass Rate", "Est. 2007"],
     bgColor: "linear-gradient(135deg,#fde8c0,#f5c972)",
     image: "/images/schools/school2.jpeg",
   },
   {
-    name: "M.S.High School (Gujarati Medium)",
+    name: "M.S.High School (Eng-Guj Medium)",
     location: "📍 Karachiya, Gujarat",
-    desc: "Classes Primary to Std.12 (Science & Commerce) | 280 students | Est. 2012",
-    chips: ["280 Students", "99% Pass Rate", "Est. 2017"],
+    desc: "Classes Pre-Primary to Std.9 | 400 students | Est. 2024",
+    chips: ["400 Students", "99% Pass Rate", "Est. 2024"],
     bgColor: "linear-gradient(135deg,#d8e8ff,#a0c0f0)",
     image: "/images/schools/school3.png",
   },
-  {
-    name: "M.S.High School (English Medium)",
-    location: "📍 Karachiya, Gujarat",
-    desc: "Classes Primary to Std.12 (Science & Commerce) |280 students | Est. 2012",
-    chips: ["230 Students", "98% Pass Rate", "Est. 2012"],
-    bgColor: "linear-gradient(135deg,#fce8f0,#f0a0c8)",
-    image: "/images/schools/school3.png",
-  },
+
 ];
 
 export default function SchoolsSection() {

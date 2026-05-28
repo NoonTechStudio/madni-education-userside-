@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 
@@ -15,17 +16,20 @@ const SCHOOL_LIFE_DATA = {
     "Classroom Life", "Community Work", "Campus & Facilities",
   ],
 
+  // ── PHOTO GALLERY ──────────────────────────────────────────────────────────
+  // To add photos: place your image files in public/images/ then update src below.
+  // Supported: jpg, jpeg, png, webp, avif
   gallery: [
-    { src: "/images/annual-day-1.jpg",  caption: "Annual Day 2024 — Cultural Night",          category: "Annual Day",           year: 2024, tag: "Event"      },
-    { src: "/images/annual-day-2.jpg",  caption: "Prize Distribution Ceremony 2024",           category: "Annual Day",           year: 2024, tag: "Achievement" },
-    { src: "/images/cultural-1.jpg",    caption: "Quran Recitation Competition 2024",          category: "Cultural Programs",    year: 2024, tag: "Cultural"   },
-    { src: "/images/cultural-2.jpg",    caption: "Drawing & Art Exhibition 2023",              category: "Cultural Programs",    year: 2023, tag: "Cultural"   },
-    { src: "/images/classroom-1.jpg",   caption: "Std. 10 Board Exam Preparation",             category: "Classroom Life",       year: 2024, tag: "Academic"   },
-    { src: "/images/classroom-2.jpg",   caption: "Science Lab Session — Std. 9",               category: "Classroom Life",       year: 2023, tag: "Academic"   },
-    { src: "/images/community-1.jpg",   caption: "Blood Donation Camp 2024",                   category: "Community Work",       year: 2024, tag: "Community"  },
-    { src: "/images/community-2.jpg",   caption: "Cleanliness Drive — Swachh Bharat",          category: "Community Work",       year: 2023, tag: "Community"  },
-    { src: "/images/campus-1.jpg",      caption: "School Library — Renovated 2023",            category: "Campus & Facilities",  year: 2023, tag: "Facility"   },
-    { src: "/images/campus-2.jpg",      caption: "New Science Lab — Completed 2024",           category: "Campus & Facilities",  year: 2024, tag: "Facility"   },
+    { src: "/images/img-101.jpg",           caption: "Annual Day 2024 — Cultural Night",          category: "Annual Day",           year: 2024, tag: "Event"      },
+    { src: "/images/img-102.jpg.avif",      caption: "Prize Distribution Ceremony 2024",           category: "Annual Day",           year: 2024, tag: "Achievement" },
+    { src: "/images/img-103.jpg",           caption: "Quran Recitation Competition 2024",          category: "Cultural Programs",    year: 2024, tag: "Cultural"   },
+    { src: "/images/img1.jpeg",             caption: "Drawing & Art Exhibition 2023",              category: "Cultural Programs",    year: 2023, tag: "Cultural"   },
+    { src: "/images/img2.jpeg",             caption: "Std. 10 Board Exam Preparation",             category: "Classroom Life",       year: 2024, tag: "Academic"   },
+    { src: "/images/schools/school1.jpeg",  caption: "Science Lab Session — Std. 9",              category: "Classroom Life",       year: 2023, tag: "Academic"   },
+    { src: "/images/schools/school2.jpeg",  caption: "Blood Donation Camp 2024",                  category: "Community Work",       year: 2024, tag: "Community"  },
+    { src: "/images/schools/school3.png",   caption: "Cleanliness Drive — Swachh Bharat",         category: "Community Work",       year: 2023, tag: "Community"  },
+    { src: "/images/img-101.jpg",           caption: "School Library — Renovated 2023",           category: "Campus & Facilities",  year: 2023, tag: "Facility"   },
+    { src: "/images/img-103.jpg",           caption: "New Science Lab — Completed 2024",          category: "Campus & Facilities",  year: 2024, tag: "Facility"   },
   ],
 
   videos: [
@@ -434,7 +438,6 @@ export default function SchoolLifePage() {
           <div className="gal-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
             {filteredGallery.map((item, i) => {
               const hue = GALLERY_BG_HUES[SCHOOL_LIFE_DATA.gallery.indexOf(item) % GALLERY_BG_HUES.length];
-              const emoji = GALLERY_EMOJIS[SCHOOL_LIFE_DATA.gallery.indexOf(item) % GALLERY_EMOJIS.length];
               return (
                 <div
                   key={`${item.src}-${i}`}
@@ -447,16 +450,21 @@ export default function SchoolLifePage() {
                     borderRadius: 16, overflow: "hidden", position: "relative",
                     cursor: "pointer", aspectRatio: "4/3",
                     background: `hsl(${hue}, 25%, 30%)`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 52,
                   }}
                 >
-                  {/* Emoji placeholder — replace with next/image when real images exist */}
-                  {emoji}
+                  {/* Real photo */}
+                  <Image
+                    src={item.src}
+                    alt={item.caption}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="gal-img"
+                  />
 
                   {/* Year badge */}
                   <span style={{
-                    position: "absolute", top: 10, right: 10,
+                    position: "absolute", top: 10, right: 10, zIndex: 2,
                     background: "var(--amber)", color: "white",
                     fontFamily: "var(--font-dm-sans-var)", fontSize: 11, fontWeight: 700,
                     padding: "3px 10px", borderRadius: 999,
@@ -466,8 +474,8 @@ export default function SchoolLifePage() {
 
                   {/* Hover overlay */}
                   <div className="gal-overlay" style={{
-                    position: "absolute", inset: 0,
-                    background: "rgba(15,61,53,0.78)",
+                    position: "absolute", inset: 0, zIndex: 1,
+                    background: "linear-gradient(to top, rgba(15,61,53,0.88) 0%, transparent 60%)",
                     display: "flex", flexDirection: "column",
                     justifyContent: "flex-end", padding: 16,
                   }}>
@@ -478,7 +486,7 @@ export default function SchoolLifePage() {
                       {item.caption}
                     </p>
                     <span style={{
-                      alignSelf: "flex-end", background: "var(--amber)", color: "white",
+                      alignSelf: "flex-start", background: "var(--amber)", color: "white",
                       fontFamily: "var(--font-dm-sans-var)", fontSize: 11, fontWeight: 600,
                       padding: "3px 10px", borderRadius: 999,
                     }}>
@@ -489,6 +497,14 @@ export default function SchoolLifePage() {
               );
             })}
           </div>
+
+          {/* Add photos note */}
+          <p style={{
+            fontFamily: "var(--font-dm-sans-var)", fontSize: 12,
+            color: "rgba(255,255,255,0.35)", textAlign: "center", marginTop: 24,
+          }}>
+            To add photos, place images in <code style={{ background: "rgba(255,255,255,0.08)", padding: "2px 6px", borderRadius: 4 }}>public/images/</code> and update the gallery array in <code style={{ background: "rgba(255,255,255,0.08)", padding: "2px 6px", borderRadius: 4 }}>school-life/page.tsx</code>
+          </p>
         </div>
       </section>
 
@@ -520,12 +536,18 @@ export default function SchoolLifePage() {
             onClick={e => e.stopPropagation()}
             style={{
               width: "min(800px, 90vw)", aspectRatio: "4/3",
-              borderRadius: 12, overflow: "hidden",
+              borderRadius: 12, overflow: "hidden", position: "relative",
               background: `hsl(${GALLERY_BG_HUES[lightboxIndex % GALLERY_BG_HUES.length]}, 25%, 25%)`,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 90,
+              boxShadow: "0 24px 80px rgba(0,0,0,0.5)",
             }}
           >
-            {GALLERY_EMOJIS[lightboxIndex % GALLERY_EMOJIS.length]}
+            <Image
+              src={lightbox.src}
+              alt={lightbox.caption}
+              fill
+              style={{ objectFit: "cover" }}
+              sizes="90vw"
+            />
           </div>
 
           {/* Caption */}
@@ -756,152 +778,220 @@ export default function SchoolLifePage() {
             </p>
           </div>
 
-          {/* Filter controls box */}
+          {/* Search & filter panel */}
           <div className="reveal" style={{
-            background: "white", borderRadius: 24, padding: "36px 40px",
-            boxShadow: "0 4px 28px rgba(26,107,90,0.10)",
-            maxWidth: 720, margin: "0 auto",
+            background: "white", borderRadius: 28,
+            boxShadow: "0 8px 48px rgba(26,107,90,0.12)",
+            maxWidth: 860, margin: "0 auto",
+            overflow: "hidden",
           }}>
-            <div className="batch-ctrl" style={{ display: "flex", gap: 16 }}>
-
-              {/* Year selector */}
-              <div style={{ flex: 1 }}>
-                <label style={{
-                  display: "block", fontFamily: "var(--font-dm-sans-var)", fontSize: 12,
-                  fontWeight: 600, color: "var(--muted)", textTransform: "uppercase",
-                  letterSpacing: "0.07em", marginBottom: 8,
-                }}>
-                  Batch Year
-                </label>
-                <select
-                  value={batchYear ?? ""}
-                  onChange={e => setBatchYear(e.target.value ? Number(e.target.value) : null)}
-                  style={{
-                    width: "100%", border: "1.5px solid #EAF4F0", borderRadius: 12,
-                    padding: "12px 16px", fontFamily: "var(--font-dm-sans-var)", fontSize: 15,
-                    color: "var(--text-head)", background: "white", outline: "none", cursor: "pointer",
-                    appearance: "auto",
-                  }}
-                >
-                  <option value="">Select Year</option>
-                  {availableYears.map(y => <option key={y} value={y}>{y}</option>)}
-                </select>
-              </div>
-
-              {/* School selector */}
-              <div style={{ flex: 1 }}>
-                <label style={{
-                  display: "block", fontFamily: "var(--font-dm-sans-var)", fontSize: 12,
-                  fontWeight: 600, color: "var(--muted)", textTransform: "uppercase",
-                  letterSpacing: "0.07em", marginBottom: 8,
-                }}>
-                  School
-                </label>
-                <select
-                  value={batchSchool}
-                  onChange={e => setBatchSchool(e.target.value)}
-                  style={{
-                    width: "100%", border: "1.5px solid #EAF4F0", borderRadius: 12,
-                    padding: "12px 16px", fontFamily: "var(--font-dm-sans-var)", fontSize: 15,
-                    color: "var(--text-head)", background: "white", outline: "none", cursor: "pointer",
-                    appearance: "auto",
-                  }}
-                >
-                  <option>All Schools</option>
-                  <option>Sabri High School</option>
-                  <option>Markaz Public School</option>
-                </select>
-              </div>
-
-              {/* Search by name */}
-              <div style={{ flex: 1 }}>
-                <label style={{
-                  display: "block", fontFamily: "var(--font-dm-sans-var)", fontSize: 12,
-                  fontWeight: 600, color: "var(--muted)", textTransform: "uppercase",
-                  letterSpacing: "0.07em", marginBottom: 8,
-                }}>
-                  Search by Name
-                </label>
-                <div style={{ position: "relative" }}>
-                  <span style={{
-                    position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)",
-                    fontSize: 15, pointerEvents: "none",
-                  }}>🔍</span>
-                  <input
-                    type="text"
-                    placeholder="Type a name..."
-                    value={searchName}
-                    onChange={e => setSearchName(e.target.value)}
-                    style={{
-                      width: "100%", border: "1.5px solid #EAF4F0", borderRadius: 12,
-                      padding: "12px 16px 12px 42px",
-                      fontFamily: "var(--font-dm-sans-var)", fontSize: 15,
-                      color: "var(--text-head)", background: "white", outline: "none",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-              </div>
+            {/* Panel header */}
+            <div style={{
+              background: "linear-gradient(135deg, #1A6B5A, #0F3D35)",
+              padding: "24px 40px",
+              display: "flex", alignItems: "center", gap: 12,
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <p style={{ fontFamily: "var(--font-epilogue-var)", fontWeight: 600, fontSize: 16, color: "white", margin: 0 }}>
+                Search Your Batch
+              </p>
             </div>
 
-            {/* Result count pill */}
-            {(batchYear !== null || searchName !== "") && (
-              <div style={{ marginTop: 20, textAlign: "center" }}>
-                <span style={{
-                  display: "inline-block", background: "var(--teal)", color: "white",
-                  fontFamily: "var(--font-dm-sans-var)", fontSize: 14, fontWeight: 600,
-                  padding: "6px 22px", borderRadius: 999,
-                }}>
-                  {allStudents.length} student{allStudents.length !== 1 ? "s" : ""} found
-                </span>
+            {/* Controls */}
+            <div style={{ padding: "32px 40px" }}>
+              <div className="batch-ctrl" style={{ display: "flex", gap: 20, marginBottom: 0 }}>
+                {/* Year selector */}
+                <div style={{ flex: 1 }}>
+                  <label style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    fontFamily: "var(--font-dm-sans-var)", fontSize: 11, fontWeight: 700,
+                    color: "var(--teal)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10,
+                  }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--amber)", display: "inline-block" }} />
+                    Batch Year
+                  </label>
+                  <select
+                    value={batchYear ?? ""}
+                    onChange={e => setBatchYear(e.target.value ? Number(e.target.value) : null)}
+                    style={{
+                      width: "100%", border: "2px solid #EAF4F0", borderRadius: 14,
+                      padding: "13px 16px", fontFamily: "var(--font-dm-sans-var)", fontSize: 15,
+                      color: "var(--text-head)", background: "white", outline: "none", cursor: "pointer",
+                      transition: "border-color 0.2s",
+                    }}
+                    className="batch-select"
+                  >
+                    <option value="">All Years</option>
+                    {availableYears.map(y => <option key={y} value={y}>{y}</option>)}
+                  </select>
+                </div>
+
+                {/* School selector */}
+                <div style={{ flex: 1 }}>
+                  <label style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    fontFamily: "var(--font-dm-sans-var)", fontSize: 11, fontWeight: 700,
+                    color: "var(--teal)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10,
+                  }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--teal)", display: "inline-block" }} />
+                    School
+                  </label>
+                  <select
+                    value={batchSchool}
+                    onChange={e => setBatchSchool(e.target.value)}
+                    style={{
+                      width: "100%", border: "2px solid #EAF4F0", borderRadius: 14,
+                      padding: "13px 16px", fontFamily: "var(--font-dm-sans-var)", fontSize: 15,
+                      color: "var(--text-head)", background: "white", outline: "none", cursor: "pointer",
+                      transition: "border-color 0.2s",
+                    }}
+                    className="batch-select"
+                  >
+                    <option>All Schools</option>
+                    <option>Sabri High School</option>
+                    <option>Markaz Public School</option>
+                  </select>
+                </div>
+
+                {/* Search by name */}
+                <div style={{ flex: 1 }}>
+                  <label style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    fontFamily: "var(--font-dm-sans-var)", fontSize: 11, fontWeight: 700,
+                    color: "var(--teal)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10,
+                  }}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#9a9a9a", display: "inline-block" }} />
+                    Search Name
+                  </label>
+                  <div style={{ position: "relative" }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9a9a9a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                      style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}>
+                      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder="Type a name..."
+                      value={searchName}
+                      onChange={e => setSearchName(e.target.value)}
+                      style={{
+                        width: "100%", border: "2px solid #EAF4F0", borderRadius: 14,
+                        padding: "13px 16px 13px 40px",
+                        fontFamily: "var(--font-dm-sans-var)", fontSize: 15,
+                        color: "var(--text-head)", background: "white", outline: "none",
+                        boxSizing: "border-box", transition: "border-color 0.2s",
+                      }}
+                      className="batch-input"
+                    />
+                  </div>
+                </div>
               </div>
-            )}
+
+              {/* Result count bar */}
+              {(batchYear !== null || searchName !== "") && (
+                <div style={{
+                  marginTop: 20, background: "#EAF4F0", borderRadius: 12,
+                  padding: "12px 20px",
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: "50%", background: "var(--teal)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" />
+                      </svg>
+                    </div>
+                    <p style={{
+                      fontFamily: "var(--font-dm-sans-var)", fontWeight: 600, fontSize: 14,
+                      color: "var(--teal)", margin: 0,
+                    }}>
+                      {allStudents.length} student{allStudents.length !== 1 ? "s" : ""} found
+                      {batchYear && <span style={{ color: "#888", fontWeight: 400 }}> · Batch {batchYear}</span>}
+                      {batchSchool !== "All Schools" && <span style={{ color: "#888", fontWeight: 400 }}> · {batchSchool}</span>}
+                    </p>
+                  </div>
+                  {(batchYear !== null || searchName !== "") && (
+                    <button
+                      onClick={() => { setBatchYear(null); setBatchSchool("All Schools"); setSearchName(""); }}
+                      style={{
+                        background: "none", border: "none", cursor: "pointer",
+                        fontFamily: "var(--font-dm-sans-var)", fontSize: 12, color: "#888",
+                        padding: "4px 8px", borderRadius: 8,
+                      }}
+                    >
+                      Clear ✕
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Results area */}
-          <div style={{ marginTop: 32 }}>
+          <div style={{ marginTop: 40 }}>
 
-            {/* Prompt state — nothing selected yet */}
+            {/* Prompt state — nothing searched yet */}
             {batchYear === null && searchName === "" && (
               <div style={{
-                background: "white", borderRadius: 20, padding: "48px 32px",
-                textAlign: "center", maxWidth: 480, margin: "0 auto",
-                boxShadow: "0 4px 20px rgba(26,107,90,0.08)",
+                background: "white", borderRadius: 24, padding: "56px 32px",
+                textAlign: "center", maxWidth: 440, margin: "0 auto",
+                boxShadow: "0 4px 24px rgba(26,107,90,0.08)",
               }}>
-                <div style={{ fontSize: 56, marginBottom: 16 }}>🔍</div>
-                <h3 style={{
-                  fontFamily: "var(--font-epilogue-var)", fontWeight: 600, fontSize: 20,
-                  color: "var(--text-head)", margin: "0 0 8px",
-                }}>Select a year to begin</h3>
-                <p style={{
-                  fontFamily: "var(--font-dm-sans-var)", fontSize: 15, color: "var(--muted)", margin: 0,
+                <div style={{
+                  width: 72, height: 72, borderRadius: "50%",
+                  background: "#EAF4F0", margin: "0 auto 20px",
+                  display: "flex", alignItems: "center", justifyContent: "center",
                 }}>
-                  Choose your batch year above to find your classmates.
+                  <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1A6B5A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" />
+                  </svg>
+                </div>
+                <h3 style={{
+                  fontFamily: "var(--font-epilogue-var)", fontWeight: 700, fontSize: 20,
+                  color: "var(--text-head)", margin: "0 0 10px",
+                }}>Find Your Batchmates</h3>
+                <p style={{
+                  fontFamily: "var(--font-dm-sans-var)", fontSize: 15, color: "var(--muted)",
+                  lineHeight: 1.6, margin: 0,
+                }}>
+                  Select a batch year or school above — or search by name to find your classmates.
                 </p>
               </div>
             )}
 
-            {/* Empty state — filters applied but no results */}
+            {/* Empty state */}
             {(batchYear !== null || searchName !== "") && allStudents.length === 0 && (
               <div style={{
-                background: "white", borderRadius: 20, padding: "48px 32px",
-                textAlign: "center", maxWidth: 480, margin: "0 auto",
+                background: "white", borderRadius: 24, padding: "48px 32px",
+                textAlign: "center", maxWidth: 440, margin: "0 auto",
                 boxShadow: "0 4px 20px rgba(26,107,90,0.08)",
               }}>
-                <div style={{ fontSize: 56, marginBottom: 16 }}>🎓</div>
+                <div style={{
+                  width: 72, height: 72, borderRadius: "50%",
+                  background: "#FFF8EC", margin: "0 auto 20px",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32,
+                }}>
+                  🎓
+                </div>
                 <h3 style={{
                   fontFamily: "var(--font-epilogue-var)", fontWeight: 600, fontSize: 20,
                   color: "var(--text-head)", margin: "0 0 8px",
                 }}>No students found</h3>
                 <p style={{
-                  fontFamily: "var(--font-dm-sans-var)", fontSize: 15, color: "var(--muted)", margin: "0 0 20px",
+                  fontFamily: "var(--font-dm-sans-var)", fontSize: 15, color: "var(--muted)",
+                  lineHeight: 1.6, margin: "0 0 24px",
                 }}>
                   Try a different year or school — or add yourself to the list.
                 </p>
                 <button style={{
-                  background: "none", border: "2px solid var(--teal)", color: "var(--teal)",
+                  background: "var(--teal)", color: "white", border: "none",
                   fontFamily: "var(--font-dm-sans-var)", fontSize: 14, fontWeight: 600,
-                  padding: "10px 24px", borderRadius: 999, cursor: "pointer",
+                  padding: "12px 28px", borderRadius: 999, cursor: "pointer",
                 }}>
                   Add My Details →
                 </button>
@@ -910,96 +1000,135 @@ export default function SchoolLifePage() {
 
             {/* Student grid */}
             {allStudents.length > 0 && (
-              <div className="batch-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
-                {allStudents.map((student, i) => (
-                  <div key={`${student.name}-${student.year}-${i}`} className="student-card" style={{
-                    background: "white", borderRadius: 20, padding: 24,
-                    boxShadow: "0 4px 20px rgba(26,107,90,0.08)",
-                  }}>
-                    {/* Top row — avatar + name/school */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 14 }}>
-                      <div style={{
-                        width: 52, height: 52, borderRadius: "50%", background: "var(--teal)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        color: "white", fontFamily: "var(--font-epilogue-var)", fontWeight: 700,
-                        fontSize: 20, flexShrink: 0,
-                      }}>
-                        {student.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <p style={{
-                          fontFamily: "var(--font-epilogue-var)", fontWeight: 600, fontSize: 16,
-                          color: "var(--text-head)", margin: "0 0 2px",
-                        }}>
-                          {student.name}
-                        </p>
-                        <p style={{
-                          fontFamily: "var(--font-dm-sans-var)", fontSize: 12,
-                          color: "var(--muted)", margin: 0,
-                        }}>
-                          {student.school}
-                        </p>
-                      </div>
-                    </div>
+              <div className="batch-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+                {allStudents.map((student, i) => {
+                  const avatarColors = [
+                    ["#1A6B5A", "#EAF4F0"],
+                    ["#F5A623", "#FFF8EC"],
+                    ["#2E8B6E", "#D4EDE5"],
+                    ["#0F3D35", "#C8E3DC"],
+                  ];
+                  const [bg, light] = avatarColors[i % avatarColors.length];
+                  return (
+                    <div key={`${student.name}-${student.year}-${i}`} className="student-card" style={{
+                      background: "white", borderRadius: 20,
+                      boxShadow: "0 4px 24px rgba(26,107,90,0.09)",
+                      overflow: "hidden",
+                    }}>
+                      {/* Color accent bar */}
+                      <div style={{ height: 4, background: bg }} />
+                      <div style={{ padding: "20px 22px 22px" }}>
+                        {/* Avatar + name */}
+                        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+                          <div style={{
+                            width: 54, height: 54, borderRadius: "50%",
+                            background: `linear-gradient(135deg, ${bg}, ${bg}cc)`,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "white", fontFamily: "var(--font-epilogue-var)", fontWeight: 700,
+                            fontSize: 22, flexShrink: 0,
+                            boxShadow: `0 4px 12px ${bg}44`,
+                          }}>
+                            {student.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{
+                              fontFamily: "var(--font-epilogue-var)", fontWeight: 700, fontSize: 16,
+                              color: "var(--text-head)", margin: "0 0 3px",
+                              overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                            }}>
+                              {student.name}
+                            </p>
+                            <p style={{
+                              fontFamily: "var(--font-dm-sans-var)", fontSize: 12,
+                              color: "var(--muted)", margin: 0,
+                            }}>
+                              🏫 {student.school}
+                            </p>
+                          </div>
+                        </div>
 
-                    {/* Bottom row — chips */}
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                      <span style={{
-                        background: "var(--teal-light)", color: "var(--teal)",
-                        fontFamily: "var(--font-dm-sans-var)", fontSize: 12, fontWeight: 600,
-                        padding: "4px 12px", borderRadius: 999,
-                      }}>
-                        {student.stream}
-                      </span>
-                      <span style={{
-                        background: "#FFF8EC", color: "var(--amber)",
-                        fontFamily: "var(--font-dm-sans-var)", fontSize: 12, fontWeight: 600,
-                        padding: "4px 12px", borderRadius: 999,
-                      }}>
-                        Batch {student.year}
-                      </span>
-                      {student.note && (
-                        <span style={{
-                          fontFamily: "var(--font-dm-sans-var)", fontSize: 12,
-                          fontStyle: "italic", color: "var(--amber)",
+                        {/* Info row */}
+                        <div style={{
+                          background: light, borderRadius: 10, padding: "10px 14px",
+                          display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap",
+                          marginBottom: student.note ? 12 : 0,
                         }}>
-                          {student.note}
-                        </span>
-                      )}
+                          <span style={{
+                            fontFamily: "var(--font-dm-sans-var)", fontSize: 12, fontWeight: 600,
+                            color: bg,
+                          }}>
+                            📚 {student.stream}
+                          </span>
+                          <span style={{
+                            fontFamily: "var(--font-dm-sans-var)", fontSize: 12, color: "#888",
+                          }}>|</span>
+                          <span style={{
+                            fontFamily: "var(--font-dm-sans-var)", fontSize: 12, fontWeight: 600,
+                            color: bg,
+                          }}>
+                            🎓 Batch {student.year}
+                          </span>
+                        </div>
+
+                        {student.note && (
+                          <div style={{
+                            display: "flex", alignItems: "center", gap: 6,
+                            marginTop: 4,
+                          }}>
+                            <span style={{ fontSize: 12 }}>⭐</span>
+                            <span style={{
+                              fontFamily: "var(--font-dm-sans-var)", fontSize: 12,
+                              fontStyle: "italic", color: "var(--amber)", fontWeight: 500,
+                            }}>
+                              {student.note}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
 
           {/* Submit your details CTA */}
-          <div className="reveal" style={{ marginTop: 40, display: "flex", justifyContent: "center" }}>
+          <div className="reveal" style={{ marginTop: 48, display: "flex", justifyContent: "center" }}>
             <div style={{
-              background: "white", borderRadius: 20, padding: "32px 48px",
-              maxWidth: 500, width: "100%",
-              border: "1.5px dashed rgba(26,107,90,0.25)", textAlign: "center",
+              background: "linear-gradient(135deg, #1A6B5A, #0F3D35)",
+              borderRadius: 24, padding: "40px 56px",
+              maxWidth: 560, width: "100%",
+              textAlign: "center",
+              boxShadow: "0 8px 40px rgba(26,107,90,0.25)",
             }}>
-              <div style={{ fontSize: 40, marginBottom: 12 }}>🙋</div>
+              <div style={{
+                width: 56, height: 56, borderRadius: "50%",
+                background: "rgba(255,255,255,0.12)", margin: "0 auto 16px",
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24,
+              }}>
+                🙋
+              </div>
               <h3 style={{
-                fontFamily: "var(--font-epilogue-var)", fontWeight: 600, fontSize: 18,
-                color: "var(--text-head)", margin: "0 0 8px",
+                fontFamily: "var(--font-epilogue-var)", fontWeight: 700, fontSize: 20,
+                color: "white", margin: "0 0 10px",
               }}>Are you an alumni?</h3>
               <p style={{
                 fontFamily: "var(--font-dm-sans-var)", fontSize: 14,
-                color: "var(--muted)", margin: "0 0 16px",
+                color: "rgba(255,255,255,0.75)", margin: "0 0 24px", lineHeight: 1.65,
               }}>
-                If you studied here and want to be listed, submit your details.
+                If you studied here and want to connect with your batchmates, submit your details.
+                We review all submissions before publishing.
               </p>
               <button style={{
-                background: "var(--teal)", color: "white", border: "none",
-                fontFamily: "var(--font-dm-sans-var)", fontSize: 14, fontWeight: 600,
-                padding: "12px 30px", borderRadius: 999, cursor: "pointer",
+                background: "var(--amber)", color: "white", border: "none",
+                fontFamily: "var(--font-dm-sans-var)", fontSize: 14, fontWeight: 700,
+                padding: "13px 32px", borderRadius: 999, cursor: "pointer",
+                boxShadow: "0 4px 16px rgba(245,166,35,0.4)",
               }}>
                 Add My Details →
               </button>
               <p style={{
-                fontFamily: "var(--font-caveat-var)", fontSize: 14, color: "var(--amber)",
+                fontFamily: "var(--font-caveat-var)", fontSize: 15, color: "rgba(255,255,255,0.5)",
                 margin: "12px 0 0",
               }}>
                 Details are reviewed before publishing.
@@ -1033,13 +1162,20 @@ export default function SchoolLifePage() {
             boxShadow: "0 8px 40px rgba(26,107,90,0.12)",
             display: "flex",
           }}>
-            {/* Left image */}
+            {/* Left image — change src below to use your own Annual Day photo */}
             <div className="annual-img" style={{
               width: "50%", minHeight: 420, flexShrink: 0,
+              position: "relative", overflow: "hidden",
               background: "linear-gradient(135deg, #1A6B5A 0%, #0F3D35 100%)",
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 90,
             }}>
-              🎭
+              <Image
+                src="/images/img-101.jpg"
+                alt="Annual Day celebration at Madni Education Trust schools"
+                fill
+                style={{ objectFit: "cover" }}
+                sizes="(max-width: 1023px) 100vw, 50vw"
+              />
+              <div style={{ position: "absolute", inset: 0, background: "rgba(10,45,38,0.22)" }} />
             </div>
 
             {/* Right content */}
