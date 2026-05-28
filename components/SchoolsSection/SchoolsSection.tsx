@@ -2,6 +2,7 @@
 import Image from "next/image";
 
 interface School {
+  slug: string;
   name: string;
   location: string;
   desc: string;
@@ -12,6 +13,7 @@ interface School {
 
 const schools: School[] = [
   {
+    slug: "sabri-high-school",
     name: "Sabri High School (Gujarati Medium)",
     location: "📍 Junabazar, Karjan, Gujarat",
     desc: "Classes Pre-Primary to Std.12 (Commerce & Arts) | 400 students | Est. 1996",
@@ -20,22 +22,23 @@ const schools: School[] = [
     image: "/images/schools/school1.jpeg",
   },
   {
+    slug: "markaz-public-school",
     name: "Markaz Public School (English Medium)",
     location: "📍 Junabazar, Karjan, Gujarat",
-    desc: "Classes Pre-Primary to Std.12 (Science & Commerce)| 300 students | Est. 2007",
+    desc: "Classes Pre-Primary to Std.12 (Science & Commerce) | 300 students | Est. 2007",
     chips: ["300 Students", "98% Pass Rate", "Est. 2007"],
     bgColor: "linear-gradient(135deg,#fde8c0,#f5c972)",
     image: "/images/schools/school2.jpeg",
   },
   {
-    name: "M.S.High School (Eng-Guj Medium)",
+    slug: "ms-high-school-gujarati",
+    name: "M.S. High School (Eng–Guj Medium)",
     location: "📍 Karachiya, Gujarat",
-    desc: "Classes Pre-Primary to Std.9 | 400 students | Est. 2024",
-    chips: ["400 Students", "99% Pass Rate", "Est. 2024"],
+    desc: "Classes Primary to Std.9 | 400 students | Est. 2024",
+    chips: ["400 Students", "New in 2024", "Growing Fast"],
     bgColor: "linear-gradient(135deg,#d8e8ff,#a0c0f0)",
     image: "/images/schools/school3.png",
   },
-
 ];
 
 export default function SchoolsSection() {
@@ -66,12 +69,12 @@ export default function SchoolsSection() {
           </p>
         </div>
 
-        {/* Grid — 2 columns on desktop, 1 on mobile */}
+        {/* Grid — 3 columns on desktop, 2 on tablet, 1 on mobile */}
         <div
           role="list"
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
+            gridTemplateColumns: "repeat(3, 1fr)",
             gap: 32,
             marginTop: 48,
           }}
@@ -172,7 +175,7 @@ export default function SchoolsSection() {
                 </div>
 
                 {/* CTA */}
-                <a href="#" className="school-cta-btn">
+                <a href={`/ourschools/${school.slug}`} className="school-cta-btn">
                   Visit School Page →
                 </a>
               </div>
@@ -199,7 +202,10 @@ export default function SchoolsSection() {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 1023px) {
+          .schools-grid-responsive { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 640px) {
           .schools-grid-responsive { grid-template-columns: 1fr !important; }
         }
       `}</style>
