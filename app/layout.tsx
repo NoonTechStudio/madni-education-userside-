@@ -28,6 +28,10 @@ export const metadata: Metadata = {
   title: "Madni Education Trust — One Trust. Four Schools. A Thousand Futures.",
   description:
     "Madni Education Trust runs 4 schools providing quality education to underprivileged children through zakat, sadaqah, and subsidy funding across Gujarat since 2012.",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
   keywords: [
     "Madni Education Trust",
     "zakat",
