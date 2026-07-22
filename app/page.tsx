@@ -11,6 +11,7 @@ import BlogSection from "@/components/BlogSection/BlogSection";
 import ContactSection from "@/components/ContactSection/ContactSection";
 import Footer from "@/components/Footer/Footer";
 import ScrollAnimations from "@/components/ScrollAnimation/ScrollAnimations";
+import DataModeSwitcher from "@/components/DataModeSwitcher/DataModeSwitcher";
 
 export default function Home() {
   return (
@@ -189,6 +190,9 @@ export default function Home() {
 
       {/* 11. Footer */}
       <Footer />
+
+      {/* Floating Data Mode Switcher Widget */}
+      <DataModeSwitcher />
     </>
   );
 }

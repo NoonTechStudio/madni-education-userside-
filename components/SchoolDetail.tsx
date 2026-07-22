@@ -21,11 +21,203 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
+function buildDonateHref(params: Record<string, string | number | null | undefined>) {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && value !== "") search.set(key, String(value));
+  });
+  return `/donate?${search.toString()}`;
+}
+
+function SchoolSvgIcon({
+  name,
+  size = 24,
+  color = "currentColor",
+  style = {},
+}: {
+  name: string;
+  size?: number;
+  color?: string;
+  style?: React.CSSProperties;
+}) {
+  const common = {
+    width: size,
+    height: size,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: color,
+    strokeWidth: 2,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    style: { display: "inline-block", verticalAlign: "middle", ...style },
+  };
+
+  const key = String(name || "").toLowerCase().trim();
+
+  if (key.includes("trophy") || key.includes("award") || key === "🏆") {
+    return (
+      <svg {...common}>
+        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+        <path d="M4 22h16" />
+        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+        <path d="M18 4H6v7a6 6 0 0 0 12 0V4z" />
+      </svg>
+    );
+  }
+
+  if (key.includes("school") || key.includes("building") || key === "🏫") {
+    return (
+      <svg {...common}>
+        <path d="M14 22V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v18" />
+        <path d="M18 22V10a2 2 0 0 0-2-2h-2" />
+        <path d="M6 6h4" />
+        <path d="M6 10h4" />
+        <path d="M6 14h4" />
+        <path d="M6 18h4" />
+        <path d="M10 22v-4a2 2 0 0 1 4 0v4" />
+      </svg>
+    );
+  }
+
+  if (key.includes("science") || key.includes("lab") || key === "🔬") {
+    return (
+      <svg {...common}>
+        <path d="M9 3h6" />
+        <path d="M10 3v5.5L4.5 17.5A2 2 0 0 0 6.2 20.5h11.6a2 2 0 0 0 1.7-3L14 8.5V3" />
+        <path d="M8.5 13h7" />
+      </svg>
+    );
+  }
+
+  if (key.includes("book") || key.includes("library") || key === "📚") {
+    return (
+      <svg {...common}>
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      </svg>
+    );
+  }
+
+  if (key.includes("computer") || key.includes("tech") || key === "🖥️") {
+    return (
+      <svg {...common}>
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+        <line x1="8" y1="21" x2="16" y2="21" />
+        <line x1="12" y1="17" x2="12" y2="21" />
+      </svg>
+    );
+  }
+
+  if (key.includes("grad") || key === "🎓") {
+    return (
+      <svg {...common}>
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+      </svg>
+    );
+  }
+
+  if (key.includes("sport") || key.includes("ball") || key === "⚽") {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 2a14.5 14.5 0 0 0 0 20M12 2a14.5 14.5 0 0 1 0 20M2 12h20" />
+      </svg>
+    );
+  }
+
+  if (key.includes("bus") || key.includes("transport") || key === "🚌") {
+    return (
+      <svg {...common}>
+        <path d="M19 17h2l.64-2.54A2 2 0 0 0 19.7 12H19V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6h-.7a2 2 0 0 0-1.94 2.46L3 17h2" />
+        <circle cx="7" cy="17" r="2" />
+        <circle cx="17" cy="17" r="2" />
+      </svg>
+    );
+  }
+
+  if (key.includes("video") || key.includes("camera") || key === "📹") {
+    return (
+      <svg {...common}>
+        <path d="M23 7l-7 5 7 5V7z" />
+        <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+      </svg>
+    );
+  }
+
+  if (key.includes("doc") || key.includes("file") || key === "📄") {
+    return (
+      <svg {...common}>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+      </svg>
+    );
+  }
+
+  if (key.includes("sprout") || key.includes("plant") || key === "🌱") {
+    return (
+      <svg {...common}>
+        <path d="M7 20h10" />
+        <path d="M12 20v-8" />
+        <path d="M12 12c-3 0-6-2-6-6 4 0 6 2 6 6z" />
+        <path d="M12 12c3 0 6-2 6-6-4 0-6 2-6 6z" />
+      </svg>
+    );
+  }
+
+  if (key.includes("zakat") || key.includes("heart") || key === "💚") {
+    return (
+      <svg {...common} fill="currentColor">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      </svg>
+    );
+  }
+
+  if (key.includes("lillah") || key.includes("star") || key === "🌟") {
+    return (
+      <svg {...common} fill="currentColor">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+      </svg>
+    );
+  }
+
+  if (key.includes("progress") || key.includes("refresh") || key === "🔄") {
+    return (
+      <svg {...common}>
+        <path d="M23 4v6h-6" />
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+      </svg>
+    );
+  }
+
+  if (key.includes("plan") || key.includes("list") || key === "📋") {
+    return (
+      <svg {...common}>
+        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg {...common}>
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
+  );
+}
+
 function ImgPlaceholder({
-  emoji = "🏫",
+  icon = "school",
+  emoji,
   bg = "#EAF4F0",
   style = {},
 }: {
+  icon?: string;
   emoji?: string;
   bg?: string;
   style?: React.CSSProperties;
@@ -37,13 +229,13 @@ function ImgPlaceholder({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 48,
+        color: "#1A6B5A",
         width: "100%",
         height: "100%",
         ...style,
       }}
     >
-      {emoji}
+      <SchoolSvgIcon name={icon || emoji || "school"} size={42} color="#1A6B5A" />
     </div>
   );
 }
@@ -169,9 +361,11 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
 
   // ─── Derived ─────────────────────────────────────────────────────────────────
   const filteredGallery = d.galleryImages.filter(
-    (img) => galleryFilter === "All" || img.tag === galleryFilter
+    (img: any) => galleryFilter === "All" || img.tag === galleryFilter || img.year === galleryFilter || img.category === galleryFilter
   );
-  const galleryTags = ["All", ...Array.from(new Set(d.galleryImages.map((i) => i.tag)))];
+  const yearBundles = Array.from(new Set(d.galleryImages.map((i: any) => i.year).filter(Boolean))).sort().reverse();
+  const categoryList = Array.from(new Set(d.galleryImages.map((i: any) => i.category || i.tag).filter(Boolean)));
+  const galleryTags = Array.from(new Set(["All", ...yearBundles, ...categoryList]));
 
   const iStyle: React.CSSProperties = {
     width: "100%",
@@ -476,9 +670,11 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           {/* Top achievers */}
           <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 22, color: "#1C1C1C", marginBottom: 20 }}>Top Achievers</h3>
           <div style={{ display: "flex", gap: 20, flexWrap: "wrap", marginBottom: 48 }}>
-            {d.achievers.map((a) => (
-              <div key={a.name} className="card-lift" style={{ background: "#fff", borderRadius: 20, padding: "28px 24px", minWidth: 180, flex: "1 1 180px", textAlign: "center", boxShadow: "0 4px 16px rgba(26,107,90,0.08)" }}>
-                <div style={{ fontSize: 40, marginBottom: 12 }}>🏆</div>
+            {d.achievers.map((a, i) => (
+              <div key={`${a.name}-${i}`} className="card-lift" style={{ background: "#fff", borderRadius: 20, padding: "28px 24px", minWidth: 180, flex: "1 1 180px", textAlign: "center", boxShadow: "0 4px 16px rgba(26,107,90,0.08)" }}>
+                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#FFF8EC", color: "#F5A623", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px" }}>
+                  <SchoolSvgIcon name="trophy" size={26} color="#F5A623" />
+                </div>
                 <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 600, fontSize: 16, color: "#1C1C1C", marginBottom: 4 }}>{a.name}</div>
                 <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#8A8A8A", marginBottom: 12 }}>{a.grade} · {a.year}</div>
                 <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 800, fontSize: 30, color: "#1A6B5A", marginBottom: 12 }}>{a.score}</div>
@@ -516,10 +712,17 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
             {/* Left — grid */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
               {d.facilities.map((f, i) => (
-                <div key={f.name} className="card-lift facility-card" style={{ background: "#fff", borderRadius: 20, padding: "24px 16px", textAlign: "center", boxShadow: "0 4px 16px rgba(26,107,90,0.07)" }}>
-                  <div style={{ width: 56, height: 56, borderRadius: "50%", background: i % 2 === 0 ? "#EAF4F0" : "#FFF8EC", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, margin: "0 auto 12px", transition: "transform 0.3s" }}>{f.icon}</div>
-                  <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 600, fontSize: 15, color: "#1C1C1C", marginBottom: 4 }}>{f.name}</div>
-                  <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 12, color: "#8A8A8A" }}>{f.detail}</div>
+                <div key={`${f.name}-${i}`} className="card-lift facility-card" style={{ background: "#fff", borderRadius: 20, padding: "24px 16px", textAlign: "center", boxShadow: "0 4px 16px rgba(26,107,90,0.07)", display: "flex", flexDirection: "column", alignItems: "center", minHeight: 168 }}>
+                  <div style={{ width: 56, height: 56, borderRadius: "50%", background: i % 2 === 0 ? "#EAF4F0" : "#FFF8EC", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", transition: "transform 0.3s" }}>
+                    <SchoolSvgIcon name={f.icon || f.name} size={26} color="#1A6B5A" />
+                  </div>
+                  <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 15, color: "#1C1C1C", marginBottom: 8, lineHeight: 1.3, overflowWrap: "anywhere" }}>{f.name || "School Facility"}</div>
+                  <span style={{ background: i % 2 === 0 ? "#EAF4F0" : "#FFF8EC", color: "#1A6B5A", fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 10, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", padding: "4px 10px", borderRadius: 9999, marginBottom: 8 }}>
+                    {(f as any).category || "Facility"}
+                  </span>
+                  {f.detail && (
+                    <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 12, color: "#8A8A8A", lineHeight: 1.5, overflowWrap: "anywhere" }}>{f.detail}</div>
+                  )}
                 </div>
               ))}
             </div>
@@ -527,14 +730,14 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
             {/* Right — image collage */}
             <div>
               <div style={{ borderRadius: 16, overflow: "hidden", height: 200, background: "#EAF4F0", marginBottom: 12 }}>
-                <ImgPlaceholder emoji="🏫" bg="#EAF4F0" />
+                <ImgPlaceholder icon="school" bg="#EAF4F0" />
               </div>
               <div style={{ display: "flex", gap: 12 }}>
                 <div style={{ flex: 1, borderRadius: 16, overflow: "hidden", height: 160, background: "#FFF8EC" }}>
-                  <ImgPlaceholder emoji="🔬" bg="#FFF8EC" />
+                  <ImgPlaceholder icon="science" bg="#FFF8EC" />
                 </div>
                 <div style={{ flex: 1, borderRadius: 16, overflow: "hidden", height: 160, background: "#EAF4F0" }}>
-                  <ImgPlaceholder emoji="📚" bg="#EAF4F0" />
+                  <ImgPlaceholder icon="book" bg="#EAF4F0" />
                 </div>
               </div>
               <div style={{ marginTop: 16, background: "#F5A623", color: "#fff", fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 600, fontSize: 14, padding: "10px 20px", borderRadius: 9999, textAlign: "center" }}>
@@ -554,8 +757,9 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           {/* Tab bar */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 32 }}>
             {d.activities.map((cat, i) => (
-              <button key={cat.category} onClick={() => handleTabChange(i)} style={{ background: activeTab === i ? "#1A6B5A" : "#fff", color: activeTab === i ? "#fff" : "#1A6B5A", border: "1.5px solid #1A6B5A", borderRadius: 9999, padding: "10px 22px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 14, cursor: "pointer", transition: "all 0.25s" }}>
-                {cat.icon} {cat.category}
+              <button key={`${cat.category}-${i}`} onClick={() => handleTabChange(i)} style={{ background: activeTab === i ? "#1A6B5A" : "#fff", color: activeTab === i ? "#fff" : "#1A6B5A", border: "1.5px solid #1A6B5A", borderRadius: 9999, padding: "10px 22px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 14, cursor: "pointer", transition: "all 0.25s", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <SchoolSvgIcon name={cat.icon || cat.category} size={16} color={activeTab === i ? "#fff" : "#1A6B5A"} />
+                {cat.category}
               </button>
             ))}
           </div>
@@ -563,8 +767,8 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           {/* Tab panel */}
           <div style={{ opacity: tabFade ? 1 : 0, transition: "opacity 0.2s ease", marginBottom: 48 }}>
             <div className="activities-grid">
-              {d.activities[activeTab].items.map((item) => (
-                <div key={item.name} className="card-lift" style={{ background: "#fff", borderRadius: 20, padding: "20px 24px", borderLeft: "3px solid #F5A623", boxShadow: "0 2px 12px rgba(26,107,90,0.07)" }}>
+              {d.activities[activeTab].items.map((item, i) => (
+                <div key={`${item.name}-${i}`} className="card-lift" style={{ background: "#fff", borderRadius: 20, padding: "20px 24px", borderLeft: "3px solid #F5A623", boxShadow: "0 2px 12px rgba(26,107,90,0.07)" }}>
                   <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 600, fontSize: 16, color: "#1C1C1C", marginBottom: 6 }}>{item.name}</div>
                   <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#8A8A8A", lineHeight: 1.5 }}>{item.desc}</div>
                 </div>
@@ -601,34 +805,69 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           <p style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 20, color: "#F5A623", margin: "0 0 48px" }}>Every brick is a child&apos;s better tomorrow.</p>
 
           <div className="projects-grid">
-            {d.projects.map((proj) => {
+            {d.projects.map((proj, i) => {
               const statusColor = proj.status === "Completed" ? "#1A6B5A" : proj.status === "In Progress" ? "#F5A623" : "#ccc";
               const statusBg = proj.status === "Completed" ? "#EAF4F0" : proj.status === "In Progress" ? "#FFF8EC" : "#F5F5F5";
               const statusText = proj.status === "Completed" ? "#1A6B5A" : proj.status === "In Progress" ? "#c47a00" : "#888";
-              const statusLabel = proj.status === "Completed" ? "✅ Completed" : proj.status === "In Progress" ? "🔄 In Progress" : "📋 Planned";
+              const statusLabel = proj.status === "Completed" ? "100% Completed" : proj.status === "In Progress" ? "In Progress" : "Planned";
+              const statusIcon = proj.status === "Completed" ? "check" : proj.status === "In Progress" ? "progress" : "plan";
+              const estimated = (proj as any).estimated || 0;
+              const paid = (proj as any).paid || 0;
+              const mediaUrl = (proj as any).mediaUrl;
+
               return (
-                <div key={proj.name} className="card-lift" style={{ background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(26,107,90,0.09)", overflow: "hidden", position: "relative", display: "flex" }}>
-                  {/* Left accent bar */}
-                  <div style={{ width: 4, background: statusColor, flexShrink: 0 }} />
-                  <div style={{ padding: "28px 28px 28px 24px", flex: 1 }}>
-                    {/* Status badge */}
-                    <span style={{ display: "inline-block", background: statusBg, color: statusText, fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 11, padding: "4px 12px", borderRadius: 9999, marginBottom: 16 }}>{statusLabel}</span>
-                    {/* Icon */}
-                    <div style={{ width: 64, height: 64, borderRadius: "50%", background: proj.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, marginBottom: 16 }}>{proj.icon}</div>
-                    {/* Name + year */}
-                    <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 19, color: "#1C1C1C", marginBottom: 4 }}>{proj.name}</div>
-                    <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#8A8A8A", marginBottom: 12 }}>{proj.year}</div>
-                    {/* Description */}
-                    <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 15, color: "#4A4A4A", lineHeight: 1.6, margin: "0 0 16px" }}>{proj.description}</p>
-                    {/* Progress bar — only for In Progress / Planned */}
-                    {proj.status !== "Completed" && (
-                      <div>
-                        <div style={{ height: 6, borderRadius: 9999, background: "#eee", overflow: "hidden" }}>
-                          <div style={{ height: "100%", borderRadius: 9999, background: "#1A6B5A", width: progressVisible ? `${proj.progress}%` : "0%", transition: "width 1.4s ease 0.2s" }} />
+                <div key={`${proj.name}-${i}`} className="card-lift" style={{ background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(26,107,90,0.09)", overflow: "hidden", position: "relative", display: "flex", flexDirection: "column" }}>
+                  <div style={{ display: "flex", flex: 1 }}>
+                    {/* Left accent bar */}
+                    <div style={{ width: 4, background: statusColor, flexShrink: 0 }} />
+                    <div style={{ padding: "28px 28px 28px 24px", flex: 1, display: "flex", flexDirection: "column" }}>
+                      {/* Status badge */}
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: statusBg, color: statusText, fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 11, padding: "4px 12px", borderRadius: 9999, marginBottom: 16, width: "fit-content" }}>
+                        <SchoolSvgIcon name={statusIcon} size={13} color={statusText} /> {statusLabel}
+                      </span>
+
+                      {/* Photo Image or Icon Bubble */}
+                      {mediaUrl ? (
+                        <div style={{ width: "100%", height: 160, borderRadius: 16, overflow: "hidden", marginBottom: 16, background: proj.color || "#EAF4F0", position: "relative" }}>
+                          <img src={mediaUrl} alt={proj.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         </div>
-                        <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 12, color: "#8A8A8A", textAlign: "right", marginTop: 4 }}>{proj.progress}% Complete</div>
-                      </div>
-                    )}
+                      ) : (
+                        <div style={{ width: 56, height: 56, borderRadius: "50%", background: proj.color || "#EAF4F0", color: "#1A6B5A", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+                          <SchoolSvgIcon name={proj.icon || "building"} size={28} color="#1A6B5A" />
+                        </div>
+                      )}
+                      {/* Name + year */}
+                      <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 19, color: "#1C1C1C", marginBottom: 4 }}>{proj.name}</div>
+                      <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#8A8A8A", marginBottom: 12 }}>{proj.year}</div>
+                      {/* Description */}
+                      <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 15, color: "#4A4A4A", lineHeight: 1.6, margin: "0 0 16px" }}>{proj.description}</p>
+                      
+                      {/* Tracking Progress & Pay Button */}
+                      {proj.status !== "Completed" ? (
+                        <div style={{ marginTop: "auto", paddingTop: 12 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 600, color: "#1A6B5A", marginBottom: 6 }}>
+                            <span>Funding Track:</span>
+                            <span>₹{Number(paid).toLocaleString("en-IN")} / ₹{Number(estimated).toLocaleString("en-IN")}</span>
+                          </div>
+                          <div style={{ height: 6, borderRadius: 9999, background: "#eee", overflow: "hidden", marginBottom: 12 }}>
+                            <div style={{ height: "100%", borderRadius: 9999, background: "#1A6B5A", width: progressVisible ? `${proj.progress}%` : "0%", transition: "width 1.4s ease 0.2s" }} />
+                          </div>
+	                          <a href={buildDonateHref({
+	                            campaign: (proj as any).referenceId,
+	                            type: (proj as any).type === "EVENT" ? "event" : "construction",
+	                            amount: Math.max(100, Number(estimated) - Number(paid)),
+	                            title: proj.name,
+	                            school: d.shortName,
+	                          })} className="pill-btn pill-btn-amber" style={{ width: "100%", justifyContent: "center", fontSize: 13 }}>
+                            Pay & Track Contribution ({proj.progress}%) →
+                          </a>
+                        </div>
+                      ) : (
+                        <div style={{ marginTop: "auto", paddingTop: 12, fontSize: 12, fontWeight: 700, color: "#1A6B5A", display: "flex", alignItems: "center", gap: 6 }}>
+                          <SchoolSvgIcon name="check" size={16} color="#1A6B5A" /> Fully Funded & Verified Infrastructure
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -638,7 +877,7 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           {/* Donation nudge */}
           <div style={{ marginTop: 40, background: "#FFF8EC", border: "1px solid rgba(245,166,35,0.3)", borderRadius: 20, padding: "28px 32px", textAlign: "center" }}>
             <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 15, color: "#4A4A4A", margin: "0 0 16px", lineHeight: 1.65 }}>
-              Help fund our next project. Your donation directly builds this school.
+              Help fund our next project at {d.shortName}. Your donation directly builds this school.
             </p>
             <a href="/donate" className="pill-btn pill-btn-outline-teal" style={{ fontSize: 14 }}>Donate to Infrastructure →</a>
           </div>
@@ -653,8 +892,8 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
 
           {/* Filter pills */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 32 }}>
-            {galleryTags.map((tag) => (
-              <button key={tag} onClick={() => setGalleryFilter(tag)} style={{ background: galleryFilter === tag ? "#F5A623" : "#fff", color: galleryFilter === tag ? "#fff" : "#1A6B5A", border: "none", borderRadius: 9999, padding: "8px 20px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all 0.25s" }}>
+            {galleryTags.map((tag, i) => (
+              <button key={`${tag}-${i}`} onClick={() => setGalleryFilter(tag)} style={{ background: galleryFilter === tag ? "#F5A623" : "#fff", color: galleryFilter === tag ? "#fff" : "#1A6B5A", border: "none", borderRadius: 9999, padding: "8px 20px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 13, cursor: "pointer", transition: "all 0.25s" }}>
                 {tag}
               </button>
             ))}
@@ -662,12 +901,23 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
 
           {/* Gallery grid */}
           <div className="gallery-grid">
-            {filteredGallery.map((img, i) => (
-              <div key={img.caption} onClick={() => setLightbox({ ...img, index: i })} className="gallery-tile" style={{ borderRadius: 16, overflow: "hidden", position: "relative", cursor: "pointer", aspectRatio: "4/3", background: "#EAF4F0" }}>
-                <ImgPlaceholder emoji={["🏫","🔬","🎓","⚽","📚","🖥️"][i % 6]} bg={["#EAF4F0","#FFF8EC","#E8F4EC","#FFF0E0","#EAF4F0","#F0F0F0"][i % 6]} />
+            {filteredGallery.map((img: any, i: number) => (
+              <div key={`${img.caption}-${i}`} onClick={() => setLightbox({ ...img, index: i })} className="gallery-tile" style={{ borderRadius: 16, overflow: "hidden", position: "relative", cursor: "pointer", aspectRatio: "4/3", background: "#EAF4F0" }}>
+                {img.src ? (
+                  <img src={img.src} alt={img.caption} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  <ImgPlaceholder icon={["school","science","grad","sport","book","computer"][i % 6]} bg={["#EAF4F0","#FFF8EC","#E8F4EC","#FFF0E0","#EAF4F0","#F0F0F0"][i % 6]} />
+                )}
+                {img.mediaType === "VIDEO" && (
+                  <div style={{ position: "absolute", top: 12, left: 12, background: "rgba(0,0,0,0.6)", color: "#fff", borderRadius: 9999, padding: "4px 10px", display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600 }}>
+                    <SchoolSvgIcon name="video" size={14} color="#fff" /> Video
+                  </div>
+                )}
                 <div className="gallery-overlay">
                   <span style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#fff", position: "absolute", bottom: 12, left: 12 }}>{img.caption}</span>
-                  <span style={{ background: "#F5A623", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 11, padding: "3px 10px", borderRadius: 9999, position: "absolute", bottom: 12, right: 12 }}>{img.tag}</span>
+                  <span style={{ background: "#F5A623", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 11, padding: "3px 10px", borderRadius: 9999, position: "absolute", bottom: 12, right: 12 }}>
+                    {img.year ? `${img.year} · ${img.category || img.tag}` : img.tag}
+                  </span>
                 </div>
               </div>
             ))}
@@ -675,7 +925,9 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
 
           {/* Video link */}
           <p style={{ textAlign: "center", marginTop: 32, fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 15, color: "#F5A623", fontWeight: 500 }}>
-            <a href="#" style={{ color: "#F5A623", textDecoration: "none" }}>📹 View Video Gallery →</a>
+            <a href="#" style={{ color: "#F5A623", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <SchoolSvgIcon name="video" size={18} color="#F5A623" /> View Video Gallery →
+            </a>
           </p>
         </div>
       </section>
@@ -684,8 +936,16 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
       {lightbox && (
         <div onClick={() => setLightbox(null)} style={{ position: "fixed", inset: 0, zIndex: 1000, background: "rgba(0,0,0,0.9)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", animation: "fadeIn 0.2s ease" }}>
           <button onClick={() => setLightbox(null)} style={{ position: "absolute", top: 20, right: 24, background: "none", border: "none", color: "#fff", fontSize: 32, cursor: "pointer", lineHeight: 1 }}>✕</button>
-          <div onClick={(e) => e.stopPropagation()} style={{ position: "relative", maxWidth: "90vw", maxHeight: "80vh", borderRadius: 12, overflow: "hidden", background: "#EAF4F0", minWidth: 300, minHeight: 200 }}>
-            <ImgPlaceholder emoji="🏫" bg="#EAF4F0" style={{ minHeight: 300 }} />
+          <div onClick={(e) => e.stopPropagation()} style={{ position: "relative", maxWidth: "90vw", maxHeight: "80vh", borderRadius: 12, overflow: "hidden", background: "#EAF4F0", minWidth: 300, minHeight: 200, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {lightbox.src ? (
+              (lightbox as any).mediaType === "VIDEO" ? (
+                <video src={lightbox.src} controls autoPlay style={{ maxWidth: "100%", maxHeight: "75vh" }} />
+              ) : (
+                <img src={lightbox.src} alt={lightbox.caption} style={{ maxWidth: "100%", maxHeight: "75vh", objectFit: "contain" }} />
+              )
+            ) : (
+              <ImgPlaceholder icon="school" bg="#EAF4F0" style={{ minHeight: 300 }} />
+            )}
           </div>
           <p style={{ color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 15, marginTop: 16 }}>{lightbox.caption}</p>
           {/* Arrows */}
@@ -701,8 +961,8 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           <p style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 20, color: "#F5A623", margin: "0 0 48px" }}>Dedicated educators. Life-changing mentors.</p>
 
           <div className="faculty-grid">
-            {d.faculty.map((f) => (
-              <div key={f.name} className="card-lift faculty-card" style={{ background: "#fff", borderRadius: 24, padding: "32px 24px", textAlign: "center", boxShadow: "0 4px 20px rgba(26,107,90,0.09)" }}>
+            {d.faculty.map((f, i) => (
+              <div key={`${f.name}-${i}`} className="card-lift faculty-card" style={{ background: "#fff", borderRadius: 24, padding: "32px 24px", textAlign: "center", boxShadow: "0 4px 20px rgba(26,107,90,0.09)" }}>
                 {/* Avatar */}
                 <div style={{ width: 80, height: 80, borderRadius: "50%", border: "3px solid #1A6B5A", background: "#EAF4F0", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", overflow: "hidden" }}>
                   <span style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 600, fontSize: 24, color: "#1A6B5A" }}>{getInitials(f.name)}</span>
@@ -740,8 +1000,8 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
               <div style={{ marginBottom: 28 }}>
                 <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 16, color: "#1C1C1C", marginBottom: 12 }}>Currently Accepting Admissions For:</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {d.admissions.openClasses.map((cls) => (
-                    <span key={cls} style={{ background: "#F5A623", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 13, padding: "6px 16px", borderRadius: 9999 }}>{cls}</span>
+                    {d.admissions.openClasses.map((cls, i) => (
+                    <span key={`${cls}-${i}`} style={{ background: "#F5A623", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 13, padding: "6px 16px", borderRadius: 9999 }}>{cls}</span>
                   ))}
                 </div>
               </div>
@@ -762,9 +1022,9 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
               {/* Documents */}
               <div style={{ marginBottom: 20 }}>
                 <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 16, color: "#1C1C1C", marginBottom: 12 }}>Documents Required</div>
-                {d.admissions.documents.map((doc) => (
-                  <div key={doc} style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#4A4A4A", lineHeight: 2, display: "flex", alignItems: "center", gap: 8 }}>
-                    <span>📄</span> {doc}
+                {d.admissions.documents.map((doc, i) => (
+                  <div key={`${doc}-${i}`} style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#4A4A4A", lineHeight: 2, display: "flex", alignItems: "center", gap: 8 }}>
+                    <SchoolSvgIcon name="doc" size={16} color="#1A6B5A" /> {doc}
                   </div>
                 ))}
               </div>
@@ -775,7 +1035,9 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
             <div style={{ background: "#fff", borderRadius: 24, padding: "36px 32px", boxShadow: "0 4px 28px rgba(26,107,90,0.10)", height: "fit-content" }}>
               {admSubmitted ? (
                 <div style={{ textAlign: "center", padding: "40px 0" }}>
-                  <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+                  <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#EAF4F0", color: "#1A6B5A", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                    <SchoolSvgIcon name="check" size={32} color="#1A6B5A" />
+                  </div>
                   <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 20, color: "#1A6B5A", margin: "0 0 10px" }}>Application Received!</h3>
                   <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 15, color: "#4A4A4A" }}>We will contact you within 24 hours.</p>
                 </div>
@@ -788,7 +1050,7 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
                     <input required type="tel" placeholder="Mobile Number" value={admForm.phone} onChange={(e) => setAdmForm({ ...admForm, phone: e.target.value })} style={iStyle} className="form-input" />
                     <select required value={admForm.cls} onChange={(e) => setAdmForm({ ...admForm, cls: e.target.value })} style={{ ...iStyle, appearance: "none" }} className="form-input">
                       <option value="" disabled>Class Applying For…</option>
-                      {d.admissions.openClasses.map((cls) => <option key={cls} value={cls}>{cls}</option>)}
+                    {d.admissions.openClasses.map((cls, i) => <option key={`${cls}-${i}`} value={cls}>{cls}</option>)}
                     </select>
                     <textarea required rows={4} placeholder="Your Message" value={admForm.message} onChange={(e) => setAdmForm({ ...admForm, message: e.target.value })} style={{ ...iStyle, resize: "vertical" }} className="form-input" />
                     <button type="submit" className="pill-btn pill-btn-teal" style={{ width: "100%", justifyContent: "center", fontSize: 15 }}>Apply for Admission</button>
@@ -811,8 +1073,8 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           <p style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 20, color: "#F5A623", margin: "0 0 48px" }}>Voices that speak louder than any report.</p>
 
           <div className="testimonials-grid">
-            {d.testimonials.map((t) => (
-              <div key={t.name} className="card-lift" style={{ background: "#fff", borderRadius: 24, padding: "36px 32px", position: "relative", overflow: "hidden", boxShadow: "0 4px 20px rgba(26,107,90,0.08)" }}>
+            {d.testimonials.map((t, i) => (
+              <div key={`${t.name}-${i}`} className="card-lift" style={{ background: "#fff", borderRadius: 24, padding: "36px 32px", position: "relative", overflow: "hidden", boxShadow: "0 4px 20px rgba(26,107,90,0.08)" }}>
                 {/* Decorative quote mark */}
                 <div aria-hidden="true" style={{ position: "absolute", top: -8, left: 16, fontFamily: "var(--font-epilogue-var),sans-serif", fontSize: 96, color: "#F5A623", opacity: 0.12, lineHeight: 1, pointerEvents: "none", userSelect: "none" }}>&ldquo;</div>
                 <blockquote style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 20, color: "#1C1C1C", lineHeight: 1.55, margin: "0 0 24px", position: "relative", zIndex: 1 }}>
@@ -842,14 +1104,65 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
           <h2 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 800, fontSize: "clamp(26px, 5vw, 40px)", color: "#0F3D35", margin: "0 0 18px", lineHeight: 1.15 }}>{d.donation.headline}</h2>
           <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 17, color: "rgba(15,61,53,0.8)", lineHeight: 1.7, maxWidth: 580, margin: "0 auto 40px" }}>{d.donation.subline}</p>
 
-          {/* Tier cards */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "center", marginBottom: 32, maxWidth: 700, margin: "0 auto 32px" }}>
-            {d.donation.amounts.map((tier) => (
-              <div key={tier.label} className="card-lift" style={{ background: "#fff", borderRadius: 20, padding: "28px 24px", textAlign: "center", flex: "1 1 160px", boxShadow: "0 4px 16px rgba(0,0,0,0.1)" }}>
-                <div style={{ fontSize: 40, marginBottom: 10 }}>{tier.icon}</div>
-                <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 800, fontSize: 26, color: "#1A6B5A", marginBottom: 6 }}>{tier.amount}</div>
-                <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 500, fontSize: 13, color: "#4A4A4A", marginBottom: 14 }}>{tier.label}</div>
-                <a href="/donate" style={{ display: "inline-block", padding: "7px 16px", border: "2px solid #1A6B5A", borderRadius: 9999, fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 12, color: "#1A6B5A", textDecoration: "none" }}>Donate This Amount →</a>
+          {/* Needy Standards Cards inside Yellow Sponsor Section */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 36, maxWidth: 960, margin: "0 auto 36px" }}>
+            {(((d as any).financialAidStandards || []).filter((s: any) => s.zakatCount > 0 || s.lillahCount > 0).length > 0
+              ? ((d as any).financialAidStandards || []).filter((s: any) => s.zakatCount > 0 || s.lillahCount > 0)
+              : [
+                  { standardName: "Std. 10 - A,B,C", fees: 10000, zakatCount: 1, lillahCount: 4, zakatGoal: 10000, lillahGoal: 40000, zakatPaid: 0, lillahPaid: 0, zakatPct: 0, lillahPct: 0 },
+                ]
+            ).map((std: any, i: number) => (
+              <div key={`${std.standardName}-${i}`} className="card-lift" style={{ background: "#fff", borderRadius: 20, padding: "24px 22px", textAlign: "left", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 17, color: "#1C1C1C" }}>{std.standardName}</div>
+                  <span style={{ background: "#EAF4F0", color: "#1A6B5A", fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 9999 }}>Fees: ₹{Number(std.fees).toLocaleString("en-IN")}/year</span>
+                </div>
+
+                {/* Zakat Box */}
+                {std.zakatCount > 0 && (
+                  <div style={{ background: "#EAF4F0", borderRadius: 14, padding: 14 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: "#1A6B5A", marginBottom: 6 }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 4 }}><SchoolSvgIcon name="zakat" size={14} color="#1A6B5A" /> Zakat Need ({std.zakatCount} Student{std.zakatCount > 1 ? "s" : ""})</span>
+                      <span>₹{Number(std.zakatPaid).toLocaleString("en-IN")} / ₹{Number(std.zakatGoal).toLocaleString("en-IN")}</span>
+                    </div>
+                    <div style={{ height: 5, background: "rgba(26,107,90,0.2)", borderRadius: 9999, overflow: "hidden", marginBottom: 10 }}>
+                      <div style={{ height: "100%", background: "#1A6B5A", width: `${std.zakatPct}%`, borderRadius: 9999 }} />
+                    </div>
+	                    <a href={buildDonateHref({
+	                      campaign: std.standardId,
+	                      schoolId: std.schoolId,
+	                      type: "zakat",
+	                      amount: Math.max(100, Number(std.zakatGoal) - Number(std.zakatPaid)),
+	                      title: `${std.standardName} Zakat Aid`,
+	                      school: d.shortName,
+	                    })} className="pill-btn pill-btn-teal" style={{ width: "100%", justifyContent: "center", fontSize: 12, padding: "6px 12px" }}>
+                      Pay Zakat Aid ({std.zakatPct}% Funded) →
+                    </a>
+                  </div>
+                )}
+
+                {/* Lillah Box */}
+                {std.lillahCount > 0 && (
+                  <div style={{ background: "#FFF8EC", borderRadius: 14, padding: 14 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 700, color: "#c27a00", marginBottom: 6 }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 4 }}><SchoolSvgIcon name="lillah" size={14} color="#c27a00" /> Lillah Need ({std.lillahCount} Student{std.lillahCount > 1 ? "s" : ""})</span>
+                      <span>₹{Number(std.lillahPaid).toLocaleString("en-IN")} / ₹{Number(std.lillahGoal).toLocaleString("en-IN")}</span>
+                    </div>
+                    <div style={{ height: 5, background: "rgba(245,166,35,0.25)", borderRadius: 9999, overflow: "hidden", marginBottom: 10 }}>
+                      <div style={{ height: "100%", background: "#F5A623", width: `${std.lillahPct}%`, borderRadius: 9999 }} />
+                    </div>
+	                    <a href={buildDonateHref({
+	                      campaign: std.standardId,
+	                      schoolId: std.schoolId,
+	                      type: "lillah",
+	                      amount: Math.max(100, Number(std.lillahGoal) - Number(std.lillahPaid)),
+	                      title: `${std.standardName} Lillah Aid`,
+	                      school: d.shortName,
+	                    })} className="pill-btn pill-btn-amber" style={{ width: "100%", justifyContent: "center", fontSize: 12, padding: "6px 12px" }}>
+                      Pay Lillah Aid ({std.lillahPct}% Funded) →
+                    </a>
+                  </div>
+                )}
               </div>
             ))}
           </div>

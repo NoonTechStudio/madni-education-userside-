@@ -1,9 +1,86 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
+
+// ─────────────────────────────────────────────
+// VECTOR SVG ICONS
+// ─────────────────────────────────────────────
+function IconStar({ size = 14, color = "currentColor" }: { size?: number; color?: string }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+    );
+}
+
+function IconCalendar({ size = 14, color = "currentColor" }: { size?: number; color?: string }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+    );
+}
+
+function IconClock({ size = 14, color = "currentColor" }: { size?: number; color?: string }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+        </svg>
+    );
+}
+
+function IconInbox({ size = 48, color = "currentColor" }: { size?: number; color?: string }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
+            <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+        </svg>
+    );
+}
+
+function IconTeacher({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 3h20" />
+            <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" />
+            <path d="m7 21 5-5 5 5" />
+        </svg>
+    );
+}
+
+function IconGraduation({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+            <path d="M6 12v5c3 3 9 3 12 0v-5" />
+        </svg>
+    );
+}
+
+function IconUserCheck({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <polyline points="16 11 18 13 22 9" />
+        </svg>
+    );
+}
+
+function IconCheckCircle({ size = 48, color = "currentColor" }: { size?: number; color?: string }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+    );
+}
 
 // ─────────────────────────────────────────────
 // PAGE DATA
@@ -22,6 +99,7 @@ const INSIGHTS_DATA = {
         {
             id: 1,
             title: "Why Gujarati Medium Education Still Matters in 2025",
+            school: "Sabri High School",
             category: "Education Guides",
             author: "Mr. Abdul Hamid Shaikh",
             authorRole: "Principal, Sabri High School",
@@ -36,6 +114,7 @@ const INSIGHTS_DATA = {
         {
             id: 2,
             title: "From Karjan to Commerce: My Journey After Sabri School",
+            school: "Sabri High School",
             category: "Alumni Stories",
             author: "Yusuf Patel",
             authorRole: "Alumni — Batch 2023",
@@ -50,6 +129,7 @@ const INSIGHTS_DATA = {
         {
             id: 3,
             title: "Sabri High School Achieves 97.9% SSC Pass Rate in 2024",
+            school: "Sabri High School",
             category: "School News",
             author: "Madni Education Trust",
             authorRole: "Official Announcement",
@@ -64,6 +144,7 @@ const INSIGHTS_DATA = {
         {
             id: 4,
             title: "How Zakat Can Transform Local Education: A Practical View",
+            school: "Madni Education Trust",
             category: "Education Guides",
             author: "Mrs. Fatema Vohra",
             authorRole: "Senior Teacher, Sabri High School",
@@ -78,6 +159,7 @@ const INSIGHTS_DATA = {
         {
             id: 5,
             title: "My First Day as a Student Writer: What I Learned",
+            school: "Sabri High School",
             category: "Student Voice",
             author: "Rukhsar Vohra",
             authorRole: "Std. 12 Student, Sabri High School",
@@ -92,6 +174,7 @@ const INSIGHTS_DATA = {
         {
             id: 6,
             title: "5 Study Habits That Actually Work for GSEB Students",
+            school: "Sabri High School",
             category: "Education Guides",
             author: "Mr. Riyaz Memon",
             authorRole: "Teacher, Sabri High School",
@@ -182,18 +265,89 @@ function ArticleImage({
 // MAIN PAGE COMPONENT
 // ─────────────────────────────────────────────
 export default function InsightsPage() {
+    const [dataSource, setDataSource] = useState<'REAL' | 'MOCK'>('REAL');
+    const [dynamicBlogs, setDynamicBlogs] = useState<any[]>([]);
     const [activeCategory, setActiveCategory] = useState("All");
     const [email, setEmail] = useState("");
     const [subscribed, setSubscribed] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [heroSearch, setHeroSearch] = useState("");
 
-    const featuredArticle = INSIGHTS_DATA.articles.find((a) => a.featured);
+    // Fetch real approved blogs & news updates from backend database
+    useEffect(() => {
+        const urlsToTry = [
+            process.env.NEXT_PUBLIC_API_URL,
+            "http://localhost:3001/api/public",
+            "http://localhost:3000/api/public",
+            "http://127.0.0.1:3001/api/public",
+            "http://127.0.0.1:3000/api/public",
+        ].filter(Boolean);
 
-    const filteredArticles = INSIGHTS_DATA.articles
-        .filter((a) => !a.featured)
+        const fetchBlogs = async () => {
+            for (const baseUrl of urlsToTry) {
+                try {
+                    const res = await fetch(`${baseUrl}/blogs`);
+                    if (!res.ok) continue;
+                    const data = await res.json();
+                    if (data?.blogs && Array.isArray(data.blogs) && data.blogs.length > 0) {
+                        setDynamicBlogs(data.blogs);
+                        break;
+                    }
+                } catch {
+                    // try next URL
+                }
+            }
+        };
+
+        fetchBlogs();
+    }, []);
+
+    const mappedDynamicArticles = dynamicBlogs.map((b: any, index: number) => {
+        const tagsArr = Array.isArray(b.tags) ? b.tags : (b.tags ? [b.tags] : []);
+        const category = tagsArr[0] || "School News";
+        const tag = tagsArr[1] || "Education";
+        const dateFormatted = b.createdAt
+            ? new Date(b.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+            : "Recently";
+
+        return {
+            id: b.id || index + 100,
+            title: b.title,
+            school: b.schoolName || "Madni Education Trust",
+            category: category,
+            author: b.authorName || "Madni Education Trust",
+            authorRole: b.authorRole || b.schoolName || "Contributor",
+            date: dateFormatted,
+            readTime: "5 min read",
+            excerpt: b.content ? b.content.substring(0, 160) + "..." : "Read the full insight article from Madni Education Trust.",
+            thumbnail: b.mediaUrl || "/images/article-1.jpg",
+            featured: Boolean(b.isFeatured),
+            isTopFeatured: Boolean(b.isTopFeatured),
+            tag: tag,
+        };
+    });
+
+    const activeArticles = dataSource === 'REAL'
+        ? (mappedDynamicArticles.length > 0 ? mappedDynamicArticles : INSIGHTS_DATA.articles)
+        : INSIGHTS_DATA.articles;
+
+    const featuredArticle = activeArticles.find((a: any) => a.isTopFeatured) || activeArticles.find((a: any) => a.featured) || activeArticles[0];
+
+    const availableCategories = ["All", ...Array.from(new Set(activeArticles.map((a: any) => a.category))).filter(Boolean)];
+
+    const handleToggleDataSource = (source: 'REAL' | 'MOCK') => {
+        setDataSource(source);
+        setActiveCategory("All");
+    };
+
+    const isCategoryMatch = availableCategories.some(
+        (cat: any) => cat.toLowerCase() === activeCategory.toLowerCase()
+    );
+
+    const filteredArticles = activeArticles
+        .filter((a) => !featuredArticle || a.id !== featuredArticle.id)
         .filter(
-            (a) => activeCategory === "All" || a.category === activeCategory
+            (a) => (activeCategory === "All" || !isCategoryMatch) || (a.category || "").toLowerCase() === activeCategory.toLowerCase()
         )
         .filter(
             (a) =>
@@ -210,11 +364,14 @@ export default function InsightsPage() {
                     if (entry.isIntersecting) entry.target.classList.add("visible");
                 });
             },
-            { threshold: 0.15 }
+            { threshold: 0.05 }
         );
-        document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+        document.querySelectorAll(".reveal").forEach((el) => {
+            el.classList.add("visible");
+            observer.observe(el);
+        });
         return () => observer.disconnect();
-    }, []);
+    }, [dataSource, activeCategory, searchQuery, dynamicBlogs]);
 
     const handleHeroSearch = () => setSearchQuery(heroSearch);
 
@@ -516,10 +673,10 @@ export default function InsightsPage() {
                         className="hero-cats"
                         style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "24px", flexWrap: "wrap" }}
                     >
-                        {INSIGHTS_DATA.categories.map((cat) => (
+                        {availableCategories.map((cat: any) => (
                             <button
                                 key={cat}
-                                className={`cat-pill cat-pill-hero ${activeCategory === cat ? "active-hero" : ""}`}
+                                className={`cat-pill cat-pill-hero ${activeCategory.toLowerCase() === cat.toLowerCase() ? "active-hero" : ""}`}
                                 onClick={() => setActiveCategory(cat)}
                             >
                                 {cat}
@@ -556,7 +713,7 @@ export default function InsightsPage() {
                                 justifyContent: "center",
                             }}
                         >
-                            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", alignItems: "center" }}>
                                 <span
                                     style={{
                                         background: "var(--amber)",
@@ -566,10 +723,28 @@ export default function InsightsPage() {
                                         fontFamily: "'DM Sans', sans-serif",
                                         fontWeight: 600,
                                         fontSize: "12px",
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: "5px",
                                     }}
                                 >
-                                    ⭐ Featured
+                                    <IconStar size={13} color="white" /> Featured
                                 </span>
+                                {featuredArticle.school && (
+                                    <span
+                                        style={{
+                                            background: "var(--teal)",
+                                            color: "white",
+                                            borderRadius: "999px",
+                                            padding: "4px 14px",
+                                            fontFamily: "'DM Sans', sans-serif",
+                                            fontWeight: 600,
+                                            fontSize: "12px",
+                                        }}
+                                    >
+                                        {featuredArticle.school}
+                                    </span>
+                                )}
                                 <span
                                     style={{
                                         background: "var(--teal-light)",
@@ -642,11 +817,19 @@ export default function InsightsPage() {
 
                             {/* Bottom row */}
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px", flexWrap: "wrap", gap: "12px" }}>
-                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "var(--muted)" }}>
-                                    📅 {featuredArticle.date} · ⏱ {featuredArticle.readTime}
+                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "12px", color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: "12px" }}>
+                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                        <IconCalendar size={13} color="var(--muted)" /> {featuredArticle.date}
+                                    </span>
+                                    <span>·</span>
+                                    <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                        <IconClock size={13} color="var(--muted)" /> {featuredArticle.readTime}
+                                    </span>
                                 </span>
-                                <button
+                                <a
+                                    href={`/insights/${encodeURIComponent(String(featuredArticle.id))}`}
                                     style={{
+                                        display: "inline-block",
                                         background: "var(--teal)",
                                         color: "white",
                                         border: "none",
@@ -656,13 +839,14 @@ export default function InsightsPage() {
                                         fontWeight: 600,
                                         fontSize: "14px",
                                         cursor: "pointer",
+                                        textDecoration: "none",
                                         transition: "background 0.2s ease",
                                     }}
                                     onMouseOver={(e) => (e.currentTarget.style.background = "var(--teal-dark)")}
                                     onMouseOut={(e) => (e.currentTarget.style.background = "var(--teal)")}
                                 >
                                     Read Article →
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -676,10 +860,10 @@ export default function InsightsPage() {
                     className="filter-tabs reveal"
                     style={{ display: "flex", gap: "8px", justifyContent: "center", marginBottom: "40px", flexWrap: "wrap" }}
                 >
-                    {INSIGHTS_DATA.categories.map((cat) => (
+                    {availableCategories.map((cat: any) => (
                         <button
                             key={cat}
-                            className={`cat-pill cat-pill-grid ${activeCategory === cat ? "active-grid" : ""}`}
+                            className={`cat-pill cat-pill-grid ${activeCategory.toLowerCase() === cat.toLowerCase() ? "active-grid" : ""}`}
                             onClick={() => setActiveCategory(cat)}
                         >
                             {cat}
@@ -708,7 +892,9 @@ export default function InsightsPage() {
                             boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
                         }}
                     >
-                        <p style={{ fontSize: "48px", marginBottom: "16px" }}>📭</p>
+                        <div style={{ display: "flex", justifyContent: "center", marginBottom: "16px" }}>
+                            <IconInbox size={48} color="var(--teal)" />
+                        </div>
                         <h3 style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 600, fontSize: "20px", color: "var(--text-head)" }}>
                             No articles found
                         </h3>
@@ -787,7 +973,9 @@ export default function InsightsPage() {
                                                 zIndex: 1,
                                             }}
                                         >
-                                            ⏱ {article.readTime}
+                                            <span style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                                <IconClock size={11} color="white" /> {article.readTime}
+                                            </span>
                                         </span>
                                     </div>
 
@@ -883,7 +1071,7 @@ export default function InsightsPage() {
                                                 {article.date}
                                             </span>
                                             <a
-                                                href="#"
+                                                href={`/insights/${encodeURIComponent(String(article.id))}`}
                                                 style={{
                                                     fontFamily: "'DM Sans', sans-serif",
                                                     fontWeight: 600,
@@ -987,19 +1175,19 @@ export default function InsightsPage() {
                     <div style={{ flex: "1 1 340px", display: "flex", flexDirection: "column", gap: "16px" }}>
                         {[
                             {
-                                icon: "🧑‍🏫",
+                                Icon: IconTeacher,
                                 label: "Teachers",
                                 desc: "Share classroom insights and teaching perspectives.",
                                 accent: "var(--amber)",
                             },
                             {
-                                icon: "🎓",
+                                Icon: IconGraduation,
                                 label: "Alumni",
                                 desc: "Tell us about your journey after school.",
                                 accent: "var(--teal)",
                             },
                             {
-                                icon: "🧑‍🎓",
+                                Icon: IconUserCheck,
                                 label: "Students",
                                 desc: "Your voice, your story, your school life.",
                                 accent: "var(--amber)",
@@ -1015,11 +1203,10 @@ export default function InsightsPage() {
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        fontSize: "18px",
                                         flexShrink: 0,
                                     }}
                                 >
-                                    {c.icon}
+                                    <c.Icon size={20} color={c.accent === "var(--amber)" ? "#B45309" : "var(--teal)"} />
                                 </div>
                                 <div>
                                     <p style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 600, fontSize: "16px", color: "var(--text-head)" }}>
@@ -1129,7 +1316,9 @@ export default function InsightsPage() {
                         </>
                     ) : (
                         <div className="fade-up" style={{ marginTop: "32px" }}>
-                            <p className="scale-in" style={{ fontSize: "48px", marginBottom: "12px" }}>✅</p>
+                            <div className="scale-in" style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
+                                <IconCheckCircle size={48} color="var(--teal-dark)" />
+                            </div>
                             <h3
                                 style={{
                                     fontFamily: "'Epilogue', sans-serif",
@@ -1147,6 +1336,77 @@ export default function InsightsPage() {
                     )}
                 </div>
             </section>
+
+            {/* ── FLOATING REAL DATA / MOCK DATA TOGGLE SWITCH ── */}
+            <div style={{
+                position: "fixed",
+                bottom: 24,
+                right: 24,
+                zIndex: 9999,
+                background: "rgba(255, 255, 255, 0.95)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(26, 107, 90, 0.2)",
+                borderRadius: 999,
+                padding: "5px 6px",
+                boxShadow: "0 8px 32px rgba(15, 61, 53, 0.2)",
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+            }}>
+                <button
+                    onClick={() => handleToggleDataSource('REAL')}
+                    style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "8px 16px",
+                        borderRadius: 999,
+                        border: "none",
+                        cursor: "pointer",
+                        fontFamily: "var(--font-dm-sans-var)",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        background: dataSource === 'REAL' ? "#18181b" : "transparent",
+                        color: dataSource === 'REAL' ? "white" : "var(--text-head)",
+                        boxShadow: dataSource === 'REAL' ? "0 2px 8px rgba(24,24,27,0.3)" : "none",
+                        transition: "all 0.2s ease-in-out",
+                    }}
+                >
+                    <span style={{
+                        width: 8, height: 8, borderRadius: "50%",
+                        background: dataSource === 'REAL' ? "#22c55e" : "#cbd5e1",
+                        display: "inline-block"
+                    }} />
+                    Real Data
+                </button>
+
+                <button
+                    onClick={() => handleToggleDataSource('MOCK')}
+                    style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        padding: "8px 16px",
+                        borderRadius: 999,
+                        border: "none",
+                        cursor: "pointer",
+                        fontFamily: "var(--font-dm-sans-var)",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        background: dataSource === 'MOCK' ? "var(--amber)" : "transparent",
+                        color: dataSource === 'MOCK' ? "white" : "var(--text-head)",
+                        boxShadow: dataSource === 'MOCK' ? "0 2px 8px rgba(245,166,35,0.4)" : "none",
+                        transition: "all 0.2s ease-in-out",
+                    }}
+                >
+                    <span style={{
+                        width: 8, height: 8, borderRadius: "50%",
+                        background: dataSource === 'MOCK' ? "white" : "#cbd5e1",
+                        display: "inline-block"
+                    }} />
+                    Mock Data
+                </button>
+            </div>
 
             <Footer />
         </>

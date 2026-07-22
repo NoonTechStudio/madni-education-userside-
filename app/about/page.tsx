@@ -5,6 +5,240 @@ import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 
 // ══════════════════════════════════════════════════════════════════════════════
+// VECTOR SVG ICON COMPONENTS
+// ══════════════════════════════════════════════════════════════════════════════
+function IconSchool({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 22v-4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4" />
+      <path d="M18 22V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v18" />
+      <path d="M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2" />
+      <path d="M10 6h4" />
+      <path d="M10 10h4" />
+    </svg>
+  );
+}
+
+function IconGraduation({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+    </svg>
+  );
+}
+
+function IconCalendar({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  );
+}
+
+function IconClipboard({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+    </svg>
+  );
+}
+
+function IconLandmark({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="22" x2="21" y2="22" />
+      <line x1="6" y1="18" x2="6" y2="11" />
+      <line x1="10" y1="18" x2="10" y2="11" />
+      <line x1="14" y1="18" x2="14" y2="11" />
+      <line x1="18" y1="18" x2="18" y2="11" />
+      <polygon points="12 2 20 7 4 7 12 2" />
+    </svg>
+  );
+}
+
+function IconUsers({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+function IconChild({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="7" r="3" />
+      <path d="M12 10v6" />
+      <path d="m9 13 3-3 3 3" />
+      <path d="m9 20 3-4 3 4" />
+    </svg>
+  );
+}
+
+function IconGift({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 12 20 22 4 22 4 12" />
+      <rect x="2" y="7" width="20" height="5" />
+      <line x1="12" y1="22" x2="12" y2="7" />
+      <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+      <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+    </svg>
+  );
+}
+
+function IconMoon({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+    </svg>
+  );
+}
+
+function IconSun({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="5" />
+      <line x1="12" y1="1" x2="12" y2="3" />
+      <line x1="12" y1="21" x2="12" y2="23" />
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+      <line x1="1" y1="12" x2="3" y2="12" />
+      <line x1="21" y1="12" x2="23" y2="12" />
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+    </svg>
+  );
+}
+
+function IconTarget({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </svg>
+  );
+}
+
+function IconBook({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  );
+}
+
+function IconMosque({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2a4 4 0 0 0-4 4v2h8V6a4 4 0 0 0-4-4z" />
+      <path d="M4 10h16v12H4z" />
+      <path d="M10 22v-6a2 2 0 0 1 4 0v6" />
+    </svg>
+  );
+}
+
+function IconPlant({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7 20h10" />
+      <path d="M12 20v-8" />
+      <path d="M12 12a5 5 0 0 1 5-5c0 5-5 5-5 5z" />
+      <path d="M12 12a5 5 0 0 0-5-5c0 5 5 5 5 5z" />
+    </svg>
+  );
+}
+
+function IconHeart({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+    </svg>
+  );
+}
+
+function IconPhone({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+  );
+}
+
+function IconGlobe({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+    </svg>
+  );
+}
+
+function IconScroll({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4" />
+      <path d="M19 17V5a2 2 0 0 0-2-2H4" />
+    </svg>
+  );
+}
+
+function IconConstruction({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="6" width="20" height="8" rx="1" />
+      <path d="M17 14v7" />
+      <path d="M7 14v7" />
+      <path d="M17 3v3" />
+      <path d="M7 3v3" />
+      <path d="M10 14v7" />
+      <path d="M14 14v7" />
+    </svg>
+  );
+}
+
+function IconLaptop({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+      <line x1="2" y1="20" x2="22" y2="20" />
+    </svg>
+  );
+}
+
+function IconBackpack({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10z" />
+      <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+      <path d="M8 14h8" />
+      <path d="M12 14v4" />
+    </svg>
+  );
+}
+
+function IconTeacher({ size = 20, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 3h20" />
+      <path d="M21 3v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3" />
+      <path d="m7 21 5-5 5 5" />
+    </svg>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // PAGE DATA — all sections pull from this object
 // ══════════════════════════════════════════════════════════════════════════════
 const ABOUT_DATA = {
@@ -33,31 +267,31 @@ const ABOUT_DATA = {
   mission: "To provide fully subsidized, high-quality education to underprivileged children in Karjan and surrounding areas through zakat, sadaqah, and CSR funding — managed with complete transparency and accountability.",
 
   values: [
-    { icon: "🤝", name: "Community First",            desc: "Every decision we make is rooted in the needs of the families we serve — not institutions, not processes." },
-    { icon: "📖", name: "Education as Empowerment",   desc: "We believe education is not a privilege — it is a right. Every child deserves a seat in a classroom." },
-    { icon: "🕌", name: "Zakat as a System",          desc: "We treat zakat not as charity but as a structured investment — one that multiplies with every child who succeeds." },
-    { icon: "📋", name: "Full Transparency",          desc: "Every rupee is tracked, audited, and reported. Our books are open to every donor who asks." },
-    { icon: "🌱", name: "Long-Term Impact",           desc: "We don't just educate children — we break generational cycles of poverty through sustained, structured support." },
-    { icon: "❤️", name: "Dignity Always",             desc: "Students are never made to feel lesser. They are celebrated, supported, and treated with the same respect as any other child." },
+    { Icon: IconUsers,        name: "Community First",            desc: "Every decision we make is rooted in the needs of the families we serve — not institutions, not processes." },
+    { Icon: IconBook,         name: "Education as Empowerment",   desc: "We believe education is not a privilege — it is a right. Every child deserves a seat in a classroom." },
+    { Icon: IconMosque,       name: "Zakat as a System",          desc: "We treat zakat not as charity but as a structured investment — one that multiplies with every child who succeeds." },
+    { Icon: IconClipboard,    name: "Full Transparency",          desc: "Every rupee is tracked, audited, and reported. Our books are open to every donor who asks." },
+    { Icon: IconPlant,        name: "Long-Term Impact",           desc: "We don't just educate children — we break generational cycles of poverty through sustained, structured support." },
+    { Icon: IconHeart,        name: "Dignity Always",             desc: "Students are never made to feel lesser. They are celebrated, supported, and treated with the same respect as any other child." },
   ],
 
   timeline: [
-    { year: "1994", title: "The Trust is Born",          desc: "Madni Islamic Study Centre & Sabri Education Trust is formally registered with the Vadodara Charity Commissioner Office on 15 December 1994. A dream becomes a legal reality.", icon: "🌱", side: "left"  },
-    { year: "1996", title: "Sabri High School Opens",    desc: "The first school under the trust opens its doors with Gujarati medium classes from Pre-Primary to Std. 7. 42 students enroll in the first year.", icon: "🏫", side: "right" },
-    { year: "2003", title: "Expansion to Std. 10",       desc: "Sabri High School completes its first SSC batch. A pass rate of 94% in the very first board exam establishes the school's academic credibility in the region.", icon: "🎓", side: "left"  },
-    { year: "2007", title: "Markaz Public School Founded",desc: "Recognizing the need for English medium education, the trust establishes Markaz Public School, Karjan — offering Science and Commerce streams up to Std. 12.", icon: "🌐", side: "right" },
-    { year: "2012", title: "Higher Secondary Achieved",  desc: "Both schools receive full HSC affiliation. Students can now complete their entire schooling journey — Nursery to Std. 12 — within the trust's institutions.", icon: "📜", side: "left"  },
-    { year: "2019", title: "Infrastructure Drive Begins",desc: "A major donation campaign funds new science labs, a computer lab with 25 systems, and an expanded library. Over ₹40 lakhs raised in a single year.", icon: "🏗️", side: "right" },
-    { year: "2023", title: "Qadri Welfare Trust Established", desc: "A second charitable trust is registered on 20 January 2023 to support expanded welfare and educational programs across Vadodara district.", icon: "🤝", side: "left"  },
-    { year: "2025", title: "Digital Transformation Underway", desc: "Smart boards, digital classrooms, and an online donor portal are being introduced. Two additional schools are in the planning phase.", icon: "💻", side: "right" },
+    { year: "1994", title: "The Trust is Born",          desc: "Madni Islamic Study Centre & Sabri Education Trust is formally registered with the Vadodara Charity Commissioner Office on 15 December 1994. A dream becomes a legal reality.", Icon: IconPlant, side: "left"  },
+    { year: "1996", title: "Sabri High School Opens",    desc: "The first school under the trust opens its doors with Gujarati medium classes from Pre-Primary to Std. 7. 42 students enroll in the first year.", Icon: IconSchool, side: "right" },
+    { year: "2003", title: "Expansion to Std. 10",       desc: "Sabri High School completes its first SSC batch. A pass rate of 94% in the very first board exam establishes the school's academic credibility in the region.", Icon: IconGraduation, side: "left"  },
+    { year: "2007", title: "Markaz Public School Founded",desc: "Recognizing the need for English medium education, the trust establishes Markaz Public School, Karjan — offering Science and Commerce streams up to Std. 12.", Icon: IconGlobe, side: "right" },
+    { year: "2012", title: "Higher Secondary Achieved",  desc: "Both schools receive full HSC affiliation. Students can now complete their entire schooling journey — Nursery to Std. 12 — within the trust's institutions.", Icon: IconScroll, side: "left"  },
+    { year: "2019", title: "Infrastructure Drive Begins",desc: "A major donation campaign funds new science labs, a computer lab with 25 systems, and an expanded library. Over ₹40 lakhs raised in a single year.", Icon: IconConstruction, side: "right" },
+    { year: "2023", title: "Qadri Welfare Trust Established", desc: "A second charitable trust is registered on 20 January 2023 to support expanded welfare and educational programs across Vadodara district.", Icon: IconUsers, side: "left"  },
+    { year: "2025", title: "Digital Transformation Underway", desc: "Smart boards, digital classrooms, and an online donor portal are being introduced. Two additional schools are in the planning phase.", Icon: IconLaptop, side: "right" },
   ],
 
   zakatUsage: [
-    { icon: "🎒", label: "Student Scholarships", percent: 45, color: "#1A6B5A", desc: "Covers full tuition, books, uniform, and stationery for eligible students." },
-    { icon: "👨‍🏫", label: "Teacher Salaries",    percent: 28, color: "#F5A623", desc: "Ensures qualified, experienced teachers are retained and fairly compensated." },
-    { icon: "🏗️", label: "Infrastructure",        percent: 15, color: "#2E8B6E", desc: "Classrooms, labs, library, and facility maintenance and improvements." },
-    { icon: "📋", label: "Administration",         percent:  7, color: "#888888", desc: "Office operations, compliance, auditing, and trust management." },
-    { icon: "🌱", label: "New Initiatives",        percent:  5, color: "#F5A623", desc: "Digital classrooms, new school planning, and community welfare programs." },
+    { Icon: IconBackpack,     label: "Student Scholarships", percent: 45, color: "#1A6B5A", desc: "Covers full tuition, books, uniform, and stationery for eligible students." },
+    { Icon: IconTeacher,      label: "Teacher Salaries",    percent: 28, color: "#F5A623", desc: "Ensures qualified, experienced teachers are retained and fairly compensated." },
+    { Icon: IconConstruction, label: "Infrastructure",        percent: 15, color: "#2E8B6E", desc: "Classrooms, labs, library, and facility maintenance and improvements." },
+    { Icon: IconClipboard,    label: "Administration",         percent:  7, color: "#888888", desc: "Office operations, compliance, auditing, and trust management." },
+    { Icon: IconPlant,        label: "New Initiatives",        percent:  5, color: "#F5A623", desc: "Digital classrooms, new school planning, and community welfare programs." },
   ],
 
   stats: [
@@ -98,12 +332,57 @@ function buildDonutSegments(items: { percent: number; color: string }[]) {
   });
 }
 
+// Map string keys to icon components for dynamic backend response
+const iconMap: Record<string, any> = {
+  IconBackpack,
+  IconTeacher,
+  IconConstruction,
+  IconClipboard,
+  IconPlant,
+};
+
 // ══════════════════════════════════════════════════════════════════════════════
 // PAGE COMPONENT
 // ══════════════════════════════════════════════════════════════════════════════
 export default function AboutPage() {
   const [zakatVisible, setZakatVisible] = useState(false);
+  const [useMockData, setUseMockData] = useState(false);
+  const [zakatUsageData, setZakatUsageData] = useState<Array<{ Icon: any; label: string; percent: number; color: string; desc: string; amountSpent?: string | null }>>(ABOUT_DATA.zakatUsage);
+  const [financialSummary, setFinancialSummary] = useState<{ totalStudentAidPaid?: number; totalInfrastructureSpent?: number } | null>(null);
   const zakatRef = useRef<HTMLElement | null>(null);
+
+  // ── Fetch dynamic financial transparency data ──────────────────────────────
+  useEffect(() => {
+    if (useMockData) {
+      setZakatUsageData(ABOUT_DATA.zakatUsage);
+      setFinancialSummary(null);
+      return;
+    }
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    fetch(`${apiUrl}/api/public/financial-transparency`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.allocations && data.allocations.length > 0) {
+          const mapped = data.allocations.map((item: any) => ({
+            Icon: iconMap[item.iconKey] || IconClipboard,
+            label: item.label,
+            percent: item.percent,
+            color: item.color,
+            desc: item.desc,
+            amountSpent: item.amountSpent,
+          }));
+          setZakatUsageData(mapped);
+          if (data.summary) {
+            setFinancialSummary(data.summary);
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn("Failed to fetch backend financial transparency data, using default:", err);
+        setZakatUsageData(ABOUT_DATA.zakatUsage);
+      });
+  }, [useMockData]);
 
   // ── Scroll reveal ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -159,7 +438,7 @@ export default function AboutPage() {
     return () => obs.disconnect();
   }, []);
 
-  const donutSegments = buildDonutSegments(ABOUT_DATA.zakatUsage);
+  const donutSegments = buildDonutSegments(zakatUsageData);
 
   // ── Shared input style ────────────────────────────────────────────────────
   const chipStyle = (bg: string, color: string): React.CSSProperties => ({
@@ -236,9 +515,9 @@ export default function AboutPage() {
 
           {/* Stat pills */}
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12, marginTop: 36 }}>
-            {[{ icon: "🏫", label: "2 Schools Running" }, { icon: "🎓", label: "650+ Students Today" }, { icon: "📅", label: "Est. 1994" }].map(({ icon, label }) => (
+            {[{ Icon: IconSchool, label: "2 Schools Running" }, { Icon: IconGraduation, label: "650+ Students Today" }, { Icon: IconCalendar, label: "Est. 1994" }].map(({ Icon, label }) => (
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.95)", color: "#1A6B5A", fontFamily: "var(--font-dm-sans-var), sans-serif", fontWeight: 600, fontSize: 14, padding: "9px 20px", borderRadius: 9999, boxShadow: "0 2px 12px rgba(0,0,0,0.12)" }}>
-                <span>{icon}</span><span>{label}</span>
+                <Icon size={16} color="#1A6B5A" /><span>{label}</span>
               </div>
             ))}
           </div>
@@ -251,8 +530,8 @@ export default function AboutPage() {
           <div className="founding-grid">
             {/* Left — image */}
             <div style={{ position: "relative" }}>
-              <div style={{ borderRadius: 24, overflow: "hidden", aspectRatio: "3/4", background: "#EAF4F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 80 }}>
-                🏫
+              <div style={{ borderRadius: 24, overflow: "hidden", aspectRatio: "3/4", background: "#EAF4F0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <IconSchool size={72} color="#1A6B5A" />
               </div>
               <div style={{ position: "absolute", bottom: 20, left: -10, background: "#F5A623", color: "#fff", fontFamily: "var(--font-epilogue-var), sans-serif", fontWeight: 600, fontSize: 13, padding: "10px 18px", borderRadius: 12, boxShadow: "0 4px 18px rgba(245,166,35,0.4)" }}>
                 Est. 15 Dec 1994
@@ -285,12 +564,12 @@ export default function AboutPage() {
                 <div style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontWeight: 600, fontSize: 11, color: "#888", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Registration Details</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {[
-                    { icon: "📋", text: `Regi. No: ${ABOUT_DATA.trust1.regiNo}` },
-                    { icon: "🏛️", text: ABOUT_DATA.trust1.authority },
-                    { icon: "📅", text: `Registered: ${ABOUT_DATA.trust1.established}` },
-                  ].map(({ icon, text }) => (
-                    <div key={text} style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 14, color: "#4A4A4A", display: "flex", gap: 8 }}>
-                      <span>{icon}</span><span>{text}</span>
+                    { Icon: IconClipboard, text: `Regi. No: ${ABOUT_DATA.trust1.regiNo}` },
+                    { Icon: IconLandmark, text: ABOUT_DATA.trust1.authority },
+                    { Icon: IconCalendar, text: `Registered: ${ABOUT_DATA.trust1.established}` },
+                  ].map(({ Icon, text }) => (
+                    <div key={text} style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 14, color: "#4A4A4A", display: "flex", alignItems: "center", gap: 8 }}>
+                      <Icon size={16} color="#1A6B5A" /><span>{text}</span>
                     </div>
                   ))}
                 </div>
@@ -349,12 +628,12 @@ export default function AboutPage() {
 
               <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 8 }}>
                 {[
-                  { icon: "📅", text: "Est. 1996" },
-                  { icon: "👦", text: "~7,000 Children" },
-                  { icon: "🆓", text: "Completely Free" },
-                  { icon: "🎓", text: "Qari & Imamat Courses" },
-                  { icon: "🌙", text: "Annual Eid Milad Ceremony" },
-                ].map(({ icon, text }) => (
+                  { Icon: IconCalendar, text: "Est. 1996" },
+                  { Icon: IconUsers, text: "~7,000 Children" },
+                  { Icon: IconGift, text: "Completely Free" },
+                  { Icon: IconGraduation, text: "Qari & Imamat Courses" },
+                  { Icon: IconMoon, text: "Annual Eid Milad Ceremony" },
+                ].map(({ Icon, text }) => (
                   <span key={text} style={{
                     display: "inline-flex", alignItems: "center", gap: 7,
                     background: "#EAF4F0", color: "#1A6B5A",
@@ -362,7 +641,7 @@ export default function AboutPage() {
                     fontWeight: 600, fontSize: 13,
                     padding: "7px 16px", borderRadius: 9999,
                   }}>
-                    {icon} {text}
+                    <Icon size={15} color="#1A6B5A" /> {text}
                   </span>
                 ))}
               </div>
@@ -384,13 +663,15 @@ export default function AboutPage() {
           {/* Vision & Mission cards */}
           <div className="vm-grid">
             {[
-              { accent: "#F5A623", icon: "🌅", iconBg: "#FFF8EC", pillBg: "#F5A623", pilllabel: "Our Vision", headline: "Where We Are Going", text: ABOUT_DATA.vision },
-              { accent: "#1A6B5A", icon: "🎯", iconBg: "#EAF4F0", pillBg: "#1A6B5A", pilllabel: "Our Mission", headline: "What We Do Every Day", text: ABOUT_DATA.mission },
+              { accent: "#F5A623", Icon: IconSun, iconBg: "#FFF8EC", iconColor: "#F5A623", pillBg: "#F5A623", pilllabel: "Our Vision", headline: "Where We Are Going", text: ABOUT_DATA.vision },
+              { accent: "#1A6B5A", Icon: IconTarget, iconBg: "#EAF4F0", iconColor: "#1A6B5A", pillBg: "#1A6B5A", pilllabel: "Our Mission", headline: "What We Do Every Day", text: ABOUT_DATA.mission },
             ].map((card) => (
               <div key={card.pilllabel} className="card-lift" style={{ background: "#fff", borderRadius: 24, boxShadow: "0 4px 20px rgba(26,107,90,0.09)", overflow: "hidden" }}>
                 <div style={{ height: 4, background: card.accent }} />
                 <div style={{ padding: "36px" }}>
-                  <div style={{ width: 64, height: 64, borderRadius: "50%", background: card.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, marginBottom: 18 }}>{card.icon}</div>
+                  <div style={{ width: 64, height: 64, borderRadius: "50%", background: card.iconBg, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>
+                    <card.Icon size={28} color={card.iconColor} />
+                  </div>
                   <span style={chipStyle(card.pillBg, "#fff")}>{card.pilllabel}</span>
                   <h3 style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontWeight: 700, fontSize: 20, color: "#1C1C1C", margin: "14px 0 16px" }}>{card.headline}</h3>
                   <p style={{ fontFamily: "var(--font-caveat-var), cursive", fontSize: 21, color: "#1A6B5A", lineHeight: 1.6, margin: 0 }}>{card.text}</p>
@@ -403,7 +684,9 @@ export default function AboutPage() {
           <div className="values-grid" style={{ marginTop: 56 }}>
             {ABOUT_DATA.values.map((v, i) => (
               <div key={v.name} className="value-card card-lift" style={{ background: "#fff", borderRadius: 20, padding: "28px 24px", boxShadow: "0 4px 16px rgba(26,107,90,0.08)", display: "flex", flexDirection: "column", gap: 12, borderLeft: "2px solid transparent", transition: "border-color 0.3s, transform 0.3s, box-shadow 0.3s" }}>
-                <div style={{ width: 48, height: 48, borderRadius: "50%", background: i % 2 === 0 ? "#FFF8EC" : "#EAF4F0", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{v.icon}</div>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: i % 2 === 0 ? "#FFF8EC" : "#EAF4F0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <v.Icon size={22} color={i % 2 === 0 ? "#F5A623" : "#1A6B5A"} />
+                </div>
                 <div style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontWeight: 600, fontSize: 17, color: "#1C1C1C" }}>{v.name}</div>
                 <div style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 14, color: "#4A4A4A", lineHeight: 1.65 }}>{v.desc}</div>
               </div>
@@ -434,8 +717,8 @@ export default function AboutPage() {
                   {/* Trust name */}
                   <h3 style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontWeight: 700, fontSize: 18, color: "#1A6B5A", margin: "0 0 8px", lineHeight: 1.3 }}>{trust.name}</h3>
                   {/* Registration row */}
-                  <p style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 13, color: "#888", margin: "0 0 0" }}>
-                    📋 Regi. No: {trust.regiNo} &nbsp;·&nbsp; {trust.authority} &nbsp;·&nbsp; Est. {trust.established}
+                  <p style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 13, color: "#888", margin: "0 0 0", display: "inline-flex", alignItems: "center", gap: 5 }}>
+                    <IconClipboard size={14} color="#888" /> Regi. No: {trust.regiNo} &nbsp;·&nbsp; {trust.authority} &nbsp;·&nbsp; Est. {trust.established}
                   </p>
                   <hr style={{ border: "none", borderTop: "1px solid #EAF4F0", margin: "20px 0" }} />
 
@@ -453,7 +736,7 @@ export default function AboutPage() {
                         <span style={{ ...chipStyle(pillBg, "#fff"), fontSize: 11, marginBottom: 6, display: "inline-block" }}>{role}</span>
                         <div style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontWeight: 600, fontSize: 15, color: "#1C1C1C", marginBottom: 4 }}>{person.name}</div>
                         <a href={`tel:${person.phone}`} style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 14, color: "#1A6B5A", fontWeight: 500, textDecoration: "none", display: "flex", alignItems: "center", gap: 5 }}>
-                          📞 {person.phone}
+                          <IconPhone size={14} color="#1A6B5A" /> {person.phone}
                         </a>
                       </div>
                     </div>
@@ -461,7 +744,7 @@ export default function AboutPage() {
 
                   {/* Trust badges */}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 20 }}>
-                    {["✅ Zakat Eligible", "✅ Charity Commissioner Registered", "✅ Annually Audited"].map((b) => (
+                    {["✓ Zakat Eligible", "✓ Charity Commissioner Registered", "✓ Annually Audited"].map((b) => (
                       <span key={b} style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 12, color: "#888" }}>{b}</span>
                     ))}
                   </div>
@@ -504,8 +787,8 @@ export default function AboutPage() {
                   </div>
 
                   {/* Center dot */}
-                  <div className="timeline-dot" style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", width: 44, height: 44, borderRadius: "50%", background: "#fff", border: "3px solid #1A6B5A", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, zIndex: 2, transition: "border-color 0.3s, transform 0.3s", flexShrink: 0 }}>
-                    {item.icon}
+                  <div className="timeline-dot" style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", width: 44, height: 44, borderRadius: "50%", background: "#fff", border: "3px solid #1A6B5A", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 2, transition: "border-color 0.3s, transform 0.3s", flexShrink: 0 }}>
+                    <item.Icon size={20} color="#1A6B5A" />
                   </div>
                 </div>
               ))}
@@ -554,7 +837,7 @@ export default function AboutPage() {
 
               {/* Legend */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 240 }}>
-                {ABOUT_DATA.zakatUsage.map((item) => (
+                {zakatUsageData.map((item) => (
                   <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ width: 12, height: 12, borderRadius: "50%", background: item.color, flexShrink: 0 }} />
                     <span style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 14, color: "rgba(255,255,255,0.85)", flex: 1 }}>{item.label}</span>
@@ -566,14 +849,23 @@ export default function AboutPage() {
 
             {/* RIGHT — breakdown list */}
             <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-              {ABOUT_DATA.zakatUsage.map((item) => (
+              {zakatUsageData.map((item) => (
                 <div key={item.label} style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
                   {/* Icon */}
-                  <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>{item.icon}</div>
+                  <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <item.Icon size={20} color="white" />
+                  </div>
                   {/* Content */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
-                      <span style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontWeight: 500, fontSize: 15, color: "#fff" }}>{item.label}</span>
+                      <span style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontWeight: 500, fontSize: 15, color: "#fff" }}>
+                        {item.label}
+                        {item.amountSpent && (
+                          <span style={{ marginLeft: 8, fontSize: 11, background: "rgba(245,166,35,0.25)", color: "#F5A623", padding: "2px 8px", borderRadius: 9999, fontWeight: 600 }}>
+                            {item.amountSpent}
+                          </span>
+                        )}
+                      </span>
                       <span style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontWeight: 600, fontSize: 16, color: "#fff", flexShrink: 0, marginLeft: 12 }}>{item.percent}%</span>
                     </div>
                     <p style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 13, color: "rgba(255,255,255,0.70)", lineHeight: 1.5, margin: "0 0 8px" }}>{item.desc}</p>
@@ -589,13 +881,24 @@ export default function AboutPage() {
 
           {/* Trust note */}
           <div style={{ marginTop: 56, background: "rgba(255,255,255,0.08)", border: "2px solid rgba(255,255,255,0.18)", borderRadius: 16, padding: "24px 32px", textAlign: "center" }}>
-            <p style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 15, color: "rgba(255,255,255,0.85)", lineHeight: 1.7, margin: "0 0 12px" }}>
-              📋 Our accounts are audited annually and submitted to the Vadodara Charity Commissioner Office. Full financial reports are available on request.
+            <p style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontSize: 15, color: "rgba(255,255,255,0.85)", lineHeight: 1.7, margin: "0 0 12px", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+              <IconClipboard size={16} color="#F5A623" /> Our accounts are audited annually and submitted to the Vadodara Charity Commissioner Office. Full financial reports are available on request.
             </p>
             <a href="/contact" style={{ fontFamily: "var(--font-dm-sans-var), sans-serif", fontWeight: 600, fontSize: 14, color: "#F5A623", textDecoration: "none" }}>Request Annual Report →</a>
           </div>
         </div>
       </section>
+
+      {/* Floating Data Mode Switcher Widget */}
+      <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 999, background: "#0F3D35", padding: "6px 12px", borderRadius: 9999, boxShadow: "0 8px 32px rgba(0,0,0,0.3)", display: "flex", alignItems: "center", gap: 8, border: "1px solid rgba(255,255,255,0.15)" }}>
+        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", fontWeight: 600, fontFamily: "sans-serif" }}>Data Source:</span>
+        <button
+          onClick={() => setUseMockData(!useMockData)}
+          style={{ background: useMockData ? "#F5A623" : "#1A6B5A", color: "#fff", border: "none", padding: "4px 10px", borderRadius: 9999, fontSize: 11, fontWeight: 700, cursor: "pointer", transition: "all 0.2s" }}
+        >
+          {useMockData ? "Mock Data" : "Real Live Data"}
+        </button>
+      </div>
 
       {/* ═══ SECTION 7: STATS ════════════════════════════════════════════════ */}
       <section className="reveal" style={{ padding: "80px 32px", background: "var(--bg)" }}>

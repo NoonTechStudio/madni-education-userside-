@@ -1,7 +1,7 @@
 import Image from "next/image";
 
-// Server Component
 interface BlogPost {
+  id: string;
   category: string;
   catStyle: { background: string; color: string };
   date: string;
@@ -12,65 +12,186 @@ interface BlogPost {
   imgAlt: string;
 }
 
-const posts: BlogPost[] = [
+interface PublicNewsUpdate {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  publishDate?: string | null;
+  imageUrl?: string | null;
+  createdAt: string;
+  schoolName: string;
+}
+
+interface NewsUpdatesResponse {
+  updates: PublicNewsUpdate[];
+}
+
+const fallbackPosts: BlogPost[] = [
   {
+    id: "fallback-achievement",
     category: "Achievement",
     catStyle: { background: "#FFF8EC", color: "#c27a00" },
     date: "Feb 28, 2026",
     title: "Sabri High School Wins District Science Championship",
     excerpt:
       "Our Class 12 team brought home the gold at the Vadodara District Science Championship for the second consecutive year.",
-    school: "🏫 Sabri High School",
+    school: "Sabri High School",
     imgSrc: "/images/img-101.jpg",
     imgAlt: "Sabri High School Science Championship",
   },
   {
+    id: "fallback-announcement",
     category: "Announcement",
     catStyle: { background: "#EAF4F0", color: "#1A6B5A" },
     date: "Feb 10, 2026",
-    title: "Ramadan 2026 Zakat Drive Now Open — Your Giving Changes Lives",
+    title: "Ramadan 2026 Zakat Drive Now Open - Your Giving Changes Lives",
     excerpt:
-      "As Ramadan approaches, we open our annual Zakat drive with a goal of ₹25 Lac to fund the next academic year for 300+ children.",
-    school: "🏛️ All Schools",
+      "As Ramadan approaches, we open our annual Zakat drive with a goal of Rs. 25 Lac to fund the next academic year for 300+ children.",
+    school: "All Schools",
     imgSrc: "/images/img-102.jpg.avif",
     imgAlt: "Ramadan Zakat Drive 2026",
   },
   {
+    id: "fallback-school-news",
     category: "School News",
     catStyle: { background: "#fce8ff", color: "#7c3aed" },
     date: "Jan 20, 2026",
     title: "Noor Academy Inaugurates 3,200-Book Digital Library Wing",
     excerpt:
       "Thanks to generous donor contributions, Noor Academy now has a fully equipped library and reading room, open to all 310 students.",
-    school: "🏫 Noor Academy, Surat",
+    school: "Noor Academy, Surat",
     imgSrc: "/images/img-103.jpg",
     imgAlt: "Digital Library Wing inauguration",
   },
 ];
 
-export default function BlogSection() {
+const fallbackFeatured: BlogPost = {
+  id: "fallback-trust-day",
+  category: "Event",
+  catStyle: { background: "#e8f4ff", color: "#2563eb" },
+  date: "March 15, 2026",
+  title: "Annual Trust Day 2026: 1,200 Voices, One Dream",
+  excerpt:
+    "This year's Annual Trust Day brought together students, teachers, donors, and parents across all four schools in a celebration of achievement, gratitude, and renewed commitment to quality education.",
+  school: "All Schools",
+  imgSrc: "/images/img1.jpeg",
+  imgAlt: "Students at annual day ceremony",
+};
+
+function categoryStyle(category: string) {
+  const normalized = category.toLowerCase();
+  if (normalized.includes("achievement")) return { background: "#FFF8EC", color: "#c27a00" };
+  if (normalized.includes("announcement") || normalized.includes("notice")) return { background: "#EAF4F0", color: "#1A6B5A" };
+  if (normalized.includes("event")) return { background: "#e8f4ff", color: "#2563eb" };
+  return { background: "#fce8ff", color: "#7c3aed" };
+}
+
+function formatDate(value?: string | null) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("en-IN", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function excerpt(text: string, maxLength = 170) {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, maxLength - 3)}...`;
+}
+
+const staticImagesList = [
+  "/images/img1.jpeg",
+  "/images/img-101.jpg",
+  "/images/img-102.jpg.avif",
+  "/images/img-103.jpg",
+];
+
+function buildPosts(updates: PublicNewsUpdate[]): BlogPost[] {
+  return updates.map((update, idx) => {
+    let img = update.imageUrl;
+    if (!img || img.startsWith("http")) {
+      img = staticImagesList[idx % staticImagesList.length];
+    }
+    return {
+      id: update.id,
+      category: update.category,
+      catStyle: categoryStyle(update.category),
+      date: formatDate(update.publishDate || update.createdAt),
+      title: update.title,
+      excerpt: excerpt(update.description),
+      school: update.schoolName || "All Schools",
+      imgSrc: img,
+      imgAlt: update.title,
+    };
+  });
+}
+
+async function getNewsPosts() {
+  const urlsToTry = [
+    process.env.NEXT_PUBLIC_API_URL,
+    "http://localhost:3001/api/public",
+    "http://localhost:3000/api/public",
+    "http://127.0.0.1:3001/api/public",
+    "http://127.0.0.1:3000/api/public",
+  ].filter(Boolean);
+
+  for (const baseUrl of urlsToTry) {
+    try {
+      const res = await fetch(`${baseUrl}/news-updates`, { next: { revalidate: 30 } });
+      if (!res.ok) continue;
+
+      const data = await res.json() as NewsUpdatesResponse;
+      const posts = buildPosts(Array.isArray(data.updates) ? data.updates : []);
+
+      if (posts.length > 0) {
+        const gridPosts = [...posts.slice(1, 4), ...fallbackPosts].slice(0, 3);
+        return {
+          featuredPost: posts[0],
+          posts: gridPosts,
+        };
+      }
+    } catch {
+      // Try next configured API URL.
+    }
+  }
+
+  return {
+    featuredPost: fallbackFeatured,
+    posts: fallbackPosts,
+  };
+}
+
+export default async function BlogSection() {
+  const { featuredPost, posts } = await getNewsPosts();
+
   return (
     <section id="blog" style={{ background: "var(--teal-light)", padding: "96px 0" }}>
       <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px" }}>
-        {/* Header */}
         <div className="fade-in" style={{ textAlign: "center" }}>
-          <h2
-            style={{
-              fontFamily: "var(--font-epilogue-var), sans-serif",
-              fontWeight: 800,
-              fontSize: "clamp(28px, 4vw, 44px)",
-              color: "var(--text-h)",
-            }}
-          >
-            Latest from Madni Islamic Study Centre
-          </h2>
+          <a href="/latest" style={{ textDecoration: "none", display: "inline-block" }} aria-label="Open latest news and announcements">
+            <h2
+              style={{
+                fontFamily: "var(--font-epilogue-var), sans-serif",
+                fontWeight: 800,
+                fontSize: "clamp(28px, 4vw, 44px)",
+                color: "var(--text-h)",
+              }}
+            >
+              Latest from Madni Islamic Study Centre
+            </h2>
+          </a>
           <p style={{ fontFamily: "var(--font-caveat-var), cursive", fontSize: 22, color: "var(--amber)", marginTop: 6 }}>
             News, events, and achievements.
           </p>
         </div>
 
-        {/* Featured post */}
-        <div
+        <a
+          href={featuredPost.id.startsWith("fallback") ? "/latest" : `/latest?news=${encodeURIComponent(featuredPost.id)}`}
           className="featured-post-responsive fade-in"
           style={{
             background: "var(--surface)",
@@ -81,9 +202,11 @@ export default function BlogSection() {
             boxShadow: "var(--shadow)",
             marginBottom: 40,
             marginTop: 48,
+            textDecoration: "none",
+            color: "inherit",
           }}
+          aria-label={`Read announcement: ${featuredPost.title}`}
         >
-          {/* Image */}
           <div
             className="featured-post-img-div"
             style={{
@@ -93,14 +216,13 @@ export default function BlogSection() {
             }}
           >
             <Image
-              src="/images/img1.jpeg"
-              alt="Students at annual day ceremony"
+              src={featuredPost.imgSrc}
+              alt={featuredPost.imgAlt}
               fill
               style={{ objectFit: "cover" }}
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
-          {/* Body */}
           <div
             className="featured-post-body"
             style={{
@@ -114,8 +236,7 @@ export default function BlogSection() {
             <span
               style={{
                 display: "inline-block",
-                background: "#e8f4ff",
-                color: "#2563eb",
+                ...featuredPost.catStyle,
                 fontSize: 11,
                 fontWeight: 700,
                 padding: "4px 14px",
@@ -125,9 +246,9 @@ export default function BlogSection() {
                 letterSpacing: "0.06em",
               }}
             >
-              Event
+              {featuredPost.category}
             </span>
-            <div style={{ fontSize: 12, color: "var(--muted)" }}>March 15, 2026</div>
+            <div style={{ fontSize: 12, color: "var(--muted)" }}>{featuredPost.date}</div>
             <h3
               style={{
                 fontFamily: "var(--font-epilogue-var), sans-serif",
@@ -137,27 +258,25 @@ export default function BlogSection() {
                 lineHeight: 1.3,
               }}
             >
-              Annual Trust Day 2026: 1,200 Voices, One Dream
+              {featuredPost.title}
             </h3>
             <p style={{ fontSize: 15, color: "var(--text-b)", lineHeight: 1.7 }}>
-              This year&apos;s Annual Trust Day brought together students, teachers,
-              donors, and parents across all four schools in a celebration of
-              achievement, gratitude, and renewed commitment to quality education.
+              {featuredPost.excerpt}
             </p>
-            <a href="#" className="text-link-teal" style={{ marginTop: 8 }}>
-              Read More →
-            </a>
+            <span className="text-link-teal" style={{ marginTop: 8 }}>
+              Read More &rarr;
+            </span>
           </div>
-        </div>
+        </a>
 
-        {/* Blog card grid */}
         <div
           style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}
           className="blog-grid-responsive"
         >
           {posts.map((post, i) => (
-            <article
-              key={post.title}
+            <a
+              key={`${post.title}-${i}`}
+              href={post.id.startsWith("fallback") ? "/latest" : `/latest?news=${encodeURIComponent(post.id)}`}
               className={`card-lift fade-in fade-in-delay-${i + 1}`}
               style={{
                 background: "var(--surface)",
@@ -166,9 +285,11 @@ export default function BlogSection() {
                 boxShadow: "var(--shadow)",
                 display: "flex",
                 flexDirection: "column",
+                textDecoration: "none",
+                color: "inherit",
               }}
+              aria-label={`Read announcement: ${post.title}`}
             >
-              {/* Thumb — real image */}
               <div
                 style={{ width: "100%", aspectRatio: "16/9", position: "relative", overflow: "hidden" }}
               >
@@ -182,7 +303,6 @@ export default function BlogSection() {
                 />
               </div>
 
-              {/* Body */}
               <div
                 style={{
                   padding: 20,
@@ -221,9 +341,9 @@ export default function BlogSection() {
                   {post.title}
                 </h4>
                 <p style={{ fontSize: 13, color: "var(--text-b)", lineHeight: 1.6 }}>{post.excerpt}</p>
-                <a href="#" className="text-link-teal" style={{ fontSize: 13 }}>
-                  Read More →
-                </a>
+                <span className="text-link-teal" style={{ fontSize: 13 }}>
+                  Read More &rarr;
+                </span>
                 <div
                   style={{
                     marginTop: "auto",
@@ -236,7 +356,7 @@ export default function BlogSection() {
                   {post.school}
                 </div>
               </div>
-            </article>
+            </a>
           ))}
         </div>
       </div>

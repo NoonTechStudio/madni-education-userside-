@@ -1,317 +1,190 @@
-"use client";
+import DonateSectionClient, { DonationCard } from "./DonateSectionClient";
 
-import { useEffect, useRef } from "react";
+type DonationIcon = "education" | "library" | "construction" | "event" | "check";
 
-interface DonateCategory {
-  icon: string;
-  iconBg: string;
-  name: string;
-  desc: string;
-  raised: string;
-  goal: string;
-  pct: number;
-  barColor: string;
+interface FinancialAidNeed {
+  schoolId: string;
+  schoolName: string;
+  standardId: string;
+  standardName: string;
+  division?: string | null;
+  stream?: string | null;
+  fees: string | number;
+  zakatCount: number;
+  lillahCount: number;
+  zakatPaid: number;
+  lillahPaid: number;
+  totalStudentsCount: number;
 }
 
-const categories: DonateCategory[] = [
+interface ExpenseNeed {
+  id: string;
+  title: string;
+  description?: string | null;
+  type: string;
+  estimatedCost: string | number;
+  paidAmount: string | number;
+  schoolId: string;
+  schoolName: string;
+}
+
+interface DonationNeedsResponse {
+  expenses: ExpenseNeed[];
+  financialAid: FinancialAidNeed[];
+}
+
+const fallbackCards: DonationCard[] = [
   {
-    icon: "🎒",
+    icon: "education",
     iconBg: "#e8f8f5",
-    name: "Sponsor a Child's Education",
-    desc: "Cover a full year of tuition, books & uniform",
-    raised: "₹8.4L raised",
-    goal: "Goal: ₹12L",
+    name: "Sabri High School - Sponsor a Child's Education",
+    desc: "Cover a full year of tuition, books and uniform",
+    raised: "Rs. 8.4L raised",
+    goal: "Goal: Rs. 12L",
     pct: 70,
     barColor: "var(--teal)",
+    category: "education",
+    schoolName: "Sabri High School",
   },
   {
-    icon: "📚",
+    icon: "library",
     iconBg: "#fff8e8",
-    name: "Library Development Fund",
+    name: "Markaz Public School - Library Development Fund",
     desc: "Help us grow our collection of 3,000+ books",
-    raised: "₹2.1L raised",
-    goal: "Goal: ₹4L",
+    raised: "Rs. 2.1L raised",
+    goal: "Goal: Rs. 4L",
     pct: 52,
     barColor: "var(--amber)",
+    category: "education",
+    schoolName: "Markaz Public School",
   },
   {
-    icon: "🏗️",
+    icon: "construction",
     iconBg: "#f0e8ff",
-    name: "Infrastructure Improvement",
+    name: "Sabri High School - Infrastructure Improvement",
     desc: "Classrooms, labs, and learning spaces",
-    raised: "₹5.6L raised",
-    goal: "Goal: ₹10L",
+    raised: "Rs. 5.6L raised",
+    goal: "Goal: Rs. 10L",
     pct: 56,
     barColor: "#a855f7",
-  },
-  {
-    icon: "🤝",
-    iconBg: "#e8f4ff",
-    name: "General Operations Fund",
-    desc: "Staff salaries, utilities, daily operations",
-    raised: "₹6.2L raised",
-    goal: "Goal: ₹8L",
-    pct: 77,
-    barColor: "#3b82f6",
-  },
-  {
-    icon: "🏢",
-    iconBg: "#fff0f0",
-    name: "CSR & Corporate Sponsorships",
-    desc: "Partner with us for large-scale impact",
-    raised: "₹3.8L raised",
-    goal: "Goal: ₹15L",
-    pct: 25,
-    barColor: "#ef4444",
+    category: "construction",
+    schoolName: "Sabri High School",
   },
 ];
 
-function ProgressBar({ pct, color }: { pct: number; color: string }) {
-  const fillRef = useRef<HTMLDivElement>(null);
-  const observed = useRef(false);
-
-  useEffect(() => {
-    const el = fillRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !observed.current) {
-          observed.current = true;
-          el.style.width = pct + "%";
-          obs.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [pct]);
-
-  return (
-    <div
-      style={{
-        height: 6,
-        background: "#e8e8e8",
-        borderRadius: 9999,
-        overflow: "hidden",
-      }}
-    >
-      <div
-        ref={fillRef}
-        className="progress-fill"
-        style={{ background: color }}
-        aria-label={`${pct}% funded`}
-      />
-    </div>
-  );
+function formatCurrency(amount: number) {
+  return `Rs. ${Math.max(0, Math.round(amount)).toLocaleString("en-IN")}`;
 }
 
-function DonateCard({ cat }: { cat: DonateCategory }) {
-  return (
-    <div
-      className="card-lift"
-      style={{
-        background: "var(--surface)",
-        borderRadius: "var(--radius)",
-        padding: 28,
-        boxShadow: "var(--shadow)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 14,
-      }}
-    >
-      <div
-        style={{
-          width: 52,
-          height: 52,
-          borderRadius: 16,
-          background: cat.iconBg,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 24,
-        }}
-        aria-hidden="true"
-      >
-        {cat.icon}
-      </div>
-      <div
-        style={{
-          fontFamily: "var(--font-dm-sans-var), sans-serif",
-          fontWeight: 600,
-          fontSize: 16,
-          color: "var(--text-h)",
-        }}
-      >
-        {cat.name}
-      </div>
-      <div style={{ fontSize: 13, color: "var(--muted)" }}>{cat.desc}</div>
-      <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: 11,
-            color: "var(--muted)",
-            marginBottom: 6,
-          }}
-        >
-          <span>{cat.raised}</span>
-          <span>{cat.goal}</span>
-        </div>
-        <ProgressBar pct={cat.pct} color={cat.barColor} />
-      </div>
-      <a href="#" className="donate-card-btn">
-        Donate →
-      </a>
-    </div>
-  );
+function toNumber(value: string | number | null | undefined) {
+  const amount = Number(value);
+  return Number.isFinite(amount) ? amount : 0;
 }
 
-export default function DonateSection() {
-  return (
-    <section
-      id="donate"
-      style={{ background: "var(--amber-pale)", padding: "96px 0" }}
-    >
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px" }}>
-        {/* Header */}
-        <div className="fade-in" style={{ textAlign: "center" }}>
-          <h2
-            style={{
-              fontFamily: "var(--font-epilogue-var), sans-serif",
-              fontWeight: 800,
-              fontSize: "clamp(28px, 4vw, 44px)",
-              color: "var(--text-h)",
-            }}
-          >
-            Your Giving, Their Future
-          </h2>
-          <p
-            style={{
-              fontFamily: "var(--font-caveat-var), cursive",
-              fontSize: 22,
-              color: "var(--amber)",
-              marginTop: 6,
-            }}
-          >
-            Every rupee is accounted for.
-          </p>
-        </div>
+function getPct(paid: number, goal: number) {
+  if (goal <= 0) return 0;
+  return Math.round((paid / goal) * 100);
+}
 
-        {/* Top 3 cards */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 24,
-            marginTop: 48,
-          }}
-          className="donate-grid-responsive"
-        >
-          {categories.slice(0, 3).map((cat) => (
-            <DonateCard key={cat.name} cat={cat} />
-          ))}
-        </div>
+function standardLabel(need: FinancialAidNeed) {
+  return [
+    `Std. ${need.standardName}`,
+    need.division ? `Div. ${need.division}` : "",
+    need.stream || "",
+  ].filter(Boolean).join(" - ");
+}
 
-        {/* Bottom 2 cards centered */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: 24,
-            maxWidth: "calc(66.66% + 16px)",
-            margin: "24px auto 0",
-          }}
-          className="donate-bottom-responsive"
-        >
-          {categories.slice(3).map((cat) => (
-            <DonateCard key={cat.name} cat={cat} />
-          ))}
-        </div>
+function buildDynamicCards(data: DonationNeedsResponse): DonationCard[] {
+  const aidCards: DonationCard[] = data.financialAid.map((need) => {
+    const fees = toNumber(need.fees);
+    const zakatCount = toNumber(need.zakatCount);
+    const lillahCount = toNumber(need.lillahCount);
+    const zakatPaid = toNumber(need.zakatPaid);
+    const lillahPaid = toNumber(need.lillahPaid);
+    const zakatGoal = fees * zakatCount;
+    const lillahGoal = fees * lillahCount;
+    const totalGoal = zakatGoal + lillahGoal;
+    const totalPaid = zakatPaid + lillahPaid;
+    const label = standardLabel(need);
+    const zakatNeeded = Math.max(0, zakatGoal - zakatPaid);
+    const lillahNeeded = Math.max(0, lillahGoal - lillahPaid);
 
-        {/* Trust badges */}
-        <div
-          className="fade-in"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 32,
-            marginTop: 40,
-            flexWrap: "wrap",
-          }}
-        >
-          {["Zakat Eligible", "Registered Trust", "Audited Annually"].map((b, i) => (
-            <div
-              key={b}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                fontSize: 14,
-                fontWeight: 600,
-                color: "var(--teal)",
-              }}
-            >
-              {i > 0 && (
-                <span style={{ width: 1, height: 20, background: "#ddd", display: "inline-block" }} />
-              )}
-              <span>✅</span> {b}
-            </div>
-          ))}
-        </div>
+    return {
+      icon: "education",
+      iconBg: "#e8f8f5",
+      name: `${need.schoolName} - ${label}`,
+      desc: `Zakat needed: ${formatCurrency(zakatNeeded)}. Lillah needed: ${formatCurrency(lillahNeeded)}.`,
+      raised: `${formatCurrency(totalPaid)} received`,
+      goal: `${formatCurrency(Math.max(0, totalGoal - totalPaid))} needed`,
+      pct: getPct(totalPaid, totalGoal),
+      barColor: "var(--teal)",
+      category: "education",
+      schoolName: need.schoolName,
+      schoolId: need.schoolId,
+      referenceId: need.standardId,
+      donationType: "zakat",
+      suggestedAmount: Math.max(100, zakatNeeded || lillahNeeded || fees),
+    };
+  });
 
-        {/* CTA banner */}
-        <div
-          className="fade-in donate-cta-banner"
-          style={{
-            background: "var(--teal)",
-            borderRadius: "var(--radius)",
-            padding: "32px 48px",
-            marginTop: 40,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 24,
-            flexWrap: "wrap",
-          }}
-        >
-          <div>
-            <p style={{ fontSize: 18, fontWeight: 500, color: "#fff" }}>
-              Instant donation receipts issued. 80G tax exemption available.
-            </p>
-            <small style={{ fontSize: 13, color: "rgba(255,255,255,0.75)", marginTop: 4, display: "block" }}>
-              All donations are securely processed and fully transparent.
-            </small>
-          </div>
-          <a href="#" className="pill-btn pill-btn-amber" style={{ whiteSpace: "nowrap" }}>
-            Make a Secure Donation
-          </a>
-        </div>
-      </div>
+  const expenseCards: DonationCard[] = data.expenses.map((expense) => {
+    const goal = toNumber(expense.estimatedCost);
+    const paid = toNumber(expense.paidAmount);
+    const isEvent = expense.type?.toUpperCase() === "EVENT";
 
-      <style>{`
-        @media (max-width: 768px) {
-          .donate-grid-responsive { grid-template-columns: 1fr 1fr !important; }
-          .donate-bottom-responsive { max-width: 100% !important; }
-          /* Reduce CTA banner padding and stack vertically on mobile */
-          .donate-cta-banner {
-            padding: 24px 20px !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 16px !important;
-          }
-          .donate-cta-banner .pill-btn {
-            width: 100% !important;
-            justify-content: center !important;
-          }
-        }
-        @media (max-width: 480px) {
-          .donate-grid-responsive { grid-template-columns: 1fr !important; }
-          .donate-bottom-responsive { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-    </section>
-  );
+    return {
+      icon: isEvent ? "event" : "construction",
+      iconBg: isEvent ? "#e8f4ff" : "#f0e8ff",
+      name: `${expense.schoolName} - ${expense.title}`,
+      desc: expense.description || (isEvent ? "School event funding requirement" : "Construction funding requirement"),
+      raised: `${formatCurrency(paid)} received`,
+      goal: `${formatCurrency(goal - paid)} needed`,
+      pct: getPct(paid, goal),
+      barColor: isEvent ? "#3b82f6" : "#a855f7",
+      category: isEvent ? "event" : "construction",
+      schoolName: expense.schoolName,
+      schoolId: expense.schoolId,
+      referenceId: expense.id,
+      donationType: isEvent ? "event" : "construction",
+      suggestedAmount: Math.max(100, goal - paid),
+    };
+  });
+
+  return [...aidCards, ...expenseCards];
+}
+
+async function getDonationCards(): Promise<{ cards: DonationCard[]; isFallback: boolean }> {
+  const urlsToTry = [
+    process.env.NEXT_PUBLIC_API_URL,
+    "http://localhost:3001/api/public",
+    "http://localhost:3000/api/public",
+    "http://127.0.0.1:3001/api/public",
+    "http://127.0.0.1:3000/api/public",
+  ].filter(Boolean);
+
+  for (const baseUrl of urlsToTry) {
+    try {
+      const res = await fetch(`${baseUrl}/donation-needs`, { next: { revalidate: 30 } });
+      if (!res.ok) continue;
+
+      const data = await res.json() as DonationNeedsResponse;
+      const cards = buildDynamicCards({
+        expenses: Array.isArray(data.expenses) ? data.expenses : [],
+        financialAid: Array.isArray(data.financialAid) ? data.financialAid : [],
+      });
+
+      if (cards.length > 0) {
+        return { cards, isFallback: false };
+      }
+    } catch {
+      // Try next URL in the fallback list.
+    }
+  }
+
+  return { cards: fallbackCards, isFallback: true };
+}
+
+export default async function DonateSection() {
+  const { cards } = await getDonationCards();
+  return <DonateSectionClient initialCards={cards} />;
 }

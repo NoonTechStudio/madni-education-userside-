@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 
@@ -275,12 +276,67 @@ const DONATE_DATA = {
   },
 };
 
+type FeaturedAlumniImpact = {
+  name: string;
+  school: string;
+  result: string;
+  quote: string;
+  image: string;
+};
+
+type ConstructionCampaign = {
+  id: string;
+  schoolId: string;
+  title: string;
+  description: string;
+  schoolName: string;
+  raised: number;
+  goal: number;
+  pct: number;
+  image: string;
+};
+
+type SchoolNeedSummary = {
+  schoolId: string;
+  schoolName: string;
+  studentsCount: number;
+  educationNeeded: number;
+  constructionNeeded: number;
+  totalNeeded: number;
+};
+
+type DonationModalTarget = {
+  campaignId: string;
+  campaignTitle: string;
+  schoolName: string;
+  amount?: number;
+  donationType?: string;
+  schoolId?: string;
+};
+
+type FundBreakdownItem = {
+  label: string;
+  note: string;
+  pct: number;
+  color: string;
+  amount?: number;
+  amountSpent?: string | null;
+};
+
 // ─── Utilities ──────────────────────────────────────────────────────────────
 function formatInr(n: number) {
   if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
   if (n >= 1000)   return `₹${(n / 1000).toFixed(0)}K`;
   return `₹${n}`;
 }
+
+const publicApiBaseUrls = [
+  process.env.NEXT_PUBLIC_API_URL,
+  "http://localhost:3001/api/public",
+  "http://localhost:3000/api/public",
+  "http://127.0.0.1:3001/api/public",
+  "http://127.0.0.1:3000/api/public",
+].filter(Boolean) as string[];
 
 // ─── Animated progress bar ──────────────────────────────────────────────────
 function ProgressBar({ pct, color }: { pct: number; color: string }) {
@@ -323,11 +379,343 @@ function ProgressBar({ pct, color }: { pct: number; color: string }) {
 // PAGE COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function DonatePage() {
+  const searchParams = useSearchParams();
   const [selectedTier, setSelectedTier]     = useState<number | null>(null);
   const [donationType, setDonationType]     = useState("zakat");
   const [openFaq, setOpenFaq]               = useState<number | null>(null);
   const [form, setForm]                     = useState({ name: "", email: "", phone: "", amount: "", type: "zakat", campaign: "", message: "" });
   const [submitted, setSubmitted]           = useState(false);
+  const [featuredAlumni, setFeaturedAlumni] = useState<FeaturedAlumniImpact[]>([]);
+  const [constructionCampaigns, setConstructionCampaigns] = useState<ConstructionCampaign[]>([]);
+  const [schoolNeedSummaries, setSchoolNeedSummaries] = useState<SchoolNeedSummary[]>([]);
+  const [donationModalTarget, setDonationModalTarget] = useState<DonationModalTarget | null>(null);
+  const [submittingInquiry, setSubmittingInquiry] = useState(false);
+  const [inquiryMessage, setInquiryMessage] = useState("");
+  const [paymentLink, setPaymentLink] = useState("");
+  const [fundBreakdown, setFundBreakdown] = useState<FundBreakdownItem[]>([]);
+  const queryDonationOpened = useRef(false);
+
+  useEffect(() => {
+    const urlsToTry = [
+      process.env.NEXT_PUBLIC_API_URL,
+      "http://localhost:3001/api/public",
+      "http://localhost:3000/api/public",
+      "http://127.0.0.1:3001/api/public",
+      "http://127.0.0.1:3000/api/public",
+    ].filter(Boolean);
+
+    const fetchFeaturedAlumni = async () => {
+      for (const baseUrl of urlsToTry) {
+        try {
+          const res = await fetch(`${baseUrl}/alumni`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          const selected = Array.isArray(data.alumni)
+            ? data.alumni
+                .filter((a: any) => a.isFeatured)
+                .map((a: any) => ({
+                  name: a.name,
+                  school: a.schoolName || "Madni Education Trust",
+                  result: a.currentTitle || "Madni Alumni",
+                  quote: a.currentBio || "Grateful for the education and values received through Madni Education Trust.",
+                  image: a.profilePic || "/images/img-101.jpg",
+                }))
+            : [];
+
+          if (selected.length > 0) {
+            setFeaturedAlumni(selected);
+            break;
+          }
+        } catch {
+          // Try next configured API URL.
+        }
+      }
+    };
+
+    fetchFeaturedAlumni();
+  }, []);
+
+  useEffect(() => {
+    const urlsToTry = [
+      process.env.NEXT_PUBLIC_API_URL,
+      "http://localhost:3001/api/public",
+      "http://localhost:3000/api/public",
+      "http://127.0.0.1:3001/api/public",
+      "http://127.0.0.1:3000/api/public",
+    ].filter(Boolean);
+
+    const toNumber = (value: any) => {
+      const amount = Number(value);
+      return Number.isFinite(amount) ? amount : 0;
+    };
+
+    const fetchDonationNeeds = async () => {
+      for (const baseUrl of urlsToTry) {
+        try {
+          const res = await fetch(`${baseUrl}/donation-needs`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          const expenses = Array.isArray(data.expenses) ? data.expenses : [];
+          const financialAid = Array.isArray(data.financialAid) ? data.financialAid : [];
+          const construction = expenses
+            .filter((expense: any) => String(expense.type).toUpperCase() === "CONSTRUCTION")
+            .map((expense: any, index: number) => {
+              const goal = toNumber(expense.estimatedCost);
+              const raised = toNumber(expense.paidAmount);
+              return {
+                id: expense.id,
+                schoolId: expense.schoolId || expense.schoolName || expense.id,
+                title: expense.title || "Construction Requirement",
+                description: expense.description || "Construction and infrastructure funding requirement.",
+                schoolName: expense.schoolName || "Madni Education Trust",
+                raised,
+                goal,
+                pct: goal > 0 ? Math.min(100, Math.round((raised / goal) * 100)) : 0,
+                image: expense.mediaUrl || DONATE_DATA.campaigns[index % DONATE_DATA.campaigns.length]?.image || "/images/img-101.jpg",
+              };
+            });
+
+          const summaryMap = new Map<string, SchoolNeedSummary>();
+          const ensureSummary = (schoolId: string, schoolName: string) => {
+            const id = schoolId || schoolName || "all";
+            if (!summaryMap.has(id)) {
+              summaryMap.set(id, { schoolId: id, schoolName: schoolName || "Madni Education Trust", studentsCount: 0, educationNeeded: 0, constructionNeeded: 0, totalNeeded: 0 });
+            }
+            return summaryMap.get(id)!;
+          };
+
+          financialAid.forEach((need: any) => {
+            const fees = toNumber(need.fees);
+            const zakatCount = toNumber(need.zakatCount);
+            const lillahCount = toNumber(need.lillahCount);
+            const zakatPaid = toNumber(need.zakatPaid);
+            const lillahPaid = toNumber(need.lillahPaid);
+            const educationNeeded = Math.max(0, (fees * zakatCount) - zakatPaid) + Math.max(0, (fees * lillahCount) - lillahPaid);
+            const summary = ensureSummary(need.schoolId, need.schoolName);
+            summary.studentsCount += zakatCount + lillahCount;
+            summary.educationNeeded += educationNeeded;
+          });
+
+          construction.forEach((campaign: any) => {
+            const summary = ensureSummary(campaign.schoolId, campaign.schoolName);
+            summary.constructionNeeded += Math.max(0, campaign.goal - campaign.raised);
+          });
+
+          const summaries = Array.from(summaryMap.values())
+            .map((summary) => ({
+              ...summary,
+              totalNeeded: summary.educationNeeded + summary.constructionNeeded,
+            }))
+            .filter((summary) => summary.totalNeeded > 0)
+            .sort((a, b) => b.totalNeeded - a.totalNeeded);
+
+          if (construction.length > 0) setConstructionCampaigns(construction);
+          if (summaries.length > 0) setSchoolNeedSummaries(summaries);
+          break;
+        } catch {
+          // Try next configured API URL.
+        }
+      }
+    };
+
+    fetchDonationNeeds();
+  }, []);
+
+  useEffect(() => {
+    const fetchFinancialTransparency = async () => {
+      for (const baseUrl of publicApiBaseUrls) {
+        try {
+          const res = await fetch(`${baseUrl}/financial-transparency`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          const allocations = Array.isArray(data.allocations)
+            ? data.allocations.map((item: any) => ({
+                label: item.label,
+                note: item.note || item.desc || "",
+                pct: Number(item.pct ?? item.percent) || 0,
+                color: item.color || "#1A6B5A",
+                amount: Number(item.amount) || 0,
+                amountSpent: item.amountSpent || null,
+              }))
+            : [];
+
+          if (allocations.length > 0) {
+            setFundBreakdown(allocations);
+            break;
+          }
+        } catch {
+          // Try next configured API URL.
+        }
+      }
+    };
+
+    fetchFinancialTransparency();
+  }, []);
+
+  const impactStories = featuredAlumni.length > 0 ? featuredAlumni : DONATE_DATA.stories;
+  const activeConstructionCampaigns = constructionCampaigns.length > 0
+    ? constructionCampaigns
+    : DONATE_DATA.campaigns
+        .filter((camp) => camp.id === "construction")
+        .map((camp) => ({
+          id: camp.id,
+          schoolId: camp.id,
+          title: camp.title,
+          description: camp.description,
+          schoolName: "Madni Education Trust",
+          raised: camp.raised,
+          goal: camp.goal,
+          pct: camp.pct,
+          image: camp.image,
+        }));
+  const activeSchoolNeedSummaries = schoolNeedSummaries.length > 0
+    ? schoolNeedSummaries
+    : DONATE_DATA.campaigns.reduce<SchoolNeedSummary[]>((rows, camp) => {
+        rows.push({
+          schoolId: camp.id,
+          schoolName: camp.title.split("—")[0].trim() || "Madni Education Trust",
+          studentsCount: 0,
+          educationNeeded: Math.max(0, camp.goal - camp.raised),
+          constructionNeeded: 0,
+          totalNeeded: Math.max(0, camp.goal - camp.raised),
+        });
+        return rows;
+      }, []);
+  const schoolNeedCards = activeSchoolNeedSummaries.map((school) => ({
+    ...school,
+    amount: school.totalNeeded,
+    label: school.schoolName,
+    description: `Education need: ${formatInr(school.educationNeeded)}. Construction need: ${formatInr(school.constructionNeeded)}. ${school.studentsCount} students need support.`,
+  }));
+  const activeFundBreakdown = fundBreakdown.length > 0
+    ? fundBreakdown
+    : DONATE_DATA.fundBreakdown.map((item) => ({
+        ...item,
+        amount: 0,
+        amountSpent: null,
+      }));
+
+  const openDonationModal = (target: DonationModalTarget) => {
+    setDonationModalTarget(target);
+    setSubmitted(false);
+    setInquiryMessage("");
+    setPaymentLink("");
+    const nextType = target.donationType || "lillah";
+    setDonationType(nextType);
+    setForm((f) => ({
+      ...f,
+      type: nextType,
+      campaign: target.campaignId,
+      amount: target.amount ? String(target.amount) : f.amount,
+      message: `I would like to support ${target.campaignTitle} at ${target.schoolName}.`,
+    }));
+  };
+
+  const closeDonationModal = () => {
+    setDonationModalTarget(null);
+    setSubmitted(false);
+    setSubmittingInquiry(false);
+    setInquiryMessage("");
+    setPaymentLink("");
+  };
+
+  const submitDonationInquiry = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submittingInquiry) return;
+
+    const amount = Number(form.amount);
+    if (!Number.isFinite(amount) || amount < 100) {
+      setInquiryMessage("Please enter a donation amount of at least ₹100.");
+      return;
+    }
+
+    const selectedCampaign = activeConstructionCampaigns.find((campaign) => campaign.id === form.campaign);
+    const selectedSchoolNeed = schoolNeedCards.find((school) => `school-${school.schoolId}` === form.campaign);
+    const campaignTitle =
+      donationModalTarget?.campaignTitle ||
+      selectedCampaign?.title ||
+      selectedSchoolNeed?.label ||
+      "General donation";
+    const schoolName =
+      donationModalTarget?.schoolName ||
+      selectedCampaign?.schoolName ||
+      selectedSchoolNeed?.schoolName ||
+      "Madni Education Trust";
+
+    setSubmittingInquiry(true);
+    setInquiryMessage("");
+    setPaymentLink("");
+
+    for (const baseUrl of publicApiBaseUrls) {
+      try {
+        const res = await fetch(`${baseUrl}/donation-inquiries`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...form,
+            amount,
+            campaignTitle,
+            schoolName,
+            schoolId: donationModalTarget?.schoolId,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to submit donation enquiry.");
+        }
+
+        setSubmitted(true);
+        setPaymentLink(data.paymentLink || "");
+        setInquiryMessage(data.message || `Payment link sent to ${form.email}.`);
+        setSubmittingInquiry(false);
+        return;
+      } catch (error: any) {
+        if (baseUrl === publicApiBaseUrls[publicApiBaseUrls.length - 1]) {
+          setInquiryMessage(error?.message || "Could not submit donation enquiry. Please try again.");
+        }
+      }
+    }
+
+    setSubmittingInquiry(false);
+  };
+
+  useEffect(() => {
+    document.body.style.overflow = donationModalTarget ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [donationModalTarget]);
+
+  useEffect(() => {
+    if (queryDonationOpened.current) return;
+
+    const campaign = searchParams.get("campaign");
+    const amount = Number(searchParams.get("amount") || 0);
+    const title = searchParams.get("title");
+    const school = searchParams.get("school");
+    const type = searchParams.get("type");
+
+    if (!campaign && !title) return;
+
+    queryDonationOpened.current = true;
+    const normalizedType = type === "zakat" || type === "sadaqah" || type === "csr" || type === "event" ? type : "lillah";
+    setDonationType(normalizedType);
+    setForm((f) => ({
+      ...f,
+      type: normalizedType,
+      campaign: campaign || "general",
+      amount: amount > 0 ? String(amount) : f.amount,
+      message: `I would like to support ${title || "this donation need"} at ${school || "Madni Education Trust"}.`,
+    }));
+    openDonationModal({
+      campaignId: campaign || "general",
+      campaignTitle: title || "Donation need",
+      schoolName: school || "Madni Education Trust",
+	      amount: amount > 0 ? amount : undefined,
+	      donationType: normalizedType,
+	      schoolId: searchParams.get("schoolId") || undefined,
+	    });
+  }, [searchParams]);
 
   // Scroll reveal
   useEffect(() => {
@@ -614,15 +1002,15 @@ export default function DonatePage() {
               Real Children. Real Impact.
             </span>
             <h2 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4.5vw, 40px)", color: "#fff", margin: "0 0 12px", letterSpacing: "-0.01em" }}>
-              The Faces Behind Every Rupee
+	              Alumni Who Carry the Impact Forward
             </h2>
             <p style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 21, color: "#F5A623", margin: 0 }}>
-              Each of these children is here because someone chose to give.
+	              Selected by each school to show what supported education can become.
             </p>
           </div>
 
           <div className="stories-grid">
-            {DONATE_DATA.stories.map((s) => (
+            {impactStories.map((s) => (
               <div key={s.name} className="card-lift" style={{ background: "#fff", borderRadius: 24, overflow: "hidden", boxShadow: "0 8px 36px rgba(0,0,0,0.20)" }}>
                 {/* Photo */}
                 <div style={{ height: 260, position: "relative", background: "#EAF4F0", overflow: "hidden" }}>
@@ -685,17 +1073,17 @@ export default function DonatePage() {
             <span style={{ display: "inline-block", background: "#1A6B5A", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 12, padding: "5px 16px", borderRadius: 9999, marginBottom: 18 }}>
               Active Fundraising Campaigns
             </span>
-            <h2 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4.5vw, 40px)", color: "#1C1C1C", margin: "0 0 12px", letterSpacing: "-0.01em" }}>
-              Where Your Money Goes
-            </h2>
-            <p style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 21, color: "#F5A623", margin: 0 }}>
-              Six open campaigns. One mission. Zero overhead surprises.
-            </p>
+	            <h2 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4.5vw, 40px)", color: "#1C1C1C", margin: "0 0 12px", letterSpacing: "-0.01em" }}>
+	              Construction Needs by School
+	            </h2>
+	            <p style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 21, color: "#F5A623", margin: 0 }}>
+	              Classroom, lab, library, and campus infrastructure costs.
+	            </p>
           </div>
 
           <div className="campaigns-grid">
-            {DONATE_DATA.campaigns.map((camp) => (
-              <div key={camp.id} className="card-lift" style={{ background: "#fff", borderRadius: 24, overflow: "hidden", boxShadow: "0 4px 24px rgba(26,107,90,0.09)", display: "flex", flexDirection: "column" }}>
+	            {activeConstructionCampaigns.map((camp) => (
+	              <div key={camp.id} className="card-lift" style={{ background: "#fff", borderRadius: 24, overflow: "hidden", boxShadow: "0 4px 24px rgba(26,107,90,0.09)", display: "flex", flexDirection: "column" }}>
                 {/* Image */}
                 <div style={{ height: 190, position: "relative", background: "#EAF4F0", overflow: "hidden" }}>
                   <Image
@@ -706,23 +1094,26 @@ export default function DonatePage() {
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
                   <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.35))" }} />
-                  <span style={{
-                    position: "absolute", top: 14, left: 14,
-                    background: camp.tagBg, color: camp.tagColor,
-                    fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 11,
-                    padding: "4px 12px", borderRadius: 9999,
-                  }}>
-                    {camp.tag}
-                  </span>
+	                  <span style={{
+	                    position: "absolute", top: 14, left: 14,
+	                    background: "#FEF2F2", color: "#DC2626",
+	                    fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 11,
+	                    padding: "4px 12px", borderRadius: 9999,
+	                  }}>
+	                    Construction
+	                  </span>
                 </div>
 
                 {/* Body */}
                 <div style={{ padding: "24px 24px 28px", flex: 1, display: "flex", flexDirection: "column", gap: 14 }}>
-                  <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 17, color: "#1C1C1C", margin: 0, lineHeight: 1.3 }}>
-                    {camp.title}
-                  </h3>
-                  <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#6B7280", lineHeight: 1.7, margin: 0, flex: 1 }}>
-                    {camp.description}
+	                  <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 17, color: "#1C1C1C", margin: 0, lineHeight: 1.3 }}>
+	                    {camp.title}
+	                  </h3>
+	                  <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 12, color: "#1A6B5A", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+	                    {camp.schoolName}
+	                  </div>
+	                  <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#6B7280", lineHeight: 1.7, margin: 0, flex: 1 }}>
+	                    {camp.description}
                   </p>
 
                   {/* Progress */}
@@ -731,15 +1122,26 @@ export default function DonatePage() {
                       <span style={{ fontWeight: 700, color: "#1A6B5A" }}>{formatInr(camp.raised)} raised</span>
                       <span style={{ color: "#9CA3AF" }}>Goal: {formatInr(camp.goal)}</span>
                     </div>
-                    <ProgressBar pct={camp.pct} color={camp.barColor} />
-                    <div style={{ textAlign: "right", fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 12, color: camp.barColor, marginTop: 4 }}>
-                      {camp.pct}% funded
-                    </div>
-                  </div>
-
-                  <a href="#donate-form" className="pill-btn pill-btn-teal" style={{ justifyContent: "center", fontSize: 14, width: "100%" }}>
-                    Donate to This Campaign
-                  </a>
+	                    <ProgressBar pct={camp.pct} color="#F5A623" />
+	                    <div style={{ textAlign: "right", fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 12, color: "#F5A623", marginTop: 4 }}>
+	                      {camp.pct}% funded
+	                    </div>
+	                  </div>
+	
+	                  <button
+	                    type="button"
+	                    onClick={() => openDonationModal({
+	                      campaignId: camp.id,
+	                      campaignTitle: camp.title,
+	                      schoolName: camp.schoolName,
+	                      amount: Math.max(0, camp.goal - camp.raised),
+	                      schoolId: camp.schoolId,
+	                    })}
+	                    className="pill-btn pill-btn-teal"
+	                    style={{ justifyContent: "center", fontSize: 14, width: "100%", border: "none", cursor: "pointer" }}
+	                  >
+	                    Donate Now
+	                  </button>
                 </div>
               </div>
             ))}
@@ -755,29 +1157,33 @@ export default function DonatePage() {
               What Your Money Does
             </span>
             <h2 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: "clamp(26px, 4.5vw, 40px)", color: "#1C1C1C", margin: "0 0 12px", letterSpacing: "-0.01em" }}>
-              Every Amount Has a Real Impact
+	              Total Need, School Wise
             </h2>
             <p style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 21, color: "#1A6B5A", margin: 0 }}>
-              Click an amount — it pre-fills the donation form below.
+	              This year's education support and construction requirements.
             </p>
           </div>
 
           <div className="tiers-grid">
-            {DONATE_DATA.impactTiers.map((tier) => (
+		            {schoolNeedCards.map((tier) => (
               <button
-                key={tier.amount}
-                onClick={() => pickTier(tier.amount)}
+		                key={tier.schoolId}
+	                type="button"
+	                onClick={() => openDonationModal({
+		                  campaignId: `school-${tier.schoolId}`,
+		                  campaignTitle: `${tier.schoolName} yearly donation need`,
+		                  schoolName: tier.schoolName,
+		                  amount: tier.totalNeeded,
+	                })}
                 style={{
-                  background: selectedTier === tier.amount ? "#1A6B5A" : "#fff",
-                  border: `2px solid ${selectedTier === tier.amount ? "#1A6B5A" : "#E5E7EB"}`,
+	                  background: "#fff",
+	                  border: "2px solid #E5E7EB",
                   borderRadius: 20,
                   padding: "28px 24px",
                   textAlign: "left",
                   cursor: "pointer",
                   transition: "all 0.25s ease",
-                  boxShadow: selectedTier === tier.amount
-                    ? "0 10px 36px rgba(26,107,90,0.28)"
-                    : "0 2px 8px rgba(0,0,0,0.04)",
+	                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                   display: "flex",
                   flexDirection: "column",
                   gap: 10,
@@ -904,8 +1310,13 @@ export default function DonatePage() {
                     Jazakallah Khair!
                   </h3>
                   <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 16, color: "#4A4A4A", lineHeight: 1.75, margin: "0 0 20px" }}>
-                    Your enquiry has been received. Our team will contact you within 24 hours with payment details and a formal receipt.
-                  </p>
+	                    {inquiryMessage || "Your enquiry has been received. We have sent a secure payment link to your email."}
+	                  </p>
+	                  {paymentLink && (
+	                    <a href={paymentLink} style={{ display: "inline-block", background: "#1A6B5A", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 14, padding: "10px 22px", borderRadius: 9999, textDecoration: "none", marginBottom: 16 }}>
+	                      Open Pay Now Link
+	                    </a>
+	                  )}
                   <p style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 19, color: "#F5A623", margin: 0 }}>
                     May Allah accept your sadaqah and multiply it manifold.
                   </p>
@@ -919,7 +1330,7 @@ export default function DonatePage() {
                     We respond within 24 hours. No commitment required.
                   </p>
 
-                  <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+	                  <form onSubmit={submitDonationInquiry} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                     <input required placeholder="Full Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} style={iStyle} className="form-input" />
                     <input required type="email" placeholder="Email Address" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} style={iStyle} className="form-input" />
                     <input required type="tel" placeholder="WhatsApp / Mobile Number" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} style={iStyle} className="form-input" />
@@ -979,7 +1390,7 @@ export default function DonatePage() {
                       className="form-input"
                     >
                       <option value="">Donate towards… (choose campaign)</option>
-                      {DONATE_DATA.campaigns.map((c) => (
+	                      {activeConstructionCampaigns.map((c) => (
                         <option key={c.id} value={c.id}>{c.title}</option>
                       ))}
                       <option value="general">General Fund — wherever needed most</option>
@@ -990,11 +1401,17 @@ export default function DonatePage() {
                       placeholder="Message (optional) — e.g. requesting child sponsorship, in memory of someone"
                       value={form.message}
                       onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
-                      style={{ ...iStyle, resize: "vertical" }}
-                      className="form-input"
-                    />
+	                      style={{ ...iStyle, resize: "vertical" }}
+	                      className="form-input"
+	                    />
 
-                    <button type="submit" className="pill-btn pill-btn-teal" style={{ width: "100%", justifyContent: "center", fontSize: 16, padding: "14px" }}>
+	                    {inquiryMessage && (
+	                      <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#DC2626", lineHeight: 1.5, margin: 0 }}>
+	                        {inquiryMessage}
+	                      </p>
+	                    )}
+
+	                    <button type="submit" disabled={submittingInquiry} className="pill-btn pill-btn-teal" style={{ width: "100%", justifyContent: "center", fontSize: 16, padding: "14px", opacity: submittingInquiry ? 0.65 : 1, cursor: submittingInquiry ? "wait" : "pointer" }}>
                       Submit Donation Enquiry →
                     </button>
 
@@ -1033,12 +1450,17 @@ export default function DonatePage() {
           <div className="transparency-layout">
             {/* Fund breakdown bars */}
             <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-              {DONATE_DATA.fundBreakdown.map((item) => (
+	              {activeFundBreakdown.map((item) => (
                 <div key={item.label}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
                     <div>
                       <span style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 600, fontSize: 16, color: "#fff" }}>{item.label}</span>
-                      <span style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "rgba(255,255,255,0.45)", marginLeft: 10 }}>{item.note}</span>
+	                      <span style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "rgba(255,255,255,0.45)", marginLeft: 10 }}>{item.note}</span>
+	                      {item.amountSpent && (
+	                        <span style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 12, color: "rgba(255,255,255,0.58)", marginLeft: 10 }}>
+	                          {item.amountSpent} counted
+	                        </span>
+	                      )}
                     </div>
                     <span style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 800, fontSize: 20, color: "#F5A623", flexShrink: 0, marginLeft: 12 }}>{item.pct}%</span>
                   </div>
@@ -1214,7 +1636,115 @@ export default function DonatePage() {
         </div>
       </section>
 
-      <Footer />
+	      {donationModalTarget && (
+	        <>
+	          <button
+	            type="button"
+	            aria-label="Close donation form"
+	            onClick={closeDonationModal}
+	            style={{ position: "fixed", inset: 0, background: "rgba(15,61,53,0.55)", border: "none", zIndex: 10000, cursor: "pointer" }}
+	          />
+	          <div
+	            role="dialog"
+	            aria-modal="true"
+	            aria-labelledby="donation-modal-title"
+	            style={{
+	              position: "fixed",
+	              top: "50%",
+	              left: "50%",
+	              transform: "translate(-50%, -50%)",
+	              width: "min(92vw, 540px)",
+	              maxHeight: "90vh",
+	              overflowY: "auto",
+	              background: "#fff",
+	              borderRadius: 24,
+	              padding: "28px",
+	              zIndex: 10001,
+	              boxShadow: "0 24px 80px rgba(0,0,0,0.24)",
+	            }}
+	          >
+	            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 18, marginBottom: 18 }}>
+	              <div>
+	                <span style={{ display: "inline-block", background: "#EAF4F0", color: "#1A6B5A", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 12, padding: "5px 12px", borderRadius: 9999, marginBottom: 10 }}>
+	                  Donation Enquiry
+	                </span>
+	                <h3 id="donation-modal-title" style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 800, fontSize: 24, color: "#1C1C1C", margin: "0 0 6px", lineHeight: 1.2 }}>
+	                  {donationModalTarget.campaignTitle}
+	                </h3>
+	                <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#6B7280", margin: 0 }}>
+	                  {donationModalTarget.schoolName}
+	                </p>
+	              </div>
+	              <button
+	                type="button"
+	                onClick={closeDonationModal}
+	                aria-label="Close"
+	                style={{ width: 36, height: 36, borderRadius: "50%", border: "none", background: "#FAF8F4", color: "#1A6B5A", fontSize: 24, lineHeight: 1, cursor: "pointer", flexShrink: 0 }}
+	              >
+	                x
+	              </button>
+	            </div>
+
+	            {submitted ? (
+	              <div style={{ textAlign: "center", padding: "22px 8px 10px" }}>
+	                <div style={{ width: 70, height: 70, borderRadius: "50%", background: "#1A6B5A", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 32, marginBottom: 18 }}>
+	                  ✓
+	                </div>
+	                <h4 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 800, fontSize: 22, color: "#1C1C1C", margin: "0 0 8px" }}>
+	                  Donation enquiry submitted
+	                </h4>
+	                <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 15, color: "#6B7280", lineHeight: 1.7, margin: "0 0 20px" }}>
+		                  {inquiryMessage || "We have emailed the donor a secure Pay Now link for this amount."}
+		                </p>
+		                {paymentLink && (
+		                  <a href={paymentLink} style={{ display: "inline-block", background: "#F5A623", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 14, padding: "10px 22px", borderRadius: 9999, textDecoration: "none", marginBottom: 16 }}>
+		                    Open Pay Now Link
+		                  </a>
+		                )}
+	                <button type="button" onClick={closeDonationModal} className="pill-btn pill-btn-teal" style={{ border: "none", cursor: "pointer" }}>
+	                  Done
+	                </button>
+	              </div>
+	            ) : (
+		              <form onSubmit={submitDonationInquiry} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+	                <input required placeholder="Full Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} style={iStyle} className="form-input" />
+	                <input required type="email" placeholder="Email Address" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} style={iStyle} className="form-input" />
+	                <input required type="tel" placeholder="WhatsApp / Mobile Number" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} style={iStyle} className="form-input" />
+	                <input required type="number" min="100" placeholder="Donation amount" value={form.amount} onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))} style={iStyle} className="form-input" />
+	                <select
+	                  value={form.type}
+	                  onChange={(e) => { setForm((f) => ({ ...f, type: e.target.value })); setDonationType(e.target.value); }}
+	                  style={{ ...iStyle, appearance: "none" as const }}
+	                  className="form-input"
+	                >
+	                  <option value="zakat">Zakat</option>
+	                  <option value="sadaqah">Sadaqah</option>
+	                  <option value="lillah">Lillah</option>
+	                  <option value="csr">CSR / Corporate (80G)</option>
+	                </select>
+	                <textarea
+	                  rows={3}
+	                  placeholder="Message (optional)"
+	                  value={form.message}
+	                  onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+		                  style={{ ...iStyle, resize: "vertical" }}
+		                  className="form-input"
+		                />
+		                {inquiryMessage && (
+		                  <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#DC2626", lineHeight: 1.5, margin: 0 }}>
+		                    {inquiryMessage}
+		                  </p>
+		                )}
+		                <button type="submit" disabled={submittingInquiry} className="pill-btn pill-btn-teal" style={{ width: "100%", justifyContent: "center", fontSize: 15, padding: "13px", border: "none", cursor: submittingInquiry ? "wait" : "pointer", opacity: submittingInquiry ? 0.65 : 1 }}>
+		                  {submittingInquiry ? "Sending Payment Link..." : "Submit Donation Enquiry"}
+		                </button>
+	              </form>
+	            )}
+	          </div>
+	        </>
+	      )}
+
+	      <Footer />
 
       {/* ══ STYLES ═══════════════════════════════════════════════════════════ */}
       <style>{`
