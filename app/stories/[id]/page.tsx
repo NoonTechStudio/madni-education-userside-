@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import Navbar from "@/components/Navbar/Navbar";
+import Footer from "@/components/Footer/Footer";
 
 export const dynamic = "force-dynamic";
 
@@ -74,8 +75,11 @@ async function fetchStoryDetails(storyId: string): Promise<FullProfileResponse |
         const data = await res.json();
         if (data && data.alumni) return data;
       }
-    } catch (_) {}
+    } catch {
+      // Try next configured API URL.
+    }
   }
+
   return null;
 }
 
@@ -84,8 +88,34 @@ function getInitials(name: string) {
   return parts.slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const data = await fetchStoryDetails(params.id);
+function excerpt(text?: string | null, maxLength = 190) {
+  const normalized = (text || "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "Read this alumni story from the Madni Education Trust community.";
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, maxLength - 3)}...`;
+}
+
+function formatDate(value?: string | null) {
+  if (!value) return "Recently";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Recently";
+  return date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function Paragraphs({ text }: { text?: string | null }) {
+  const paragraphs = (text || "").split(/\n{2,}/).map((item) => item.trim()).filter(Boolean);
+  return (
+    <>
+      {paragraphs.map((paragraph, index) => (
+        <p key={index}>{paragraph}</p>
+      ))}
+    </>
+  );
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const data = await fetchStoryDetails(id);
   if (!data) return { title: "Story Not Found - Madni Education Trust" };
   const blog = data.blogs[0];
   return {
@@ -94,210 +124,462 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   };
 }
 
-export default async function StoryDetailPage({ params }: { params: { id: string } }) {
-  const data = await fetchStoryDetails(params.id);
+export default async function StoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const data = await fetchStoryDetails(id);
 
   if (!data) {
-    // If fallback story id or not in DB, render fallback detail page gracefully
     return (
-      <main style={{ background: "var(--bg)", minHeight: "100vh", padding: "120px 24px 80px" }}>
-        <div style={{ maxWidth: 800, margin: "0 auto", textTransform: "none" }}>
-          <Link href="/#stories" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--teal)", fontWeight: 700, textDecoration: "none", marginBottom: 32, fontSize: 14 }}>
-            ← Back to Stories
-          </Link>
-          <div style={{ background: "#fff", borderRadius: 24, padding: 40, boxShadow: "0 10px 40px rgba(0,0,0,0.06)", border: "1px solid #EAF4F0" }}>
-            <span style={{ background: "var(--amber-pale)", color: "#c27a00", fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 9999, textTransform: "uppercase" }}>Featured Alumni Transformation</span>
-            <h1 style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontSize: 32, fontWeight: 800, color: "var(--text-h)", margin: "16px 0 8px" }}>
-              From Madni Classrooms to Inspiring Career Success
-            </h1>
-            <p style={{ fontFamily: "var(--font-caveat-var), cursive", fontSize: 22, color: "var(--amber)", marginBottom: 24 }}>
-              &quot;Madni Education Trust gave me the ladder when I couldn&apos;t see the sky.&quot;
-            </p>
-            <p style={{ fontSize: 15, color: "var(--text-b)", lineHeight: 1.8, marginBottom: 20 }}>
-              Coming from a humble background in Karjan, pursuing higher education felt like an unattainable dream. Madni Education Trust stepped in with full Zakat educational aid, covering tuition, books, and lab access.
-            </p>
-            <p style={{ fontSize: 15, color: "var(--text-b)", lineHeight: 1.8, marginBottom: 28 }}>
-              Through dedicated teacher mentorship and rigorous academic support, I cleared board exams with top distinction and secured campus placement. Today, I am proud to give back by sponsoring current Madni students.
-            </p>
-            <Link href="/#donate" style={{ background: "var(--teal)", color: "#fff", padding: "14px 28px", borderRadius: 9999, textDecoration: "none", fontWeight: 700, display: "inline-block" }}>
-              💚 Sponsor a Needy Student Today →
-            </Link>
-          </div>
-        </div>
-      </main>
+      <>
+        <Navbar />
+        <main className="story-detail-main">
+          <section className="story-empty">
+            <span>Story not found</span>
+            <h1>We could not find this alumni story.</h1>
+            <Link href="/#stories">Back to Stories</Link>
+          </section>
+        </main>
+        <Footer />
+        <StoryStyles />
+      </>
     );
   }
 
   const { alumni, blogs, achievements, careers, mentorships } = data;
-  const currentBlog = blogs.find((b) => b.id === params.id) || blogs[0];
+  const currentBlog = blogs.find((blog) => blog.id === id) || blogs[0];
+  const heroImage = currentBlog?.mediaType !== "VIDEO" && currentBlog?.mediaUrl
+    ? currentBlog.mediaUrl
+    : alumni.profilePic || "/images/img2.jpeg";
+  const title = currentBlog?.title || `${alumni.name}'s Journey at Madni Trust`;
+  const summary = excerpt(currentBlog?.content || alumni.currentBio);
+  const hasImpactDetails = achievements.length > 0 || careers.length > 0 || mentorships.length > 0;
 
   return (
-    <main style={{ background: "var(--bg)", minHeight: "100vh", padding: "120px 24px 96px" }}>
-      <div style={{ maxWidth: 880, margin: "0 auto" }}>
-        {/* Navigation back */}
-        <Link href="/#stories" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: "var(--teal)", fontWeight: 700, textDecoration: "none", marginBottom: 32, fontSize: 14, background: "#fff", padding: "8px 18px", borderRadius: 9999, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-          ← Back to All Stories
-        </Link>
-
-        {/* Hero Card */}
-        <div style={{ background: "linear-gradient(135deg, #0d2b24, #1A6B5A)", borderRadius: 28, padding: "44px 40px", color: "#fff", boxShadow: "0 20px 50px rgba(13,43,36,0.25)", position: "relative", overflow: "hidden", marginBottom: 32 }}>
-          <div style={{ position: "absolute", top: -40, right: -40, width: 240, height: 240, background: "rgba(245,166,35,0.12)", borderRadius: "50%", filter: "blur(60px)" }} />
-
-          <div style={{ display: "flex", gap: 24, alignItems: "center", flexWrap: "wrap", position: "relative", zIndex: 2 }}>
-            <div style={{ width: 90, height: 90, borderRadius: "50%", border: "3.5px solid #F5A623", background: "linear-gradient(135deg,#FFF8EC,#EAF4F0)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, fontWeight: 800, color: "#1A6B5A", flexShrink: 0, overflow: "hidden" }}>
-              {alumni.profilePic ? (
-                <img src={alumni.profilePic} alt={alumni.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              ) : (
-                getInitials(alumni.name)
-              )}
+    <>
+      <Navbar />
+      <main className="story-detail-main">
+        <section className="story-detail-hero">
+          <div className="story-detail-image">
+            <img src={heroImage} alt={title} />
+          </div>
+          <div className="story-detail-hero-content">
+            <div className="story-detail-pills">
+              <span>Alumni Story</span>
+              <span>{alumni.schoolName}</span>
             </div>
+            <h1>{title}</h1>
+            <p>{summary}</p>
+            <div className="story-detail-meta">
+              <strong>{alumni.name}</strong>
+              {alumni.currentTitle && <span>{alumni.currentTitle}</span>}
+              {alumni.batchYear && <span>Batch of {alumni.batchYear}</span>}
+              {currentBlog?.createdAt && <span>{formatDate(currentBlog.createdAt)}</span>}
+            </div>
+          </div>
+        </section>
 
-            <div style={{ flex: 1, minWidth: 260 }}>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-                <span style={{ background: "rgba(245,166,35,0.25)", color: "#F5A623", fontSize: 11, fontWeight: 800, padding: "4px 12px", borderRadius: 9999, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                  Alumni Transformation Story
-                </span>
-                <span style={{ background: "rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.9)", fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 9999 }}>
-                  {alumni.schoolName}
-                </span>
+        <section className="story-detail-body">
+          <div className="story-detail-nav">
+            <Link href="/#stories">Back to Stories</Link>
+            <Link href="/stories">View All Stories</Link>
+          </div>
+
+          <article>
+            {alumni.currentBio && (
+              <blockquote>
+                <span>{getInitials(alumni.name)}</span>
+                <p>{alumni.currentBio}</p>
+              </blockquote>
+            )}
+
+            {currentBlog?.content ? (
+              <Paragraphs text={currentBlog.content} />
+            ) : (
+              <p>Full story details will appear here once this alumni story is completed.</p>
+            )}
+
+            {(alumni.linkedIn || alumni.workLink) && (
+              <div className="story-link-row">
+                {alumni.linkedIn && (
+                  <a href={alumni.linkedIn} target="_blank" rel="noopener noreferrer">LinkedIn Profile</a>
+                )}
+                {alumni.workLink && (
+                  <a href={alumni.workLink} target="_blank" rel="noopener noreferrer">Work / Website</a>
+                )}
               </div>
-              <h1 style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontSize: "clamp(24px, 3.5vw, 36px)", fontWeight: 800, color: "#fff", margin: "4px 0 8px", lineHeight: 1.3 }}>
-                {currentBlog?.title || `${alumni.name}'s Journey at Madni Trust`}
-              </h1>
-              <div style={{ fontSize: 15, color: "rgba(255,255,255,0.85)", fontWeight: 500 }}>
-                {alumni.name} · {alumni.currentTitle} {alumni.batchYear ? `(Class of ${alumni.batchYear})` : ""}
-              </div>
-            </div>
-          </div>
+            )}
+          </article>
+        </section>
 
-          {/* External Links */}
-          {(alumni.linkedIn || alumni.workLink) && (
-            <div style={{ display: "flex", gap: 12, marginTop: 24, flexWrap: "wrap", position: "relative", zIndex: 2 }}>
-              {alumni.linkedIn && (
-                <a href={alumni.linkedIn} target="_blank" rel="noopener noreferrer" style={{ background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: 12, fontWeight: 700, padding: "8px 18px", borderRadius: 9999, textDecoration: "none", border: "1px solid rgba(255,255,255,0.25)" }}>
-                  🔗 LinkedIn Profile
-                </a>
-              )}
-              {alumni.workLink && (
-                <a href={alumni.workLink} target="_blank" rel="noopener noreferrer" style={{ background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: 12, fontWeight: 700, padding: "8px 18px", borderRadius: 9999, textDecoration: "none", border: "1px solid rgba(255,255,255,0.25)" }}>
-                  🌐 Work / Website
-                </a>
-              )}
-            </div>
-          )}
-        </div>
+        {hasImpactDetails && (
+          <section className="story-related">
+            <div className="story-related-inner">
+              <span>Alumni Impact</span>
+              <h2>More from {alumni.name}</h2>
 
-        {/* Story Main Body Card */}
-        <div style={{ background: "#fff", borderRadius: 24, padding: 40, boxShadow: "0 10px 40px rgba(0,0,0,0.06)", border: "1px solid #EAF4F0", marginBottom: 32 }}>
-          {/* Bio Quote */}
-          {alumni.currentBio && (
-            <div style={{ background: "linear-gradient(135deg,#EAF4F0,#FFF8EC)", borderRadius: 18, padding: "20px 24px", borderLeft: "4px solid var(--amber)", marginBottom: 32 }}>
-              <p style={{ fontFamily: "var(--font-caveat-var), cursive", fontSize: 22, color: "#1A6B5A", margin: 0, lineHeight: 1.5 }}>
-                &quot;{alumni.currentBio}&quot;
-              </p>
-            </div>
-          )}
-
-          {/* Main Story Content */}
-          {currentBlog?.content ? (
-            <div>
-              <h2 style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontSize: 22, fontWeight: 800, color: "var(--text-h)", marginBottom: 16 }}>
-                The Complete Journey
-              </h2>
-              {currentBlog.content.split("\n\n").map((paragraph, i) => (
-                <p key={i} style={{ fontSize: 16, color: "var(--text-b)", lineHeight: 1.8, marginBottom: 20 }}>
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-          ) : null}
-
-          {/* Media attachment if any */}
-          {currentBlog?.mediaUrl && (
-            <div style={{ marginTop: 24, borderRadius: 16, overflow: "hidden", border: "1px solid #eee" }}>
-              {currentBlog.mediaType === "VIDEO" ? (
-                <video src={currentBlog.mediaUrl} controls style={{ width: "100%", maxHeight: 450, display: "block" }} />
-              ) : (
-                <img src={currentBlog.mediaUrl} alt={currentBlog.title} style={{ width: "100%", maxHeight: 450, objectFit: "cover", display: "block" }} />
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Achievements Section */}
-        {achievements && achievements.length > 0 && (
-          <div style={{ background: "#fff", borderRadius: 24, padding: 36, boxShadow: "0 10px 40px rgba(0,0,0,0.06)", border: "1px solid #EAF4F0", marginBottom: 32 }}>
-            <h3 style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontSize: 20, fontWeight: 800, color: "var(--text-h)", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-              🏆 Achievements & Honors
-            </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {achievements.map((ach) => (
-                <div key={ach.id} style={{ background: "#EAF4F0", borderRadius: 16, padding: "18px 22px", borderLeft: "4px solid #1A6B5A" }}>
-                  <div style={{ fontWeight: 700, fontSize: 16, color: "#1C1C1C", marginBottom: 6 }}>{ach.title}</div>
-                  <div style={{ fontSize: 14, color: "#4A4A4A", lineHeight: 1.6 }}>{ach.description}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Jobs & Internships Section */}
-        {careers && careers.length > 0 && (
-          <div style={{ background: "#fff", borderRadius: 24, padding: 36, boxShadow: "0 10px 40px rgba(0,0,0,0.06)", border: "1px solid #EAF4F0", marginBottom: 32 }}>
-            <h3 style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontSize: 20, fontWeight: 800, color: "var(--text-h)", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-              💼 Career Opportunities Offered by {alumni.name}
-            </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {careers.map((car) => (
-                <div key={car.id} style={{ background: car.type === "JOB" ? "#f0faf6" : "#FFF8EC", borderRadius: 16, padding: "18px 22px", border: `1px solid ${car.type === "JOB" ? "#c5e8df" : "#fde8b8"}` }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8, marginBottom: 6 }}>
-                    <span style={{ fontWeight: 800, fontSize: 16, color: "#1C1C1C" }}>{car.role}</span>
-                    <span style={{ background: car.type === "JOB" ? "#1A6B5A" : "#F5A623", color: "#fff", fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 9999 }}>
-                      {car.type === "JOB" ? "Full-Time Job" : "Internship"}
-                    </span>
+              {achievements.length > 0 && (
+                <div className="story-related-group">
+                  <h3>Achievements & Honors</h3>
+                  <div className="story-related-grid">
+                    {achievements.map((achievement) => (
+                      <div key={achievement.id}>
+                        <small>{achievement.category || "Achievement"}</small>
+                        <strong>{achievement.title}</strong>
+                        <em>{achievement.description}</em>
+                      </div>
+                    ))}
                   </div>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: "#1A6B5A", marginBottom: 4 }}>
-                    {car.companyName} {car.relation ? `(${car.relation})` : ""}
+                </div>
+              )}
+
+              {careers.length > 0 && (
+                <div className="story-related-group">
+                  <h3>Career Opportunities</h3>
+                  <div className="story-related-grid">
+                    {careers.map((career) => (
+                      <div key={career.id}>
+                        <small>{career.type}</small>
+                        <strong>{career.role}</strong>
+                        <em>{career.companyName}{career.relation ? ` (${career.relation})` : ""}</em>
+                      </div>
+                    ))}
                   </div>
-                  {car.description && <div style={{ fontSize: 14, color: "#4A4A4A", lineHeight: 1.6 }}>{car.description}</div>}
                 </div>
-              ))}
+              )}
+
+              {mentorships.length > 0 && (
+                <div className="story-related-group">
+                  <h3>Mentorship Sessions</h3>
+                  <div className="story-related-grid">
+                    {mentorships.map((mentorship) => (
+                      <div key={mentorship.id}>
+                        <small>{mentorship.targetStudent || "Mentorship"}</small>
+                        <strong>{mentorship.title}</strong>
+                        <em>{mentorship.description}</em>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
+          </section>
         )}
 
-        {/* Mentorship Section */}
-        {mentorships && mentorships.length > 0 && (
-          <div style={{ background: "#fff", borderRadius: 24, padding: 36, boxShadow: "0 10px 40px rgba(0,0,0,0.06)", border: "1px solid #EAF4F0", marginBottom: 32 }}>
-            <h3 style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontSize: 20, fontWeight: 800, color: "var(--text-h)", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-              🤝 Mentorship Sessions
-            </h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              {mentorships.map((m) => (
-                <div key={m.id} style={{ background: "#f8f4ff", borderRadius: 16, padding: "18px 22px", border: "1px solid #ddd6fe" }}>
-                  <div style={{ fontWeight: 800, fontSize: 16, color: "#1C1C1C", marginBottom: 6 }}>{m.title}</div>
-                  <div style={{ fontSize: 14, color: "#4A4A4A", lineHeight: 1.6, marginBottom: 8 }}>{m.description}</div>
-                  {m.targetStudent && <div style={{ fontSize: 12, fontWeight: 700, color: "#7c3aed" }}>👤 Target: {m.targetStudent}</div>}
-                  {m.availability && <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>🕐 Schedule: {m.availability}</div>}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <section className="story-cta">
+          <h2>Help Build More Success Stories Like {alumni.name.split(" ")[0]}</h2>
+          <p>Your Zakat and Lillah contributions support deserving students across all Madni Education Trust schools.</p>
+          <Link href="/#donate">Donate Educational Aid</Link>
+        </section>
+      </main>
+      <Footer />
+      <StoryStyles />
+    </>
+  );
+}
 
-        {/* Call to Action Banner */}
-        <div style={{ background: "#FAF8F4", borderRadius: 24, padding: 36, textAlign: "center", border: "2px dashed #1A6B5A" }}>
-          <h3 style={{ fontFamily: "var(--font-epilogue-var), sans-serif", fontSize: 22, fontWeight: 800, color: "#1C1C1C", margin: "0 0 8px" }}>
-            Help Build More Success Stories Like {alumni.name.split(" ")[0]}
-          </h3>
-          <p style={{ fontSize: 14, color: "#666", maxWidth: 540, margin: "0 auto 20px" }}>
-            Your Zakat and Lillah contributions support deserving students across all Madni Education Trust schools.
-          </p>
-          <Link href="/#donate" style={{ background: "#1A6B5A", color: "#fff", padding: "14px 32px", borderRadius: 9999, textDecoration: "none", fontWeight: 800, fontSize: 15, display: "inline-block", boxShadow: "0 4px 16px rgba(26,107,90,0.3)" }}>
-            💚 Donate Educational Aid Now →
-          </Link>
-        </div>
-      </div>
-    </main>
+function StoryStyles() {
+  return (
+    <style>{`
+      .story-detail-main {
+        background: #FAF8F4;
+        color: #1C1C1C;
+        min-height: 100vh;
+        font-family: 'DM Sans', sans-serif;
+      }
+
+      .story-detail-hero {
+        display: grid;
+        grid-template-columns: minmax(320px, 0.95fr) minmax(320px, 1.05fr);
+        min-height: 620px;
+        background: #0F3D35;
+      }
+
+      .story-detail-image {
+        position: relative;
+        min-height: 360px;
+        overflow: hidden;
+        background: #EAF4F0;
+      }
+
+      .story-detail-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .story-detail-hero-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 72px clamp(28px, 6vw, 84px);
+        color: white;
+      }
+
+      .story-detail-pills {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 22px;
+      }
+
+      .story-detail-pills span {
+        display: inline-flex;
+        width: fit-content;
+        border-radius: 999px;
+        padding: 6px 14px;
+        background: rgba(255,255,255,0.12);
+        color: #FFF8EC;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .story-detail-hero h1 {
+        font-family: 'Epilogue', sans-serif;
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 1.05;
+        margin: 0;
+        letter-spacing: 0;
+        overflow-wrap: anywhere;
+      }
+
+      .story-detail-hero p {
+        margin-top: 22px;
+        max-width: 680px;
+        color: rgba(255,255,255,0.82);
+        font-size: 18px;
+        line-height: 1.75;
+      }
+
+      .story-detail-meta {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-top: 28px;
+        color: rgba(255,255,255,0.72);
+        font-size: 13px;
+      }
+
+      .story-detail-meta strong {
+        color: #F5A623;
+      }
+
+      .story-detail-body {
+        width: min(900px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 64px 0 80px;
+      }
+
+      .story-detail-nav {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 28px;
+      }
+
+      .story-detail-nav a,
+      .story-empty a,
+      .story-cta a,
+      .story-link-row a {
+        display: inline-flex;
+        text-decoration: none;
+        border-radius: 999px;
+        padding: 11px 18px;
+        background: #EAF4F0;
+        color: #1A6B5A;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .story-detail-body article {
+        background: white;
+        border: 1px solid #EAF4F0;
+        border-radius: 24px;
+        padding: clamp(28px, 5vw, 56px);
+        box-shadow: 0 12px 40px rgba(15,61,53,0.08);
+      }
+
+      .story-detail-body article p {
+        color: #4A4A4A;
+        font-size: 18px;
+        line-height: 1.9;
+        margin: 0 0 24px;
+      }
+
+      .story-detail-body article p:last-child {
+        margin-bottom: 0;
+      }
+
+      .story-detail-body blockquote {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 16px;
+        align-items: start;
+        margin: 0 0 32px;
+        padding: 22px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #EAF4F0, #FFF8EC);
+        border-left: 4px solid #F5A623;
+      }
+
+      .story-detail-body blockquote span {
+        display: inline-flex;
+        width: 48px;
+        height: 48px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #0F3D35;
+        color: #FFF8EC;
+        font-weight: 900;
+      }
+
+      .story-detail-body blockquote p {
+        color: #1A6B5A;
+        font-family: 'Caveat', cursive;
+        font-size: 24px;
+        line-height: 1.55;
+        margin: 0;
+      }
+
+      .story-link-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+      }
+
+      .story-related {
+        background: #EAF4F0;
+        padding: 72px 24px;
+      }
+
+      .story-related-inner {
+        width: min(1100px, 100%);
+        margin: 0 auto;
+      }
+
+      .story-related-inner > span,
+      .story-empty span {
+        color: #B45309;
+        font-family: 'Caveat', cursive;
+        font-size: 24px;
+      }
+
+      .story-related h2,
+      .story-empty h1,
+      .story-cta h2 {
+        font-family: 'Epilogue', sans-serif;
+        font-size: clamp(28px, 4vw, 38px);
+        line-height: 1.15;
+        margin: 8px 0 28px;
+      }
+
+      .story-related-group {
+        margin-top: 30px;
+      }
+
+      .story-related-group h3 {
+        font-family: 'Epilogue', sans-serif;
+        margin: 0 0 16px;
+      }
+
+      .story-related-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+
+      .story-related-grid div {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 170px;
+        padding: 24px;
+        border-radius: 18px;
+        background: white;
+        border: 1px solid rgba(26,107,90,0.12);
+      }
+
+      .story-related-grid small {
+        color: #1A6B5A;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .story-related-grid strong {
+        font-family: 'Epilogue', sans-serif;
+        font-size: 18px;
+        line-height: 1.35;
+      }
+
+      .story-related-grid em {
+        margin-top: auto;
+        color: #666;
+        font-size: 13px;
+        line-height: 1.55;
+        font-style: normal;
+      }
+
+      .story-cta {
+        width: min(900px, calc(100% - 48px));
+        margin: 72px auto;
+        padding: clamp(28px, 5vw, 48px);
+        border-radius: 24px;
+        background: #0F3D35;
+        color: white;
+        text-align: center;
+      }
+
+      .story-cta h2 {
+        margin-bottom: 14px;
+      }
+
+      .story-cta p {
+        max-width: 620px;
+        margin: 0 auto 24px;
+        color: rgba(255,255,255,0.78);
+        line-height: 1.75;
+      }
+
+      .story-cta a {
+        background: #F5A623;
+        color: white;
+      }
+
+      .story-empty {
+        width: min(760px, calc(100% - 48px));
+        margin: 0 auto;
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+      }
+
+      @media (max-width: 860px) {
+        .story-detail-hero,
+        .story-related-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .story-detail-hero-content {
+          padding: 44px 24px 56px;
+        }
+
+        .story-detail-body,
+        .story-cta {
+          width: min(100% - 32px, 900px);
+        }
+
+        .story-detail-body blockquote {
+          grid-template-columns: 1fr;
+        }
+      }
+    `}</style>
   );
 }

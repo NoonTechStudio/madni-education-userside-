@@ -4,6 +4,16 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 
+const ARTICLES_PER_PAGE = 6;
+const FALLBACK_ARTICLE_IMAGES = [
+    "/images/img1.jpeg",
+    "/images/img-101.jpg",
+    "/images/img-102.jpg.avif",
+    "/images/img-103.jpg",
+    "/images/img2.jpeg",
+    "/images/Hero-1.jpg",
+];
+
 // ─────────────────────────────────────────────
 // VECTOR SVG ICONS
 // ─────────────────────────────────────────────
@@ -107,7 +117,7 @@ const INSIGHTS_DATA = {
             readTime: "6 min read",
             excerpt:
                 "In a world racing toward English fluency, the value of mother-tongue education is often overlooked. Here's why Gujarati medium schools remain vital for communities like ours.",
-            thumbnail: "/images/article-1.jpg",
+            thumbnail: FALLBACK_ARTICLE_IMAGES[0],
             featured: true,
             tag: "Education",
         },
@@ -122,7 +132,7 @@ const INSIGHTS_DATA = {
             readTime: "4 min read",
             excerpt:
                 "I never imagined I'd be writing a college essay one day. Sabri School didn't just teach me accounts — it taught me to believe I had a future worth writing about.",
-            thumbnail: "/images/article-2.jpg",
+            thumbnail: FALLBACK_ARTICLE_IMAGES[1],
             featured: false,
             tag: "Alumni",
         },
@@ -137,7 +147,7 @@ const INSIGHTS_DATA = {
             readTime: "3 min read",
             excerpt:
                 "We are proud to announce that Sabri High School achieved a 97.9% pass rate in the 2023–24 SSC board examinations — the highest in the school's history.",
-            thumbnail: "/images/article-3.jpg",
+            thumbnail: FALLBACK_ARTICLE_IMAGES[2],
             featured: false,
             tag: "Achievement",
         },
@@ -152,7 +162,7 @@ const INSIGHTS_DATA = {
             readTime: "8 min read",
             excerpt:
                 "Zakat is often seen as a religious duty. But at Madni Education Trust, we've seen it become a complete educational ecosystem — one rupee at a time.",
-            thumbnail: "/images/article-4.jpg",
+            thumbnail: FALLBACK_ARTICLE_IMAGES[3],
             featured: false,
             tag: "Insight",
         },
@@ -167,7 +177,7 @@ const INSIGHTS_DATA = {
             readTime: "3 min read",
             excerpt:
                 "I was scared to write. Now I can't stop. This is the story of how a single assignment from my teacher changed the way I see myself.",
-            thumbnail: "/images/article-5.jpg",
+            thumbnail: FALLBACK_ARTICLE_IMAGES[4],
             featured: false,
             tag: "Student",
         },
@@ -182,7 +192,7 @@ const INSIGHTS_DATA = {
             readTime: "5 min read",
             excerpt:
                 "After 9 years of teaching Std. 9 and 10 students, I've seen what separates the students who perform from those who struggle. Here's what actually works.",
-            thumbnail: "/images/article-6.jpg",
+            thumbnail: FALLBACK_ARTICLE_IMAGES[5],
             featured: false,
             tag: "Guide",
         },
@@ -272,6 +282,7 @@ export default function InsightsPage() {
     const [subscribed, setSubscribed] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [heroSearch, setHeroSearch] = useState("");
+    const [visibleArticleCount, setVisibleArticleCount] = useState(ARTICLES_PER_PAGE);
 
     // Fetch real approved blogs & news updates from backend database
     useEffect(() => {
@@ -320,7 +331,7 @@ export default function InsightsPage() {
             date: dateFormatted,
             readTime: "5 min read",
             excerpt: b.content ? b.content.substring(0, 160) + "..." : "Read the full insight article from Madni Education Trust.",
-            thumbnail: b.mediaUrl || "/images/article-1.jpg",
+            thumbnail: b.mediaUrl || FALLBACK_ARTICLE_IMAGES[index % FALLBACK_ARTICLE_IMAGES.length],
             featured: Boolean(b.isFeatured),
             isTopFeatured: Boolean(b.isTopFeatured),
             tag: tag,
@@ -355,6 +366,12 @@ export default function InsightsPage() {
                 a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 a.author.toLowerCase().includes(searchQuery.toLowerCase())
         );
+    const visibleArticles = filteredArticles.slice(0, visibleArticleCount);
+    const hasMoreArticles = visibleArticleCount < filteredArticles.length;
+
+    useEffect(() => {
+        setVisibleArticleCount(ARTICLES_PER_PAGE);
+    }, [dataSource, activeCategory, searchQuery, dynamicBlogs]);
 
     // Scroll reveal
     useEffect(() => {
@@ -920,17 +937,18 @@ export default function InsightsPage() {
                         </button>
                     </div>
                 ) : (
-                    <div
-                        className="grid-3 reveal"
-                        style={{
-                            display: "grid",
-                            gridTemplateColumns: "repeat(3, 1fr)",
-                            gap: "24px",
-                            maxWidth: "1100px",
-                            margin: "0 auto",
-                        }}
-                    >
-                        {filteredArticles.map((article) => {
+                    <>
+                        <div
+                            className="grid-3 reveal"
+                            style={{
+                                display: "grid",
+                                gridTemplateColumns: "repeat(3, 1fr)",
+                                gap: "24px",
+                                maxWidth: "1100px",
+                                margin: "0 auto",
+                            }}
+                        >
+                        {visibleArticles.map((article) => {
                             const tagColor = INSIGHTS_DATA.tagColors[article.tag] || { bg: "#EAF4F0", text: "#1A6B5A" };
                             return (
                                 <div key={article.id} className="article-card">
@@ -1080,14 +1098,38 @@ export default function InsightsPage() {
                                                     textDecoration: "none",
                                                 }}
                                             >
-                                                Read More →
+                                                Read More &rarr;
                                             </a>
                                         </div>
                                     </div>
                                 </div>
                             );
                         })}
-                    </div>
+                        </div>
+
+                        {hasMoreArticles && (
+                            <div style={{ display: "flex", justifyContent: "center", marginTop: "32px" }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setVisibleArticleCount((count) => Math.min(count + ARTICLES_PER_PAGE, filteredArticles.length))}
+                                    style={{
+                                        background: "white",
+                                        color: "var(--teal)",
+                                        border: "1.5px solid rgba(26,107,90,0.18)",
+                                        borderRadius: "999px",
+                                        padding: "13px 28px",
+                                        fontFamily: "'DM Sans', sans-serif",
+                                        fontWeight: 700,
+                                        fontSize: "14px",
+                                        cursor: "pointer",
+                                        boxShadow: "0 10px 28px rgba(0,0,0,0.08)",
+                                    }}
+                                >
+                                    Load More Insights
+                                </button>
+                            </div>
+                        )}
+                    </>
                 )}
             </section>
 

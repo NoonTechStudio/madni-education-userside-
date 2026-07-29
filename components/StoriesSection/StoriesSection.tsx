@@ -296,6 +296,7 @@ export default async function StoriesSection() {
     getFeaturedStories(),
   ]);
   const featuredStory = stories[0];
+  const remainingStories = stories.slice(1);
 
   return (
     <section id="stories" style={{ background: "var(--bg)", padding: "96px 0" }}>
@@ -389,12 +390,7 @@ export default async function StoriesSection() {
           </div>
         </div>
 
-        <div
-          style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}
-          className="stories-grid-responsive"
-        >
-          <StoriesSectionClient stories={stories as StoryCard[]} />
-        </div>
+        <StoriesSectionClient stories={remainingStories as StoryCard[]} />
 
         <div style={{ marginTop: 56 }}>
           <h3

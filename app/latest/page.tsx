@@ -194,22 +194,36 @@ function LatestArticle({ post, featured = false, detail = false }: { post: Lates
   if (detail) {
     return (
       <article id={post.id} className="latest-detail-article">
-        <div className="latest-detail-heading">
-          <CategoryPill post={post} />
-          <div className="latest-meta">
-            <span>{post.school}</span>
-            {post.date && <span>{post.date}</span>}
+        <section className="latest-detail-hero">
+          <div className="latest-detail-image">
+            <img src={post.imgSrc} alt={post.imgAlt} />
           </div>
-          <h2>{post.title}</h2>
-        </div>
+          <div className="latest-detail-hero-content">
+            <div className="latest-detail-pills">
+              <span>{post.category}</span>
+              <span>{post.school}</span>
+            </div>
+            <h1>{post.title}</h1>
+            <p>{post.excerpt}</p>
+            <div className="latest-detail-meta">
+              <strong>Madni Education Trust</strong>
+              {post.date && <span>{post.date}</span>}
+              <span>News & Announcement</span>
+            </div>
+          </div>
+        </section>
 
-        <div className="latest-detail-image">
-          <img src={post.imgSrc} alt={post.imgAlt} />
-        </div>
-
-        <div className="latest-detail-description">
-          <p>{post.description}</p>
-        </div>
+        <section className="latest-detail-body">
+          <div className="latest-detail-nav">
+            <a href="/#blog">Back to Latest</a>
+            <a href="/latest">View All Announcements</a>
+          </div>
+          <div className="latest-detail-description">
+            {post.description.split(/\n{2,}/).map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </div>
+        </section>
       </article>
     );
   }
@@ -276,12 +290,7 @@ export default async function LatestPage({ searchParams }: LatestPageProps) {
         )}
 
         <section className={isDetailPage ? "latest-page-body latest-page-body-detail" : "latest-page-body"}>
-          {isDetailPage ? (
-            <div className="latest-detail-nav">
-              <a href="/#blog">Back to Latest</a>
-              <a href="/latest">View All Announcements</a>
-            </div>
-          ) : (
+          {!isDetailPage && (
             <div className="latest-intro">
               <div>
                 <span>News, events, and achievements.</span>
@@ -313,7 +322,7 @@ export default async function LatestPage({ searchParams }: LatestPageProps) {
         }
 
         .latest-main-detail {
-          background: #F7FBF9;
+          background: #FAF8F4;
         }
 
         .latest-hero {
@@ -389,8 +398,8 @@ export default async function LatestPage({ searchParams }: LatestPageProps) {
         }
 
         .latest-page-body-detail {
-          width: min(980px, calc(100% - 48px));
-          padding: 42px 0 84px;
+          width: 100%;
+          padding: 0;
         }
 
         .latest-intro {
@@ -433,15 +442,20 @@ export default async function LatestPage({ searchParams }: LatestPageProps) {
         .latest-detail-nav {
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          justify-content: flex-start;
           gap: 16px;
-          margin-bottom: 22px;
+          margin-bottom: 28px;
+          flex-wrap: wrap;
         }
 
         .latest-detail-nav a {
-          color: var(--teal);
+          display: inline-flex;
+          border-radius: 999px;
+          padding: 11px 18px;
+          background: #EAF4F0;
+          color: #1A6B5A;
           text-decoration: none;
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 800;
         }
 
@@ -518,48 +532,107 @@ export default async function LatestPage({ searchParams }: LatestPageProps) {
         }
 
         .latest-detail-article {
-          background: #fff;
-          border-radius: 18px;
-          box-shadow: 0 8px 28px rgba(26,107,90,0.08);
-          overflow: hidden;
-          border: 1px solid rgba(26,107,90,0.08);
+          background: #FAF8F4;
         }
 
-        .latest-detail-heading {
-          padding: clamp(24px, 4vw, 42px) clamp(22px, 5vw, 46px) 22px;
+        .latest-detail-hero {
+          display: grid;
+          grid-template-columns: minmax(320px, 0.95fr) minmax(320px, 1.05fr);
+          min-height: 620px;
+          background: #0F3D35;
+        }
+
+        .latest-detail-hero-content {
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          justify-content: center;
+          padding: 72px clamp(28px, 6vw, 84px);
+          color: white;
         }
 
-        .latest-detail-heading h2 {
+        .latest-detail-pills {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-bottom: 22px;
+        }
+
+        .latest-detail-pills span {
+          display: inline-flex;
+          width: fit-content;
+          border-radius: 999px;
+          padding: 6px 14px;
+          background: rgba(255,255,255,0.12);
+          color: #FFF8EC;
+          font-size: 11px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+        }
+
+        .latest-detail-hero h1 {
           font-family: var(--font-epilogue-var), sans-serif;
-          color: var(--text-h);
-          font-size: clamp(28px, 4.5vw, 46px);
-          line-height: 1.12;
+          color: white;
+          font-size: clamp(34px, 5vw, 58px);
+          line-height: 1.05;
           margin: 0;
-          max-width: 860px;
+          letter-spacing: 0;
           overflow-wrap: anywhere;
         }
 
+        .latest-detail-hero p {
+          margin-top: 22px;
+          max-width: 680px;
+          color: rgba(255,255,255,0.82);
+          font-size: 18px;
+          line-height: 1.75;
+        }
+
+        .latest-detail-meta {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          align-items: center;
+          margin-top: 28px;
+          color: rgba(255,255,255,0.72);
+          font-size: 13px;
+        }
+
+        .latest-detail-meta strong {
+          color: #F5A623;
+        }
+
         .latest-detail-image {
-          width: 100%;
-          aspect-ratio: 16 / 8;
-          min-height: 300px;
+          position: relative;
+          min-height: 360px;
           background: #EAF4F0;
+          overflow: hidden;
+        }
+
+        .latest-detail-body {
+          width: min(900px, calc(100% - 48px));
+          margin: 0 auto;
+          padding: 64px 0 80px;
         }
 
         .latest-detail-description {
-          padding: 28px clamp(22px, 5vw, 46px) clamp(34px, 5vw, 48px);
+          background: white;
+          border: 1px solid #EAF4F0;
+          border-radius: 24px;
+          padding: clamp(28px, 5vw, 56px);
+          box-shadow: 0 12px 40px rgba(15,61,53,0.08);
         }
 
         .latest-detail-description p {
-          color: var(--text-b);
-          font-size: clamp(16px, 1.8vw, 18px);
-          line-height: 1.85;
-          margin: 0;
+          color: #4A4A4A;
+          font-size: 18px;
+          line-height: 1.9;
+          margin: 0 0 24px;
           white-space: pre-line;
-          max-width: 820px;
+        }
+
+        .latest-detail-description p:last-child {
+          margin-bottom: 0;
         }
 
         .latest-empty {
@@ -582,15 +655,24 @@ export default async function LatestPage({ searchParams }: LatestPageProps) {
             flex-direction: column;
           }
 
-          .latest-page-body-detail {
-            width: min(100% - 32px, 980px);
-            padding-top: 24px;
-          }
+	          .latest-page-body-detail {
+	            width: 100%;
+	            padding-top: 0;
+	          }
 
-          .latest-detail-nav {
-            align-items: flex-start;
-            flex-direction: column;
-          }
+	          .latest-detail-hero {
+	            grid-template-columns: 1fr;
+	            min-height: auto;
+	          }
+
+	          .latest-detail-hero-content {
+	            padding: 44px 24px 56px;
+	          }
+
+	          .latest-detail-body {
+	            width: min(100% - 32px, 900px);
+	            padding: 36px 0 64px;
+	          }
 
           .latest-intro a {
             white-space: normal;
@@ -605,10 +687,9 @@ export default async function LatestPage({ searchParams }: LatestPageProps) {
             min-height: 220px;
           }
 
-          .latest-detail-image {
-            aspect-ratio: 16 / 10;
-            min-height: 220px;
-          }
+	          .latest-detail-image {
+	            min-height: 320px;
+	          }
         }
 
         @media (max-width: 420px) {
@@ -620,14 +701,13 @@ export default async function LatestPage({ searchParams }: LatestPageProps) {
             min-height: 180px;
           }
 
-          .latest-detail-image {
-            min-height: 180px;
-          }
+	          .latest-detail-image {
+	            min-height: 240px;
+	          }
 
-          .latest-detail-heading,
-          .latest-detail-description {
-            padding-left: 18px;
-            padding-right: 18px;
+	          .latest-detail-description {
+	            padding-left: 18px;
+	            padding-right: 18px;
           }
 
           .latest-article-body {

@@ -404,7 +404,46 @@ export default function DonatePage() {
   const [inquiryMessage, setInquiryMessage] = useState("");
   const [paymentLink, setPaymentLink] = useState("");
   const [fundBreakdown, setFundBreakdown] = useState<FundBreakdownItem[]>([]);
+  const [aoyWinner, setAoyWinner] = useState<any>(null);
+  const [alumniMode, setAlumniMode] = useState(false);
+  const [alumniEmailInput, setAlumniEmailInput] = useState("");
+  const [alumniCheckMsg, setAlumniCheckMsg] = useState("");
+  const [alumniCheckLoading, setAlumniCheckLoading] = useState(false);
   const queryDonationOpened = useRef(false);
+
+  const handleAlumniCheck = async (action: 'check' | 'forgot_password') => {
+    if (!alumniEmailInput) return;
+    setAlumniCheckLoading(true);
+    setAlumniCheckMsg("");
+
+    const urlsToTry = [
+      process.env.NEXT_PUBLIC_API_URL,
+      "http://localhost:3001/api/public",
+      "http://localhost:3000/api/public",
+      "http://127.0.0.1:3001/api/public",
+      "http://127.0.0.1:3000/api/public",
+    ].filter(Boolean);
+
+    for (const baseUrl of urlsToTry) {
+      try {
+        const res = await fetch(`${baseUrl}/alumni-check-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: alumniEmailInput, action }),
+        });
+        const data = await res.json();
+        if (res.ok || data.message) {
+          setAlumniCheckMsg(data.message);
+          break;
+        } else {
+          setAlumniCheckMsg(data.error || "Verification failed");
+        }
+      } catch {
+        // try next
+      }
+    }
+    setAlumniCheckLoading(false);
+  };
 
   useEffect(() => {
     const urlsToTry = [
@@ -414,6 +453,24 @@ export default function DonatePage() {
       "http://127.0.0.1:3001/api/public",
       "http://127.0.0.1:3000/api/public",
     ].filter(Boolean);
+
+    const fetchAoyWinner = async () => {
+      for (const baseUrl of urlsToTry) {
+        try {
+          const res = await fetch(`${baseUrl}/alumni-of-the-year`);
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (data && !data.error) {
+            setAoyWinner(data);
+            break;
+          }
+        } catch {
+          // Try next configured API URL.
+        }
+      }
+    };
+
+    fetchAoyWinner();
 
     const fetchFeaturedAlumni = async () => {
       for (const baseUrl of urlsToTry) {
@@ -1091,6 +1148,57 @@ export default function DonatePage() {
             </p>
           </div>
 
+          {/* 🏆 Alumni of the Year Live Spotlight Banner */}
+          {aoyWinner && (
+            <div style={{
+              background: "linear-gradient(135deg, #FFF8EC 0%, #FFFFFF 100%)",
+              borderRadius: 28,
+              padding: "36px 36px",
+              marginBottom: 48,
+              boxShadow: "0 12px 40px rgba(0,0,0,0.18)",
+              border: "2px solid #F5A623",
+              position: "relative",
+              overflow: "hidden"
+            }}>
+              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 20, maxWidth: 640 }}>
+                  <img
+                    src={aoyWinner.alumniProfilePic || "/images/img-101.jpg"}
+                    alt={aoyWinner.alumniName}
+                    style={{ width: 84, height: 84, borderRadius: 20, objectFit: "cover", border: "3px solid #F5A623", flexShrink: 0 }}
+                  />
+                  <div>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#F5A623", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 800, fontSize: 11, padding: "4px 12px", borderRadius: 9999, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>
+                      🏆 Alumni of the Year {aoyWinner.year || 2026}
+                    </div>
+                    <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 800, fontSize: 24, color: "#1C1C1C", margin: "0 0 4px" }}>
+                      {aoyWinner.alumniName}
+                    </h3>
+                    <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 13, color: "#1A6B5A", marginBottom: 8 }}>
+                      {aoyWinner.headline || "Top Educational Aid & Computer Lab Sponsor"}
+                    </div>
+                    <blockquote style={{ fontFamily: "var(--font-caveat-var),cursive", fontSize: 18, color: "#4A4A4A", margin: 0, lineHeight: 1.5 }}>
+                      &ldquo;{aoyWinner.reason}&rdquo;
+                    </blockquote>
+                  </div>
+                </div>
+
+                {Array.isArray(aoyWinner.highlights) && aoyWinner.highlights.length > 0 && (
+                  <div style={{ background: "#EAF4F0", padding: "20px 24px", borderRadius: 20, border: "1px solid #1A6B5A20", flex: 1, minWidth: 260 }}>
+                    <div style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 800, fontSize: 11, color: "#1A6B5A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10, borderBottom: "1px solid #1A6B5A30", paddingBottom: 6 }}>
+                      Key Impact Contributions
+                    </div>
+                    {aoyWinner.highlights.map((h: string, idx: number) => (
+                      <div key={idx} style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#1C1C1C", fontWeight: 600, marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ color: "#F5A623", fontWeight: 800 }}>✓</span> {h}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="stories-grid">
             {impactStories.map((s) => (
               <div key={s.name} className="card-lift" style={{ background: "#fff", borderRadius: 24, overflow: "hidden", boxShadow: "0 8px 36px rgba(0,0,0,0.20)" }}>
@@ -1452,12 +1560,109 @@ export default function DonatePage() {
                 </div>
               ) : (
                 <>
-                  <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 22, color: "#1C1C1C", margin: "0 0 6px" }}>
-                    Donation Enquiry
-                  </h3>
-                  <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#9CA3AF", margin: "0 0 28px" }}>
-                    We respond within 24 hours. No commitment required.
-                  </p>
+                  {/* Mode Switcher */}
+                  <div style={{ display: "flex", background: "#F3F4F6", padding: 4, borderRadius: 16, marginBottom: 24 }}>
+                    <button
+                      type="button"
+                      onClick={() => setAlumniMode(false)}
+                      style={{
+                        flex: 1, padding: "10px 14px", borderRadius: 12, border: "none",
+                        background: !alumniMode ? "#fff" : "transparent",
+                        color: !alumniMode ? "#1A6B5A" : "#6B7280",
+                        fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 13,
+                        cursor: "pointer", boxShadow: !alumniMode ? "0 2px 8px rgba(0,0,0,0.06)" : "none",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      General Donor 🎁
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAlumniMode(true)}
+                      style={{
+                        flex: 1, padding: "10px 14px", borderRadius: 12, border: "none",
+                        background: alumniMode ? "#1A6B5A" : "transparent",
+                        color: alumniMode ? "#fff" : "#6B7280",
+                        fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 13,
+                        cursor: "pointer", boxShadow: alumniMode ? "0 2px 8px rgba(0,0,0,0.12)" : "none",
+                        transition: "all 0.2s"
+                      }}
+                    >
+                      Madni Alumni 🎓
+                    </button>
+                  </div>
+
+                  {alumniMode ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                      <div>
+                        <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 20, color: "#1C1C1C", margin: "0 0 6px" }}>
+                          Alumni Portal Verification & Access
+                        </h3>
+                        <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#6B7280", margin: 0, lineHeight: 1.5 }}>
+                          Enter your registered email to receive a direct login link or request a password reset.
+                        </p>
+                      </div>
+
+                      <input
+                        required
+                        type="email"
+                        placeholder="Enter Registered Alumni Email Address"
+                        value={alumniEmailInput}
+                        onChange={(e) => setAlumniEmailInput(e.target.value)}
+                        style={iStyle}
+                        className="form-input"
+                      />
+
+                      {alumniCheckMsg && (
+                        <div style={{
+                          padding: "14px 16px", borderRadius: 14,
+                          background: alumniCheckMsg.includes("not registered") ? "#FEF2F2" : "#ECFDF5",
+                          border: `1px solid ${alumniCheckMsg.includes("not registered") ? "#FCA5A5" : "#A7F3D0"}`,
+                          color: alumniCheckMsg.includes("not registered") ? "#991B1B" : "#065F46",
+                          fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, fontWeight: 600, lineHeight: 1.5
+                        }}>
+                          {alumniCheckMsg}
+                        </div>
+                      )}
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
+                        <button
+                          type="button"
+                          disabled={alumniCheckLoading || !alumniEmailInput}
+                          onClick={() => handleAlumniCheck('check')}
+                          style={{
+                            width: "100%", padding: "14px", borderRadius: 9999, border: "none",
+                            background: "#1A6B5A", color: "#fff",
+                            fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 14,
+                            cursor: "pointer", opacity: alumniCheckLoading ? 0.6 : 1
+                          }}
+                        >
+                          {alumniCheckLoading ? "Verifying..." : "Send Alumni Login Link to Email ✉️"}
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={alumniCheckLoading || !alumniEmailInput}
+                          onClick={() => handleAlumniCheck('forgot_password')}
+                          style={{
+                            width: "100%", padding: "12px", borderRadius: 9999,
+                            border: "1.5px solid #F5A623", background: "#FFF8EC", color: "#854D0E",
+                            fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 13,
+                            cursor: "pointer", opacity: alumniCheckLoading ? 0.6 : 1
+                          }}
+                        >
+                          Forgot Password? Request Ping School Admin 🔑
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 22, color: "#1C1C1C", margin: "0 0 6px" }}>
+                        Donation Enquiry
+                      </h3>
+                      <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#9CA3AF", margin: "0 0 28px" }}>
+                        We respond within 24 hours. No commitment required.
+                      </p>
 
 	                  <form onSubmit={submitDonationInquiry} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                     <input required placeholder="Full Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} style={iStyle} className="form-input" />
@@ -1573,6 +1778,8 @@ export default function DonatePage() {
                   </form>
                 </>
               )}
+            </>
+          )}
             </div>
           </div>
         </div>

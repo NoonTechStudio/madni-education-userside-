@@ -264,6 +264,54 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [progressVisible, setProgressVisible] = useState(false);
   const [tabFade, setTabFade] = useState(true);
+  const [donateModal, setDonateModal] = useState<{
+    title: string;
+    type: string;
+    amount: number;
+    schoolName: string;
+    standardName?: string;
+  } | null>(null);
+  const [donateModalForm, setDonateModalForm] = useState({ name: "", email: "", phone: "", amount: "", message: "" });
+  const [donateModalSubmitting, setDonateModalSubmitting] = useState(false);
+  const [donateModalSuccess, setDonateModalSuccess] = useState("");
+  const [donateModalPayLink, setDonateModalPayLink] = useState("");
+
+  const handleDonateModalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!donateModal) return;
+    setDonateModalSubmitting(true);
+    setDonateModalSuccess("");
+    const urlsToTry = [
+      process.env.NEXT_PUBLIC_API_URL,
+      "http://localhost:3001/api/public",
+      "http://localhost:3000/api/public",
+    ].filter(Boolean);
+    for (const baseUrl of urlsToTry) {
+      try {
+        const res = await fetch(`${baseUrl}/donation-inquiries`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            donorName: donateModalForm.name,
+            donorEmail: donateModalForm.email,
+            donorPhone: donateModalForm.phone,
+            amount: Number(donateModalForm.amount || donateModal.amount),
+            type: donateModal.type,
+            campaignTitle: donateModal.title,
+            schoolName: d.name || donateModal.schoolName,
+            message: donateModalForm.message,
+          }),
+        });
+        const data = await res.json();
+        if (res.ok && (data.token || data.message)) {
+          setDonateModalSuccess("Jazakallah Khair! Your donation enquiry has been registered.");
+          if (data.token) setDonateModalPayLink(data.paymentLink || `/donate/pay/${data.token}`);
+          break;
+        }
+      } catch { /* try next */ }
+    }
+    setDonateModalSubmitting(false);
+  };
 
   const projectsRef = useRef<HTMLDivElement | null>(null);
 
@@ -1128,16 +1176,19 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
                     <div style={{ height: 5, background: "rgba(26,107,90,0.2)", borderRadius: 9999, overflow: "hidden", marginBottom: 10 }}>
                       <div style={{ height: "100%", background: "#1A6B5A", width: `${std.zakatPct}%`, borderRadius: 9999 }} />
                     </div>
-	                    <a href={buildDonateHref({
-	                      campaign: std.standardId,
-	                      schoolId: std.schoolId,
-	                      type: "zakat",
-	                      amount: Math.max(100, Number(std.zakatGoal) - Number(std.zakatPaid)),
-	                      title: `${std.standardName} Zakat Aid`,
-	                      school: d.shortName,
-	                    })} className="pill-btn pill-btn-teal" style={{ width: "100%", justifyContent: "center", fontSize: 12, padding: "6px 12px" }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const amt = Math.max(100, Number(std.zakatGoal) - Number(std.zakatPaid));
+                        setDonateModal({ title: `${std.standardName} Zakat Aid`, type: "zakat", amount: amt, schoolName: d.shortName, standardName: std.standardName });
+                        setDonateModalForm({ name: "", email: "", phone: "", amount: String(amt), message: "" });
+                        setDonateModalSuccess(""); setDonateModalPayLink("");
+                      }}
+                      className="pill-btn pill-btn-teal"
+                      style={{ width: "100%", justifyContent: "center", fontSize: 12, padding: "6px 12px", border: "none", cursor: "pointer" }}
+                    >
                       Pay Zakat Aid ({std.zakatPct}% Funded) →
-                    </a>
+                    </button>
                   </div>
                 )}
 
@@ -1151,16 +1202,19 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
                     <div style={{ height: 5, background: "rgba(245,166,35,0.25)", borderRadius: 9999, overflow: "hidden", marginBottom: 10 }}>
                       <div style={{ height: "100%", background: "#F5A623", width: `${std.lillahPct}%`, borderRadius: 9999 }} />
                     </div>
-	                    <a href={buildDonateHref({
-	                      campaign: std.standardId,
-	                      schoolId: std.schoolId,
-	                      type: "lillah",
-	                      amount: Math.max(100, Number(std.lillahGoal) - Number(std.lillahPaid)),
-	                      title: `${std.standardName} Lillah Aid`,
-	                      school: d.shortName,
-	                    })} className="pill-btn pill-btn-amber" style={{ width: "100%", justifyContent: "center", fontSize: 12, padding: "6px 12px" }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const amt = Math.max(100, Number(std.lillahGoal) - Number(std.lillahPaid));
+                        setDonateModal({ title: `${std.standardName} Lillah Aid`, type: "lillah", amount: amt, schoolName: d.shortName, standardName: std.standardName });
+                        setDonateModalForm({ name: "", email: "", phone: "", amount: String(amt), message: "" });
+                        setDonateModalSuccess(""); setDonateModalPayLink("");
+                      }}
+                      className="pill-btn pill-btn-amber"
+                      style={{ width: "100%", justifyContent: "center", fontSize: 12, padding: "6px 12px", border: "none", cursor: "pointer" }}
+                    >
                       Pay Lillah Aid ({std.lillahPct}% Funded) →
-                    </a>
+                    </button>
                   </div>
                 )}
               </div>
@@ -1245,6 +1299,63 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
       </section>
 
       <Footer />
+
+      {/* ══ DONATE MODAL — Zakat / Lillah ══════════════════════════════════ */}
+      {donateModal && (
+        <div
+          onClick={() => setDonateModal(null)}
+          style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px", backdropFilter: "blur(4px)", animation: "fadeIn 0.2s ease" }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ background: "#fff", borderRadius: 24, padding: "36px", maxWidth: 500, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)", maxHeight: "90vh", overflowY: "auto" }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+              <div>
+                <span style={{ display: "inline-block", background: donateModal.type === "zakat" ? "#EAF4F0" : "#FFF8EC", color: donateModal.type === "zakat" ? "#1A6B5A" : "#c27a00", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 11, padding: "4px 12px", borderRadius: 9999, marginBottom: 10, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  {donateModal.type === "zakat" ? "🕌 Zakat Aid" : "💛 Lillah Aid"}
+                </span>
+                <h3 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 20, color: "#1C1C1C", margin: 0 }}>{donateModal.title}</h3>
+                <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#8A8A8A", marginTop: 4 }}>{d.shortName} · Suggested: ₹{donateModal.amount.toLocaleString("en-IN")}</p>
+              </div>
+              <button onClick={() => setDonateModal(null)} style={{ background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#888", lineHeight: 1, marginLeft: 12 }}>✕</button>
+            </div>
+
+            {donateModalSuccess ? (
+              <div style={{ textAlign: "center", padding: "24px 0" }}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+                <h4 style={{ fontFamily: "var(--font-epilogue-var),sans-serif", fontWeight: 700, fontSize: 18, color: "#1A6B5A", margin: "0 0 10px" }}>Jazakallah Khair!</h4>
+                <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#4A4A4A", lineHeight: 1.6, margin: "0 0 20px" }}>{donateModalSuccess}</p>
+                {donateModalPayLink && (
+                  <a href={donateModalPayLink} style={{ display: "inline-block", background: "#1A6B5A", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 14, padding: "12px 24px", borderRadius: 9999, textDecoration: "none", marginBottom: 12 }}>
+                    Open Payment Link →
+                  </a>
+                )}
+                <br />
+                <button onClick={() => setDonateModal(null)} style={{ background: "none", border: "none", color: "#1A6B5A", cursor: "pointer", fontSize: 13, fontWeight: 600, marginTop: 8 }}>Close</button>
+              </div>
+            ) : (
+              <form onSubmit={handleDonateModalSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <input required placeholder="Full Name" value={donateModalForm.name} onChange={(e) => setDonateModalForm({ ...donateModalForm, name: e.target.value })} style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 10, padding: "12px 16px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#1C1C1C", outline: "none", width: "100%", boxSizing: "border-box" }} className="form-input" />
+                <input required type="email" placeholder="Email Address (receipt sent here)" value={donateModalForm.email} onChange={(e) => setDonateModalForm({ ...donateModalForm, email: e.target.value })} style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 10, padding: "12px 16px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#1C1C1C", outline: "none", width: "100%", boxSizing: "border-box" }} className="form-input" />
+                <input required type="tel" placeholder="WhatsApp / Mobile Number" value={donateModalForm.phone} onChange={(e) => setDonateModalForm({ ...donateModalForm, phone: e.target.value })} style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 10, padding: "12px 16px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#1C1C1C", outline: "none", width: "100%", boxSizing: "border-box" }} className="form-input" />
+                <input required type="number" min="100" placeholder={`Amount (₹) — Suggested ₹${donateModal.amount.toLocaleString("en-IN")}`} value={donateModalForm.amount} onChange={(e) => setDonateModalForm({ ...donateModalForm, amount: e.target.value })} style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 10, padding: "12px 16px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#1C1C1C", outline: "none", width: "100%", boxSizing: "border-box" }} className="form-input" />
+                <textarea rows={2} placeholder="Message (optional)" value={donateModalForm.message} onChange={(e) => setDonateModalForm({ ...donateModalForm, message: e.target.value })} style={{ background: "#F8FAFC", border: "1.5px solid #E2E8F0", borderRadius: 10, padding: "12px 16px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: "#1C1C1C", outline: "none", width: "100%", boxSizing: "border-box", resize: "vertical" }} className="form-input" />
+                <button
+                  type="submit"
+                  disabled={donateModalSubmitting}
+                  style={{ background: donateModal.type === "zakat" ? "#1A6B5A" : "#F5A623", color: "#fff", border: "none", borderRadius: 9999, padding: "14px", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 14, cursor: "pointer", opacity: donateModalSubmitting ? 0.6 : 1 }}
+                >
+                  {donateModalSubmitting ? "Submitting..." : `Submit ${donateModal.type === "zakat" ? "Zakat" : "Lillah"} Donation Enquiry →`}
+                </button>
+                <div style={{ textAlign: "center", fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 12, color: "#9CA3AF" }}>
+                  Zakat Eligible ✓ &nbsp;|&nbsp; 80G Certificate ✓ &nbsp;|&nbsp; Instant Email Receipt ✓
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ══ GLOBAL STYLES ════════════════════════════════════════════════════ */}
       <style>{`

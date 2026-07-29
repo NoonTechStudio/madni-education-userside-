@@ -1,8 +1,53 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, type CSSProperties, type ReactNode } from "react";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
+
+type IconProps = {
+    size?: number;
+    style?: CSSProperties;
+    className?: string;
+};
+
+const Icon = ({
+    size = 16,
+    style,
+    className,
+    children,
+}: IconProps & { children: ReactNode }) => (
+    <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={style}
+        className={className}
+        aria-hidden="true"
+    >
+        {children}
+    </svg>
+);
+
+const MapPin = (props: IconProps) => <Icon {...props}><path d="M12 21s7-5.2 7-12a7 7 0 0 0-14 0c0 6.8 7 12 7 12Z" /><circle cx="12" cy="9" r="2.5" /></Icon>;
+const Building2 = (props: IconProps) => <Icon {...props}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18" /><path d="M4 22h16" /><path d="M10 6h4M10 10h4M10 14h4" /></Icon>;
+const DollarSign = (props: IconProps) => <Icon {...props}><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6" /></Icon>;
+const Calendar = (props: IconProps) => <Icon {...props}><path d="M8 2v4M16 2v4M3 10h18" /><rect x="3" y="4" width="18" height="18" rx="2" /></Icon>;
+const Award = (props: IconProps) => <Icon {...props}><circle cx="12" cy="8" r="6" /><path d="M9 14 7 22l5-3 5 3-2-8" /></Icon>;
+const Clock = (props: IconProps) => <Icon {...props}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></Icon>;
+const Send = (props: IconProps) => <Icon {...props}><path d="m22 2-7 20-4-9-9-4 20-7Z" /><path d="M22 2 11 13" /></Icon>;
+const Handshake = (props: IconProps) => <Icon {...props}><path d="m11 17 2 2a3 3 0 0 0 4.2 0l3.8-3.8a3 3 0 0 0 0-4.2l-3-3" /><path d="m13 7 3 3" /><path d="M3 12h3l4-4a3 3 0 0 1 4.2 0l.8.8" /><path d="m7 16 2 2" /></Icon>;
+const ThumbsUp = (props: IconProps) => <Icon {...props}><path d="M7 10v12H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h3Z" /><path d="M7 10 12 2a3 3 0 0 1 3 3v4h5a2 2 0 0 1 2 2l-1 7a4 4 0 0 1-4 4H7" /></Icon>;
+const Globe = (props: IconProps) => <Icon {...props}><circle cx="12" cy="12" r="10" /><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20" /></Icon>;
+const Tag = (props: IconProps) => <Icon {...props}><path d="M20 13 13 20 4 11V4h7l9 9Z" /><circle cx="8.5" cy="8.5" r="1.5" /></Icon>;
+const UserCheck = (props: IconProps) => <Icon {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="m16 11 2 2 4-4" /></Icon>;
+const X = (props: IconProps) => <Icon {...props}><path d="M18 6 6 18M6 6l12 12" /></Icon>;
+const Briefcase = (props: IconProps) => <Icon {...props}><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2M2 12h20" /></Icon>;
+const AlertCircle = (props: IconProps) => <Icon {...props}><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></Icon>;
 
 // ─────────────────────────────────────────────
 // PAGE DATA
@@ -204,19 +249,108 @@ const CAREER_DATA = {
 
 export default function CareerBoardClient() {
     const [jobFilter, setJobFilter] = useState("All");
-    const [selectedJob, setSelectedJob] = useState<number | null>(null);
+    const [selectedJob, setSelectedJob] = useState<any>(null);
     const [formStep, setFormStep] = useState(1);
     const [submitted, setSubmitted] = useState(false);
     const [dragOver, setDragOver] = useState(false);
 
+    const [liveJobs, setLiveJobs] = useState<any[]>([]);
+    const [liveInternships, setLiveInternships] = useState<any[]>([]);
+    const [loadingCareers, setLoadingCareers] = useState(true);
+
+    useEffect(() => {
+        fetchApprovedCareers();
+    }, []);
+
+    const fetchApprovedCareers = async () => {
+        const apiBases = [
+            process.env.NEXT_PUBLIC_API_URL,
+            "http://localhost:3001/api/public",
+            "http://localhost:3000/api/public",
+            "http://127.0.0.1:3001/api/public",
+            "http://127.0.0.1:3000/api/public",
+            "/api/public"
+        ].filter(Boolean) as string[];
+
+        for (const base of apiBases) {
+            try {
+                const res = await fetch(`${base}/careers`);
+                const data = await res.json();
+                if (res.ok && data.success && Array.isArray(data.careers)) {
+                    const jobsList = data.careers.filter((c: any) => 
+                        !c.type || (c.type || '').toUpperCase() === 'JOB'
+                    );
+                    const internshipsList = data.careers.filter((c: any) => 
+                        (c.type || '').toUpperCase() === 'INTERNSHIP'
+                    );
+
+                    if (jobsList.length > 0) {
+                        setLiveJobs(jobsList.map((j: any) => ({
+                            id: j.id,
+                            title: j.role ? `${j.role} at ${j.companyName || 'Company'}` : (j.title || "Career Opening"),
+                            school: j.companyName || j.schoolName || "Alumni Partner",
+                            roleName: j.role || "Career Opening",
+                            companyName: j.companyName || j.schoolName || "Alumni Partner",
+                            type: j.workMode ? (j.workMode === 'REMOTE' ? 'Remote' : j.workMode === 'HYBRID' ? 'Hybrid' : 'On-Site') : 'Full-Time',
+                            workMode: j.workMode,
+                            category: j.category || "General",
+                            location: j.location || "Vadodara / Remote",
+                            posted: j.createdAt ? new Date(j.createdAt).toLocaleDateString() : "Recently",
+                            deadline: j.deadline ? new Date(j.deadline).toLocaleDateString() : "Open",
+                            description: j.description || j.relation || "Opportunity shared by Madni Alumni.",
+                            experienceLevel: j.experienceLevel,
+                            relation: j.relation,
+                            requirements: [
+                                j.experienceLevel ? `Experience: ${j.experienceLevel}` : null,
+                                j.relation ? `Referral: ${j.relation}` : null,
+                                j.applyLink ? `Apply: ${j.applyLink}` : null
+                            ].filter(Boolean),
+                            salary: j.salary || "As per norms",
+                            duration: j.duration,
+                            applyLink: j.applyLink,
+                            companyLink: j.companyLink,
+                            postedByName: j.postedByName,
+                            interestedCount: j.interestedCount || 0,
+                            referralCount: j.referralCount || 0,
+                            urgent: false
+                        })));
+                    }
+
+                    if (internshipsList.length > 0) {
+                        setLiveInternships(internshipsList.map((i: any) => ({
+                            title: i.role ? `${i.role} at ${i.companyName || 'Company'}` : (i.title || "Internship Opening"),
+                            school: i.companyName || i.schoolName || "Alumni Partner",
+                            duration: i.duration || "Flexible",
+                            stipend: i.salary || "Stipend / Certificate",
+                            description: i.description || i.relation || "Internship opportunity shared by Madni Alumni.",
+                            suitable: i.experienceLevel || "Students & Fresh Graduates",
+                            applyLink: i.applyLink
+                        })));
+                    }
+                    break;
+                }
+            } catch (err) {
+                // try next endpoint
+            }
+        }
+        setLoadingCareers(false);
+    };
+
+    const activeJobs = liveJobs.length > 0 ? liveJobs : CAREER_DATA.jobs;
+    const activeInternships = liveInternships.length > 0 ? liveInternships : CAREER_DATA.internships;
+
+    const availableCategories = Array.from(
+        new Set(["All", ...activeJobs.map((j) => j.category).filter(Boolean)])
+    );
+
     const filteredJobs =
         jobFilter === "All"
-            ? CAREER_DATA.jobs
-            : CAREER_DATA.jobs.filter((j) => j.category === jobFilter);
+            ? activeJobs
+            : activeJobs.filter((j) => (j.category || "").trim().toLowerCase() === jobFilter.trim().toLowerCase());
 
-    const selectedJobData = CAREER_DATA.jobs.find((j) => j.id === selectedJob);
+    const selectedJobData = activeJobs.find((j) => j.id === selectedJob);
 
-    // Scroll reveal
+    // Scroll reveal — re-run whenever live jobs or filter changes
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
@@ -226,11 +360,20 @@ export default function CareerBoardClient() {
                     }
                 });
             },
-            { threshold: 0.15 }
+            { threshold: 0.05 }
         );
-        document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+        
+        // Also immediately make all job cards visible to avoid flash/disappear
+        const elements = document.querySelectorAll(".reveal");
+        elements.forEach((el) => {
+            observer.observe(el);
+            if (el.classList.contains("job-card")) {
+                el.classList.add("visible");
+            }
+        });
+
         return () => observer.disconnect();
-    }, []);
+    }, [liveJobs, liveInternships, jobFilter, loadingCareers]);
 
     // Close drawer on Escape
     useEffect(() => {
@@ -737,7 +880,7 @@ export default function CareerBoardClient() {
                     className="filter-tabs"
                     style={{ display: "flex", gap: "8px", justifyContent: "center", marginBottom: "36px", flexWrap: "wrap" }}
                 >
-                    {CAREER_DATA.categories.map((cat) => (
+                    {availableCategories.map((cat) => (
                         <button
                             key={cat}
                             className={`filter-tab ${jobFilter === cat ? "active" : "inactive"}`}
@@ -750,11 +893,24 @@ export default function CareerBoardClient() {
 
                 {/* Job cards */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxWidth: "860px", margin: "0 auto" }}>
-                    {filteredJobs.map((job) => {
+                    {filteredJobs.length === 0 ? (
+                        <div style={{ textAlign: "center", padding: "48px 24px", background: "white", borderRadius: "16px", border: "1px solid #EAF4F0" }}>
+                            <p style={{ fontSize: "16px", fontWeight: 600, color: "var(--text-head)" }}>
+                                No active openings found in "{jobFilter}" category.
+                            </p>
+                            <p style={{ fontSize: "14px", color: "var(--muted)", marginTop: "8px" }}>
+                                Select "All" to view all available opportunities.
+                            </p>
+                        </div>
+                    ) : (
+                        filteredJobs.map((job) => {
                         const catMeta: Record<string, { icon: string; color: string; light: string }> = {
                             Teaching:       { icon: "📖", color: "#1A6B5A", light: "#EAF4F0" },
                             Technical:      { icon: "💻", color: "#2563EB", light: "#EFF6FF" },
                             Administration: { icon: "📋", color: "#7C3AED", light: "#F5F3FF" },
+                            "Engineering & Tech": { icon: "💻", color: "#2563EB", light: "#EFF6FF" },
+                            "Business & Finance": { icon: "📊", color: "#059669", light: "#ECFDF5" },
+                            "Education & Academics": { icon: "📖", color: "#1A6B5A", light: "#EAF4F0" },
                         };
                         const meta = catMeta[job.category] ?? { icon: "💼", color: "#1A6B5A", light: "#EAF4F0" };
                         return (
@@ -775,22 +931,24 @@ export default function CareerBoardClient() {
                                         <div>
                                             {job.urgent && (
                                                 <span style={{
-                                                    display: "inline-block",
+                                                    display: "inline-flex",
+                                                    alignItems: "center",
+                                                    gap: "4px",
                                                     background: "rgba(220,50,50,0.1)",
                                                     color: "#DC3232",
                                                     fontSize: "11px", fontWeight: 700,
                                                     padding: "3px 10px", borderRadius: "999px",
                                                     marginBottom: "6px",
                                                 }}>
-                                                    🔴 Urgent Hiring
+                                                    <AlertCircle size={12} /> Urgent Hiring
                                                 </span>
                                             )}
                                             <h3 style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 700, fontSize: "20px", color: "var(--text-head)", margin: 0 }}>
                                                 {job.title}
                                             </h3>
                                             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "8px", flexWrap: "wrap" }}>
-                                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "var(--muted)" }}>
-                                                    📍 {job.location} · {job.school}
+                                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "13px", color: "var(--muted)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                                    <MapPin size={13} style={{ color: "var(--teal)" }} /> {job.location} · {job.school}
                                                 </span>
                                                 <span style={{ background: meta.light, color: meta.color, fontSize: "12px", fontWeight: 600, padding: "3px 10px", borderRadius: "999px" }}>
                                                     {job.type}
@@ -817,8 +975,8 @@ export default function CareerBoardClient() {
                             </p>
 
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px", flexWrap: "wrap", gap: "12px" }}>
-                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: "14px", color: "var(--teal)" }}>
-                                    💰 {job.salary}
+                                <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: "14px", color: "var(--teal)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                    <DollarSign size={14} /> {job.salary}
                                 </span>
                                 <div style={{ display: "flex", gap: "10px" }}>
                                     <button
@@ -834,7 +992,7 @@ export default function CareerBoardClient() {
                             </div>{/* close footer row */}
                         </div>
                         );
-                    })}
+                    }))}
                 </div>
             </section>
 
@@ -842,113 +1000,246 @@ export default function CareerBoardClient() {
             {selectedJob !== null && (
                 <>
                     <div className="drawer-backdrop" onClick={() => setSelectedJob(null)} />
-                    <div className="drawer">
+                    <div className="drawer custom-scrollbar" style={{ overflowY: "auto" }}>
                         <button
                             onClick={() => setSelectedJob(null)}
                             style={{
                                 position: "absolute",
                                 top: "20px",
                                 right: "20px",
-                                background: "none",
+                                background: "#F1F5F9",
                                 border: "none",
-                                fontSize: "22px",
+                                width: "32px",
+                                height: "32px",
+                                borderRadius: "50%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
                                 cursor: "pointer",
-                                color: "var(--muted)",
-                                lineHeight: 1,
+                                color: "#64748B",
+                                transition: "all 0.2s ease",
                             }}
                         >
-                            ✕
+                            <X size={18} />
                         </button>
 
                         {selectedJobData && (
-                            <>
-                                {selectedJobData.urgent && (
-                                    <span
-                                        style={{
-                                            display: "inline-block",
-                                            background: "rgba(220,50,50,0.1)",
-                                            color: "#DC3232",
-                                            fontSize: "11px",
-                                            fontWeight: 700,
-                                            padding: "4px 12px",
-                                            borderRadius: "999px",
-                                            marginBottom: "12px",
-                                        }}
-                                    >
-                                        🔴 Urgent Hiring
-                                    </span>
-                                )}
-
-                                <h2
-                                    style={{
-                                        fontFamily: "'Epilogue', sans-serif",
-                                        fontWeight: 700,
-                                        fontSize: "26px",
-                                        color: "var(--text-head)",
-                                        lineHeight: "1.3",
-                                    }}
-                                >
-                                    {selectedJobData.title}
-                                </h2>
-
-                                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "var(--muted)", marginTop: "8px" }}>
-                                    {selectedJobData.school} · {selectedJobData.type} · 📍 {selectedJobData.location}
-                                </p>
-
-                                <hr style={{ border: "none", borderTop: "1px solid #EAF4F0", margin: "20px 0" }} />
-
-                                <h4 style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 700, fontSize: "16px", color: "var(--text-head)", marginBottom: "10px" }}>
-                                    About This Role
-                                </h4>
-                                <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "16px", color: "var(--text-body)", lineHeight: "1.75" }}>
-                                    {selectedJobData.description}
-                                </p>
-
-                                <h4 style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 700, fontSize: "16px", color: "var(--text-head)", margin: "20px 0 10px" }}>
-                                    Requirements
-                                </h4>
-                                <ul style={{ listStyle: "none", padding: 0 }}>
-                                    {selectedJobData.requirements.map((req, i) => (
-                                        <li
-                                            key={i}
+                            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                                {/* Header Badges */}
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center", paddingRight: "40px" }}>
+                                    {selectedJobData.urgent && (
+                                        <span
                                             style={{
-                                                fontFamily: "'DM Sans', sans-serif",
-                                                fontSize: "15px",
-                                                color: "var(--text-body)",
-                                                marginBottom: "8px",
-                                                display: "flex",
-                                                alignItems: "flex-start",
-                                                gap: "10px",
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                gap: "4px",
+                                                background: "#FEF2F2",
+                                                color: "#DC2626",
+                                                border: "1px solid #FECACA",
+                                                fontSize: "11px",
+                                                fontWeight: 700,
+                                                padding: "4px 10px",
+                                                borderRadius: "999px",
+                                                textTransform: "uppercase"
                                             }}
                                         >
-                                            <span style={{ color: "var(--teal)", fontWeight: 700, marginTop: "1px" }}>✓</span>
-                                            {req}
-                                        </li>
-                                    ))}
-                                </ul>
-
-                                <div style={{ display: "flex", gap: "12px", alignItems: "center", margin: "20px 0" }}>
-                                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "14px", color: "var(--teal)", fontWeight: 600 }}>
-                                        💰 {selectedJobData.salary}
-                                    </span>
+                                            <AlertCircle size={12} /> Urgent Hiring
+                                        </span>
+                                    )}
                                     <span
                                         style={{
-                                            background: "var(--amber)",
-                                            color: "white",
-                                            fontSize: "12px",
-                                            fontWeight: 600,
-                                            padding: "5px 14px",
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            gap: "4px",
+                                            background: "var(--teal-light)",
+                                            color: "var(--teal-dark)",
+                                            fontSize: "11px",
+                                            fontWeight: 700,
+                                            padding: "4px 10px",
                                             borderRadius: "999px",
+                                            textTransform: "uppercase"
                                         }}
                                     >
-                                        Deadline: {selectedJobData.deadline}
+                                        <Briefcase size={12} /> {selectedJobData.type || "Full-Time"}
                                     </span>
+                                    {selectedJobData.category && (
+                                        <span
+                                            style={{
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                gap: "4px",
+                                                background: "#F1F5F9",
+                                                color: "#334155",
+                                                fontSize: "11px",
+                                                fontWeight: 700,
+                                                padding: "4px 10px",
+                                                borderRadius: "999px"
+                                            }}
+                                        >
+                                            <Tag size={12} /> {selectedJobData.category}
+                                        </span>
+                                    )}
                                 </div>
 
-                                <button className="btn-teal" style={{ width: "100%", marginTop: "8px" }}>
-                                    Apply for This Role →
+                                {/* Title & Organization */}
+                                <div>
+                                    <h2
+                                        style={{
+                                            fontFamily: "'Epilogue', sans-serif",
+                                            fontWeight: 800,
+                                            fontSize: "24px",
+                                            color: "var(--text-head)",
+                                            lineHeight: "1.3",
+                                            margin: "0 0 6px"
+                                        }}
+                                    >
+                                        {selectedJobData.roleName || selectedJobData.title}
+                                    </h2>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--teal)", fontWeight: 700, fontSize: "15px" }}>
+                                        <Building2 size={16} />
+                                        <span>{selectedJobData.companyName || selectedJobData.school}</span>
+                                    </div>
+                                </div>
+
+                                {/* Details Grid with Icons */}
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", background: "#F8FAFC", padding: "16px", borderRadius: "12px", border: "1px solid #E2E8F0" }}>
+                                    {selectedJobData.location && (
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#EFF6FF", color: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <MapPin size={16} />
+                                            </div>
+                                            <div>
+                                                <p style={{ fontSize: "11px", color: "#64748B", fontWeight: 600, textTransform: "uppercase", margin: 0 }}>Location</p>
+                                                <p style={{ fontSize: "13px", color: "#1E293B", fontWeight: 700, margin: 0 }}>{selectedJobData.location}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectedJobData.salary && (
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#ECFDF5", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <DollarSign size={16} />
+                                            </div>
+                                            <div>
+                                                <p style={{ fontSize: "11px", color: "#64748B", fontWeight: 600, textTransform: "uppercase", margin: 0 }}>Salary / Stipend</p>
+                                                <p style={{ fontSize: "13px", color: "#059669", fontWeight: 700, margin: 0 }}>{selectedJobData.salary}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectedJobData.experienceLevel && (
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#F5F3FF", color: "#7C3AED", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <Award size={16} />
+                                            </div>
+                                            <div>
+                                                <p style={{ fontSize: "11px", color: "#64748B", fontWeight: 600, textTransform: "uppercase", margin: 0 }}>Experience</p>
+                                                <p style={{ fontSize: "13px", color: "#1E293B", fontWeight: 700, margin: 0 }}>{selectedJobData.experienceLevel}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectedJobData.deadline && (
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#FFF7ED", color: "#EA580C", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <Calendar size={16} />
+                                            </div>
+                                            <div>
+                                                <p style={{ fontSize: "11px", color: "#64748B", fontWeight: 600, textTransform: "uppercase", margin: 0 }}>Deadline</p>
+                                                <p style={{ fontSize: "13px", color: "#EA580C", fontWeight: 700, margin: 0 }}>{selectedJobData.deadline}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectedJobData.duration && (
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#CCFBF1", color: "#0D9488", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <Clock size={16} />
+                                            </div>
+                                            <div>
+                                                <p style={{ fontSize: "11px", color: "#64748B", fontWeight: 600, textTransform: "uppercase", margin: 0 }}>Duration</p>
+                                                <p style={{ fontSize: "13px", color: "#1E293B", fontWeight: 700, margin: 0 }}>{selectedJobData.duration}</p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectedJobData.companyLink && (
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                            <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "#F1F5F9", color: "#475569", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                                <Globe size={16} />
+                                            </div>
+                                            <div style={{ overflow: "hidden" }}>
+                                                <p style={{ fontSize: "11px", color: "#64748B", fontWeight: 600, textTransform: "uppercase", margin: 0 }}>Website</p>
+                                                <a href={selectedJobData.companyLink} target="_blank" rel="noreferrer" style={{ fontSize: "12px", color: "#2563EB", fontWeight: 700, textDecoration: "underline", wordBreak: "break-all" }}>
+                                                    Visit Website
+                                                </a>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Alumni Referral Note */}
+                                {selectedJobData.relation && (
+                                    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", background: "#EEF2FF", border: "1px solid #C7D2FE", padding: "12px", borderRadius: "10px" }}>
+                                        <Handshake size={18} style={{ color: "#4F46E5", marginTop: "2px", flexShrink: 0 }} />
+                                        <div>
+                                            <p style={{ fontSize: "11px", fontWeight: 700, color: "#3730A3", textTransform: "uppercase", margin: "0 0 2px" }}>Alumni Referral Available</p>
+                                            <p style={{ fontSize: "13px", fontWeight: 600, color: "#1E1B4B", margin: 0 }}>{selectedJobData.relation}</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Posted By Alumni & Live Engagement Counts */}
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px", padding: "10px 14px", background: "#FAF8F4", borderRadius: "10px", border: "1px solid #EAF4F0" }}>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#334155", fontWeight: 600 }}>
+                                        <UserCheck size={16} style={{ color: "var(--teal)" }} />
+                                        <span>Posted by: <strong style={{ color: "var(--text-head)" }}>{selectedJobData.postedByName || "Madni Alumni"}</strong></span>
+                                    </div>
+                                    <div style={{ display: "flex", gap: "12px", fontSize: "12px", fontWeight: 700 }}>
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#2563EB" }}>
+                                            <ThumbsUp size={14} /> {selectedJobData.interestedCount || 0} Interested
+                                        </span>
+                                        <span style={{ display: "inline-flex", alignItems: "center", gap: "4px", color: "#7C3AED" }}>
+                                            <Handshake size={14} /> {selectedJobData.referralCount || 0} Referrals
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* About / Job Description */}
+                                <div>
+                                    <h4 style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 700, fontSize: "16px", color: "var(--text-head)", margin: "0 0 8px" }}>
+                                        About This Role
+                                    </h4>
+                                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "15px", color: "var(--text-body)", lineHeight: "1.7", margin: 0, whiteSpace: "pre-line" }}>
+                                        {selectedJobData.description}
+                                    </p>
+                                </div>
+
+                                {/* Apply Action */}
+                                <button
+                                    className="btn-teal"
+                                    style={{
+                                        width: "100%",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        gap: "8px",
+                                        padding: "14px 20px",
+                                        fontSize: "15px",
+                                        fontWeight: 700,
+                                        borderRadius: "12px",
+                                        marginTop: "8px"
+                                    }}
+                                    onClick={() => {
+                                        if (selectedJobData?.applyLink) {
+                                            window.open(selectedJobData.applyLink.startsWith('http') ? selectedJobData.applyLink : `mailto:${selectedJobData.applyLink}`, '_blank');
+                                        }
+                                    }}
+                                >
+                                    <Send size={16} />
+                                    <span>{selectedJobData?.applyLink ? 'Apply Now for This Role' : 'Apply for This Role'}</span>
                                 </button>
-                            </>
+                            </div>
                         )}
                     </div>
                 </>
@@ -972,7 +1263,7 @@ export default function CareerBoardClient() {
                         margin: "0 auto",
                     }}
                 >
-                    {CAREER_DATA.internships.map((intern) => (
+                    {activeInternships.map((intern) => (
                         <div key={intern.title} className="intern-card">
                             <h3 style={{ fontFamily: "'Epilogue', sans-serif", fontWeight: 700, fontSize: "20px", color: "var(--text-head)" }}>
                                 {intern.title}
