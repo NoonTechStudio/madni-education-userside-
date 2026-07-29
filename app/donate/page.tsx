@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
+import DonateSectionClient, { type DonationCard } from "@/components/DonateSection/DonateSectionClient";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DONATE PAGE DATA — Admin: update this single object to change all page content
@@ -323,6 +324,14 @@ type FundBreakdownItem = {
   amountSpent?: string | null;
 };
 
+interface DynamicCauseOption {
+  id: string;
+  title: string;
+  category: "zakat" | "lillah" | "construction" | "event" | "sadaqah" | "csr";
+  schoolName: string;
+  amountNeeded: number;
+}
+
 // ─── Utilities ──────────────────────────────────────────────────────────────
 function formatInr(n: number) {
   if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`;
@@ -388,6 +397,8 @@ export default function DonatePage() {
   const [featuredAlumni, setFeaturedAlumni] = useState<FeaturedAlumniImpact[]>([]);
   const [constructionCampaigns, setConstructionCampaigns] = useState<ConstructionCampaign[]>([]);
   const [schoolNeedSummaries, setSchoolNeedSummaries] = useState<SchoolNeedSummary[]>([]);
+  const [dynamicCauses, setDynamicCauses]   = useState<DynamicCauseOption[]>([]);
+  const [modalCause, setModalCause]         = useState<DonationCard | null>(null);
   const [donationModalTarget, setDonationModalTarget] = useState<DonationModalTarget | null>(null);
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
   const [inquiryMessage, setInquiryMessage] = useState("");
@@ -457,6 +468,65 @@ export default function DonatePage() {
           const data = await res.json();
           const expenses = Array.isArray(data.expenses) ? data.expenses : [];
           const financialAid = Array.isArray(data.financialAid) ? data.financialAid : [];
+
+          const parsedCauses: DynamicCauseOption[] = [];
+
+          // Process Financial Aid per Class Standard (Zakat & Lillah)
+          financialAid.forEach((need: any) => {
+            const fees = toNumber(need.fees) > 0 ? toNumber(need.fees) : 35000;
+            const zakatCount = toNumber(need.zakatCount);
+            const lillahCount = toNumber(need.lillahCount);
+            const zakatPaid = toNumber(need.zakatPaid);
+            const lillahPaid = toNumber(need.lillahPaid);
+            const zakatNeeded = Math.max(0, (fees * zakatCount) - zakatPaid);
+            const lillahNeeded = Math.max(0, (fees * lillahCount) - lillahPaid);
+
+            const stdLabel = `Std. ${need.standardName}${need.division ? ' Div. ' + need.division : ''}`;
+            const school = need.schoolName || "Madni Education Trust";
+
+            if (zakatCount > 0 && zakatNeeded > 0) {
+              parsedCauses.push({
+                id: `std-zakat-${need.standardId}`,
+                title: `${school} — ${stdLabel} Zakat Aid (${zakatCount} Needy Students)`,
+                category: "zakat",
+                schoolName: school,
+                amountNeeded: zakatNeeded,
+              });
+            }
+
+            if (lillahCount > 0 && lillahNeeded > 0) {
+              parsedCauses.push({
+                id: `std-lillah-${need.standardId}`,
+                title: `${school} — ${stdLabel} Lillah Fund (${lillahCount} Needy Students)`,
+                category: "lillah",
+                schoolName: school,
+                amountNeeded: lillahNeeded,
+              });
+            }
+          });
+
+          // Process Expenses (Construction & Event costs)
+          expenses.forEach((expense: any) => {
+            const goal = toNumber(expense.estimatedCost);
+            const paid = toNumber(expense.paidAmount);
+            const needed = Math.max(0, goal - paid);
+            const isEvent = String(expense.type).toUpperCase() === "EVENT";
+            const school = expense.schoolName || "Madni Education Trust";
+
+            // Only add uncompleted costs!
+            if (goal <= 0 || needed <= 0) return;
+
+            parsedCauses.push({
+              id: expense.id,
+              title: `${school} — ${expense.title} (${isEvent ? 'Event Cost' : 'Construction Cost'})`,
+              category: isEvent ? "event" : "construction",
+              schoolName: school,
+              amountNeeded: needed,
+            });
+          });
+
+          setDynamicCauses(parsedCauses);
+
           const construction = expenses
             .filter((expense: any) => String(expense.type).toUpperCase() === "CONSTRUCTION")
             .map((expense: any, index: number) => {
@@ -553,7 +623,7 @@ export default function DonatePage() {
   }, []);
 
   const impactStories = featuredAlumni.length > 0 ? featuredAlumni : DONATE_DATA.stories;
-  const activeConstructionCampaigns = constructionCampaigns.length > 0
+  const activeConstructionCampaigns = (constructionCampaigns.length > 0
     ? constructionCampaigns
     : DONATE_DATA.campaigns
         .filter((camp) => camp.id === "construction")
@@ -567,7 +637,8 @@ export default function DonatePage() {
           goal: camp.goal,
           pct: camp.pct,
           image: camp.image,
-        }));
+        }))
+  ).filter((camp) => Math.max(0, camp.goal - camp.raised) > 0);
   const activeSchoolNeedSummaries = schoolNeedSummaries.length > 0
     ? schoolNeedSummaries
     : DONATE_DATA.campaigns.reduce<SchoolNeedSummary[]>((rows, camp) => {
@@ -666,12 +737,23 @@ export default function DonatePage() {
 
         setSubmitted(true);
         setPaymentLink(data.paymentLink || "");
-        setInquiryMessage(data.message || `Payment link sent to ${form.email}.`);
+        setInquiryMessage(`✉️ Secure donation payment link has been sent to ${form.email}! Please check your email inbox to complete your donation.`);
         setSubmittingInquiry(false);
+
+        setTimeout(() => {
+          setSubmitted(false);
+          setForm({ name: "", email: "", phone: "", amount: "", type: "zakat", campaign: "", message: "" });
+          setInquiryMessage("");
+          setPaymentLink("");
+        }, 4500);
         return;
       } catch (error: any) {
         if (baseUrl === publicApiBaseUrls[publicApiBaseUrls.length - 1]) {
-          setInquiryMessage(error?.message || "Could not submit donation enquiry. Please try again.");
+          const raw = error?.message || "";
+          const friendly = raw === "Failed to fetch"
+            ? "Unable to connect to donation server. Please check your connection."
+            : raw || "Could not submit donation enquiry. Please try again.";
+          setInquiryMessage(friendly);
         }
       }
     }
@@ -1130,13 +1212,21 @@ export default function DonatePage() {
 	
 	                  <button
 	                    type="button"
-	                    onClick={() => openDonationModal({
-	                      campaignId: camp.id,
-	                      campaignTitle: camp.title,
-	                      schoolName: camp.schoolName,
-	                      amount: Math.max(0, camp.goal - camp.raised),
-	                      schoolId: camp.schoolId,
-	                    })}
+	                    onClick={() => setModalCause({
+                        icon: "construction",
+                        iconBg: "#FEF2F2",
+                        name: `${camp.schoolName} - ${camp.title}`,
+                        desc: camp.description,
+                        raised: `${formatInr(camp.raised)} raised`,
+                        goal: `${formatInr(camp.goal - camp.raised)} needed`,
+                        pct: camp.pct,
+                        barColor: "#F5A623",
+                        category: "construction",
+                        schoolName: camp.schoolName,
+                        schoolId: camp.schoolId,
+                        referenceId: camp.id,
+                        suggestedAmount: Math.max(0, camp.goal - camp.raised),
+                      })}
 	                    className="pill-btn pill-btn-teal"
 	                    style={{ justifyContent: "center", fontSize: 14, width: "100%", border: "none", cursor: "pointer" }}
 	                  >
@@ -1169,12 +1259,23 @@ export default function DonatePage() {
               <button
 		                key={tier.schoolId}
 	                type="button"
-	                onClick={() => openDonationModal({
-		                  campaignId: `school-${tier.schoolId}`,
-		                  campaignTitle: `${tier.schoolName} yearly donation need`,
-		                  schoolName: tier.schoolName,
-		                  amount: tier.totalNeeded,
-	                })}
+	                onClick={() => setModalCause({
+                    icon: "education",
+                    iconBg: "#EAF4F0",
+                    name: `${tier.schoolName} - Total Educational & Facility Need`,
+                    desc: tier.description,
+                    raised: "₹0",
+                    goal: formatInr(tier.totalNeeded),
+                    pct: 0,
+                    barColor: "#1A6B5A",
+                    schoolName: tier.schoolName,
+                    schoolId: tier.schoolId,
+                    suggestedAmount: tier.totalNeeded,
+                    zakatNeeded: tier.educationNeeded,
+                    lillahNeeded: tier.constructionNeeded,
+                    zakatCount: tier.studentsCount,
+                    lillahCount: 0,
+                  })}
                 style={{
 	                  background: "#fff",
 	                  border: "2px solid #E5E7EB",
@@ -1244,10 +1345,38 @@ export default function DonatePage() {
                   Choose Your Donation Type
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {DONATE_DATA.donationTypes.map((dt) => (
+                  {[
+                    {
+                      id: "zakat",
+                      label: "Zakat Aid",
+                      badge: "Student Fees",
+                      desc: "Zakat directly paying tuition & education fees for verified needy students",
+                    },
+                    {
+                      id: "lillah",
+                      label: "Lillah Fund",
+                      badge: "Student Welfare",
+                      desc: "Lillah contribution for student welfare, uniforms, stationery & school facilities",
+                    },
+                    {
+                      id: "construction",
+                      label: "Construction Cost",
+                      badge: "Building & Infra",
+                      desc: "Help fund school classroom construction, lab & campus building costs",
+                    },
+                    {
+                      id: "event",
+                      label: "School Event Cost",
+                      badge: "Events & Activities",
+                      desc: "Support annual school educational events, science fairs & student competitions",
+                    },
+                  ].map((dt) => (
                     <div
                       key={dt.id}
-                      onClick={() => { setDonationType(dt.id); setForm((f) => ({ ...f, type: dt.id })); }}
+                      onClick={() => {
+                        setDonationType(dt.id);
+                        setForm((f) => ({ ...f, type: dt.id, campaign: "" }));
+                      }}
                       style={{
                         background: donationType === dt.id ? "#EAF4F0" : "#fff",
                         border: `1.5px solid ${donationType === dt.id ? "#1A6B5A" : "#E5E7EB"}`,
@@ -1373,27 +1502,44 @@ export default function DonatePage() {
 
                     <select
                       value={form.type}
-                      onChange={(e) => { setForm((f) => ({ ...f, type: e.target.value })); setDonationType(e.target.value); }}
+                      onChange={(e) => {
+                        const nextCat = e.target.value;
+                        setDonationType(nextCat);
+                        setForm((f) => ({ ...f, type: nextCat, campaign: "" }));
+                      }}
                       style={{ ...iStyle, appearance: "none" as const }}
                       className="form-input"
                     >
-                      <option value="zakat">Zakat</option>
-                      <option value="sadaqah">Sadaqah</option>
-                      <option value="lillah">Lillah</option>
-                      <option value="csr">CSR / Corporate (80G)</option>
+                      <option value="zakat">Zakat Aid</option>
+                      <option value="lillah">Lillah Fund</option>
+                      <option value="construction">Construction Cost</option>
+                      <option value="event">School Event Cost</option>
                     </select>
 
                     <select
                       value={form.campaign}
-                      onChange={(e) => setForm((f) => ({ ...f, campaign: e.target.value }))}
+                      onChange={(e) => {
+                        const chosenId = e.target.value;
+                        const match = dynamicCauses.find((c) => c.id === chosenId);
+                        setForm((f) => ({
+                          ...f,
+                          campaign: chosenId,
+                          amount: match ? String(match.amountNeeded) : f.amount,
+                          message: match ? `Donation towards ${match.title}` : f.message,
+                        }));
+                      }}
                       style={{ ...iStyle, appearance: "none" as const }}
                       className="form-input"
                     >
-                      <option value="">Donate towards… (choose campaign)</option>
-	                      {activeConstructionCampaigns.map((c) => (
-                        <option key={c.id} value={c.id}>{c.title}</option>
-                      ))}
-                      <option value="general">General Fund — wherever needed most</option>
+                      <option value="">Donate towards… (Choose {donationType.toUpperCase()} Cause)</option>
+                      {dynamicCauses
+                        .filter((c) => c.category === donationType)
+                        .map((c) => (
+                          <option key={`${c.category}-${c.id}`} value={c.id}>
+                            {c.title} — ₹{c.amountNeeded.toLocaleString("en-IN")} needed
+                          </option>
+                        ))}
+                      <option value="general">General {donationType.toUpperCase()} Fund — wherever needed most</option>
                     </select>
 
                     <textarea
@@ -1801,12 +1947,10 @@ export default function DonatePage() {
         .cta-outline-btn:hover { background: rgba(15,61,53,0.08) !important; }
 
         /* Trust strip responsive */
-        @media (max-width: 640px) {
-          .trust-strip { flex-direction: column; }
-          .trust-strip > div { border-left: none !important; border-top: 1px solid #F0F0F0; }
-          .trust-strip > div:first-child { border-top: none; }
         }
       `}</style>
+
+      <DonateSectionClient externalSelectedCause={modalCause} onExternalClose={() => setModalCause(null)} />
     </main>
   );
 }

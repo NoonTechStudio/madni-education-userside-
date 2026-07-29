@@ -252,18 +252,29 @@ body {
 
 /* ─── Donate card btn ─── */
 .donate-card-btn {
-  display: inline-block;
-  padding: 8px 20px;
-  border: 2px solid var(--teal);
-  border-radius: 9999px;
-  color: var(--teal);
-  font-weight: 600;
-  font-size: 13px;
-  transition: all 0.25s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 12px;
+  background: transparent;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.25s ease;
 }
 .donate-card-btn:hover {
-  background: var(--teal);
-  color: #fff;
+  background: var(--btn-hover-bg, var(--teal)) !important;
+  color: #ffffff !important;
+  border-color: var(--btn-hover-bg, var(--teal)) !important;
+}
+.donate-card-btn:hover .btn-arrow-icon {
+  transform: translateX(4px);
+}
+.btn-arrow-icon {
+  transition: transform 0.2s ease;
 }
 
 /* ─── Text link ─── */
@@ -273,6 +284,21 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+}
+
+/* ─── Modal scroll prevention ─── */
+.donation-modal-panel {
+  max-height: calc(100vh - 24px) !important;
+  overflow: hidden !important;
+}
+@media (max-height: 720px) {
+  .donation-modal-panel {
+    padding: 16px 20px !important;
+    border-radius: 16px !important;
+  }
+}
+
+.text-link-teal {
   transition: gap 0.2s;
 }
 .text-link-teal:hover { gap: 8px; }

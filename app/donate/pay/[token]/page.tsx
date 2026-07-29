@@ -45,6 +45,7 @@ export default function DonationPaymentPage() {
   const [inquiry, setInquiry] = useState<DonationInquiry | null>(null);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [donorPan, setDonorPan] = useState("");
   const [message, setMessage] = useState("");
 
   const canPay = useMemo(() => {
@@ -121,13 +122,16 @@ export default function DonationPaymentPage() {
             const verifyRes = await fetch(`${apiBaseUrl}/donation-inquiries/${token}/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(response),
+              body: JSON.stringify({ ...response, donorPan }),
             });
             const verifyData = await verifyRes.json().catch(() => ({}));
             if (!verifyRes.ok) throw new Error(verifyData.error || "Payment verification failed.");
 
             setInquiry((current) => current ? { ...current, status: "PAID" } : current);
-            setMessage("Payment successful. Jazakallah khair, your donation has been recorded.");
+            setMessage("✅ Payment successful! Jazakallah khair, your official 80G tax receipt has been emailed to you. Redirecting to homepage...");
+            setTimeout(() => {
+              window.location.href = "/";
+            }, 3000);
           } catch (error: any) {
             setMessage(error?.message || "Payment verification failed.");
           } finally {
@@ -185,21 +189,61 @@ export default function DonationPaymentPage() {
 
               {inquiry.status === "PAID" ? (
                 <div style={{ background: "#EAF4F0", color: "#1A6B5A", borderRadius: 14, padding: 16, fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700 }}>
-                  This donation is already paid and recorded.
+                  ✓ This donation has been successfully paid. Official 80G receipt has been emailed to {inquiry.donorEmail}.
                 </div>
               ) : inquiry.expired ? (
                 <div style={{ background: "#FEF2F2", color: "#B91C1C", borderRadius: 14, padding: 16, fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700 }}>
-                  This payment link has expired. Please submit a fresh donation enquiry.
+                  This payment link has expired. Please request a new payment link from the home page.
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={handlePayNow}
-                  disabled={paying}
-                  style={{ width: "100%", border: "none", borderRadius: 9999, background: "#1A6B5A", color: "#fff", padding: "15px 24px", fontFamily: "var(--font-epilogue-var),sans-serif", fontSize: 16, fontWeight: 800, cursor: paying ? "wait" : "pointer", opacity: paying ? 0.65 : 1 }}
-                >
-                  {paying ? "Opening Razorpay..." : "Pay Now"}
-                </button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {/* Optional PAN Card Input for 80G Exemption */}
+                  <div style={{ background: "#fff", borderRadius: 14, padding: "14px 16px", border: "1.5px solid #E5E7EB" }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: "#1C1C1C", display: "block", marginBottom: 4 }}>
+                      PAN Card No. (Optional — For 80G Tax Exemption Receipt)
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={10}
+                      placeholder="e.g. ABCDE1234F"
+                      value={donorPan}
+                      onChange={(e) => setDonorPan(e.target.value.toUpperCase())}
+                      style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #CBD5E1", borderRadius: 10, fontSize: 14, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}
+                    />
+                    <span style={{ fontSize: 11, color: "#64748B", marginTop: 4, display: "block" }}>
+                      🔒 Your PAN is encrypted & used exclusively for issuing official Section 80G Tax Exemption Receipts.
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handlePayNow}
+                    disabled={paying}
+                    style={{ width: "100%", border: "none", borderRadius: 14, background: "#1A6B5A", color: "#fff", padding: "15px 24px", fontFamily: "var(--font-epilogue-var),sans-serif", fontSize: 16, fontWeight: 800, cursor: paying ? "wait" : "pointer", opacity: paying ? 0.65 : 1, boxShadow: "0 4px 16px rgba(26,107,90,0.25)" }}
+                  >
+                    {paying ? "Opening Razorpay Secure Checkout..." : `Complete Payment of ${formatInr(inquiry.amount)} →`}
+                  </button>
+
+                  {/* SECURITY & RECEIPT BADGES */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "10px 14px", background: "#F8FAFC", borderRadius: 12, border: "1px solid #E2E8F0", fontSize: 12, color: "#475569", fontWeight: 600 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0f766e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      <span>256-Bit SSL Encrypted</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1A6B5A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                      </svg>
+                      <span>Instant 80G Receipt Emailed</span>
+                    </div>
+                  </div>
+                </div>
               )}
             </>
           ) : (

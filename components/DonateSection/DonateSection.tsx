@@ -95,60 +95,108 @@ function standardLabel(need: FinancialAidNeed) {
 }
 
 function buildDynamicCards(data: DonationNeedsResponse): DonationCard[] {
-  const aidCards: DonationCard[] = data.financialAid.map((need) => {
-    const fees = toNumber(need.fees);
-    const zakatCount = toNumber(need.zakatCount);
-    const lillahCount = toNumber(need.lillahCount);
-    const zakatPaid = toNumber(need.zakatPaid);
-    const lillahPaid = toNumber(need.lillahPaid);
-    const zakatGoal = fees * zakatCount;
-    const lillahGoal = fees * lillahCount;
-    const totalGoal = zakatGoal + lillahGoal;
-    const totalPaid = zakatPaid + lillahPaid;
-    const label = standardLabel(need);
-    const zakatNeeded = Math.max(0, zakatGoal - zakatPaid);
-    const lillahNeeded = Math.max(0, lillahGoal - lillahPaid);
+  const aidCards: DonationCard[] = data.financialAid
+    .filter((need) => {
+      const fees = toNumber(need.fees);
+      const effectiveFees = fees > 0 ? fees : 35000;
+      const zakatCount = toNumber(need.zakatCount);
+      const lillahCount = toNumber(need.lillahCount);
+      const zakatPaid = toNumber(need.zakatPaid);
+      const lillahPaid = toNumber(need.lillahPaid);
+      const zakatGoal = effectiveFees * zakatCount;
+      const lillahGoal = effectiveFees * lillahCount;
+      const totalGoal = zakatGoal + lillahGoal;
+      const totalPaid = zakatPaid + lillahPaid;
 
-    return {
-      icon: "education",
-      iconBg: "#e8f8f5",
-      name: `${need.schoolName} - ${label}`,
-      desc: `Zakat needed: ${formatCurrency(zakatNeeded)}. Lillah needed: ${formatCurrency(lillahNeeded)}.`,
-      raised: `${formatCurrency(totalPaid)} received`,
-      goal: `${formatCurrency(Math.max(0, totalGoal - totalPaid))} needed`,
-      pct: getPct(totalPaid, totalGoal),
-      barColor: "var(--teal)",
-      category: "education",
-      schoolName: need.schoolName,
-      schoolId: need.schoolId,
-      referenceId: need.standardId,
-      donationType: "zakat",
-      suggestedAmount: Math.max(100, zakatNeeded || lillahNeeded || fees),
-    };
-  });
+      const zakatNeeded = Math.max(0, zakatGoal - zakatPaid);
+      const lillahNeeded = Math.max(0, lillahGoal - lillahPaid);
 
-  const expenseCards: DonationCard[] = data.expenses.map((expense) => {
-    const goal = toNumber(expense.estimatedCost);
-    const paid = toNumber(expense.paidAmount);
-    const isEvent = expense.type?.toUpperCase() === "EVENT";
+      // 1. Only show standards that have at least 1 needy student for Zakat or Lillah
+      if (zakatCount <= 0 && lillahCount <= 0) return false;
 
-    return {
-      icon: isEvent ? "event" : "construction",
-      iconBg: isEvent ? "#e8f4ff" : "#f0e8ff",
-      name: `${expense.schoolName} - ${expense.title}`,
-      desc: expense.description || (isEvent ? "School event funding requirement" : "Construction funding requirement"),
-      raised: `${formatCurrency(paid)} received`,
-      goal: `${formatCurrency(goal - paid)} needed`,
-      pct: getPct(paid, goal),
-      barColor: isEvent ? "#3b82f6" : "#a855f7",
-      category: isEvent ? "event" : "construction",
-      schoolName: expense.schoolName,
-      schoolId: expense.schoolId,
-      referenceId: expense.id,
-      donationType: isEvent ? "event" : "construction",
-      suggestedAmount: Math.max(100, goal - paid),
-    };
-  });
+      // 2. Goal must be greater than 0
+      if (totalGoal <= 0) return false;
+
+      // 3. If BOTH Zakat and Lillah needed are 0 (or totalPaid >= totalGoal), don't show card
+      if (zakatNeeded <= 0 && lillahNeeded <= 0) return false;
+      if (totalPaid >= totalGoal) return false;
+
+      return true;
+    })
+    .map((need) => {
+      const fees = toNumber(need.fees);
+      const effectiveFees = fees > 0 ? fees : 35000;
+      const zakatCount = toNumber(need.zakatCount);
+      const lillahCount = toNumber(need.lillahCount);
+      const zakatPaid = toNumber(need.zakatPaid);
+      const lillahPaid = toNumber(need.lillahPaid);
+      const zakatGoal = effectiveFees * zakatCount;
+      const lillahGoal = effectiveFees * lillahCount;
+      const totalGoal = zakatGoal + lillahGoal;
+      const totalPaid = zakatPaid + lillahPaid;
+      const label = standardLabel(need);
+      const zakatNeeded = Math.max(0, zakatGoal - zakatPaid);
+      const lillahNeeded = Math.max(0, lillahGoal - lillahPaid);
+
+      return {
+        icon: "education",
+        iconBg: "#e8f8f5",
+        name: `${need.schoolName} - ${label}`,
+        desc: `Zakat needed: ${formatCurrency(zakatNeeded)}. Lillah needed: ${formatCurrency(lillahNeeded)}.`,
+        raised: `${formatCurrency(totalPaid)} received`,
+        goal: `${formatCurrency(Math.max(0, totalGoal - totalPaid))} needed`,
+        pct: getPct(totalPaid, totalGoal),
+        barColor: "var(--teal)",
+        category: "education",
+        schoolName: need.schoolName,
+        schoolId: need.schoolId,
+        referenceId: need.standardId,
+        donationType: "zakat",
+        suggestedAmount: Math.max(100, zakatNeeded || lillahNeeded || effectiveFees),
+        zakatCount,
+        lillahCount,
+        zakatNeeded,
+        lillahNeeded,
+        zakatPaid,
+        lillahPaid,
+        totalGoal,
+        totalPaid,
+        annualFees: effectiveFees,
+      };
+    });
+
+  const expenseCards: DonationCard[] = data.expenses
+    .filter((expense) => {
+      const goal = toNumber(expense.estimatedCost);
+      const paid = toNumber(expense.paidAmount);
+
+      // If goal <= 0 or donation is completed (paid >= goal), don't show it
+      if (goal <= 0 || paid >= goal) return false;
+
+      return true;
+    })
+    .map((expense) => {
+      const goal = toNumber(expense.estimatedCost);
+      const paid = toNumber(expense.paidAmount);
+      const isEvent = expense.type?.toUpperCase() === "EVENT";
+
+      return {
+        icon: isEvent ? "event" : "construction",
+        iconBg: isEvent ? "#e8f4ff" : "#f0e8ff",
+        name: `${expense.schoolName} - ${expense.title}`,
+        desc: expense.description || (isEvent ? "School event funding requirement" : "Construction funding requirement"),
+        raised: `${formatCurrency(paid)} received`,
+        goal: `${formatCurrency(goal - paid)} needed`,
+        pct: getPct(paid, goal),
+        barColor: isEvent ? "#3b82f6" : "#a855f7",
+        category: isEvent ? "event" : "construction",
+        schoolName: expense.schoolName,
+        schoolId: expense.schoolId,
+        referenceId: expense.id,
+        donationType: isEvent ? "event" : "construction",
+        suggestedAmount: Math.max(100, goal - paid),
+      };
+    });
 
   return [...aidCards, ...expenseCards];
 }
