@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, type FormEvent } from "react";
+import { useState, useEffect, useRef, Suspense, type FormEvent } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar/Navbar";
@@ -387,7 +387,7 @@ function ProgressBar({ pct, color }: { pct: number; color: string }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // PAGE COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
-export default function DonatePage() {
+function DonatePageContent() {
   const searchParams = useSearchParams();
   const [selectedTier, setSelectedTier]     = useState<number | null>(null);
   const [donationType, setDonationType]     = useState("zakat");
@@ -2159,5 +2159,13 @@ export default function DonatePage() {
 
       <DonateSectionClient externalSelectedCause={modalCause} onExternalClose={() => setModalCause(null)} />
     </main>
+  );
+}
+
+export default function DonatePage() {
+  return (
+    <Suspense fallback={null}>
+      <DonatePageContent />
+    </Suspense>
   );
 }
