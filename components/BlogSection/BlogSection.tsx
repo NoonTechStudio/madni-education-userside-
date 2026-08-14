@@ -111,12 +111,22 @@ const staticImagesList = [
   "/images/img-103.jpg",
 ];
 
+function resolvePostImage(imageUrl: string | null | undefined, fallbackIndex: number) {
+  const cleanUrl = imageUrl?.trim();
+
+  if (!cleanUrl) {
+    return staticImagesList[fallbackIndex % staticImagesList.length];
+  }
+
+  if (cleanUrl.includes("cloudinary.com") && !cleanUrl.includes("q_auto")) {
+    return cleanUrl.replace("/upload/", "/upload/f_auto,q_auto,w_900/");
+  }
+
+  return cleanUrl;
+}
+
 function buildPosts(updates: PublicNewsUpdate[]): BlogPost[] {
   return updates.map((update, idx) => {
-    let img = update.imageUrl;
-    if (!img || img.startsWith("http")) {
-      img = staticImagesList[idx % staticImagesList.length];
-    }
     return {
       id: update.id,
       category: update.category,
@@ -125,7 +135,7 @@ function buildPosts(updates: PublicNewsUpdate[]): BlogPost[] {
       title: update.title,
       excerpt: excerpt(update.description),
       school: update.schoolName || "All Schools",
-      imgSrc: img,
+      imgSrc: resolvePostImage(update.imageUrl, idx),
       imgAlt: update.title,
     };
   });

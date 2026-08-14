@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import { SABRI_SCHOOL_DATA, SchoolDataType } from "@/data/schoolsData";
+import { usePortalDialog } from "@/components/PortalDialog/PortalDialog";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SCHOOL DATA — Swap this object to render any school. All sections reference `d`.
@@ -273,14 +274,14 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
   } | null>(null);
   const [donateModalForm, setDonateModalForm] = useState({ name: "", email: "", phone: "", amount: "", message: "" });
   const [donateModalSubmitting, setDonateModalSubmitting] = useState(false);
-  const [donateModalSuccess, setDonateModalSuccess] = useState("");
-  const [donateModalPayLink, setDonateModalPayLink] = useState("");
+  const donateModalSuccess = "";
+  const donateModalPayLink = "";
+  const { dialog, showAlert } = usePortalDialog();
 
   const handleDonateModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!donateModal) return;
     setDonateModalSubmitting(true);
-    setDonateModalSuccess("");
     const urlsToTry = [
       process.env.NEXT_PUBLIC_API_URL,
       "http://localhost:3001/api/public",
@@ -304,12 +305,27 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
         });
         const data = await res.json();
         if (res.ok && (data.token || data.message)) {
-          setDonateModalSuccess("Jazakallah Khair! Your donation enquiry has been registered.");
-          if (data.token) setDonateModalPayLink(data.paymentLink || `/donate/pay/${data.token}`);
-          break;
+          const payLink = data.token ? (data.paymentLink || `/donate/pay/${data.token}`) : "";
+          showAlert({
+            title: "Jazakallah Khair",
+            message: payLink
+              ? "Your donation enquiry has been registered. Continue to the secure payment page."
+              : "Your donation enquiry has been registered.",
+            variant: "success",
+          }).then(() => {
+            if (payLink) window.location.href = payLink;
+            else setDonateModal(null);
+          });
+          setDonateModalSubmitting(false);
+          return;
         }
       } catch { /* try next */ }
     }
+    showAlert({
+      title: "Donation enquiry failed",
+      message: "Your donation enquiry could not be registered. Please try again.",
+      variant: "danger",
+    });
     setDonateModalSubmitting(false);
   };
 
@@ -1358,6 +1374,7 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
       )}
 
       {/* ══ GLOBAL STYLES ════════════════════════════════════════════════════ */}
+      {dialog}
       <style>{`
         /* Scroll reveal */
         .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
 import DonateSectionClient, { type DonationCard } from "@/components/DonateSection/DonateSectionClient";
+import { usePortalDialog } from "@/components/PortalDialog/PortalDialog";
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // DONATE PAGE DATA — Admin: update this single object to change all page content
@@ -389,6 +390,7 @@ function ProgressBar({ pct, color }: { pct: number; color: string }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 function DonatePageContent() {
   const searchParams = useSearchParams();
+  const { dialog, showAlert } = usePortalDialog();
   const [selectedTier, setSelectedTier]     = useState<number | null>(null);
   const [donationType, setDonationType]     = useState("zakat");
   const [openFaq, setOpenFaq]               = useState<number | null>(null);
@@ -401,20 +403,18 @@ function DonatePageContent() {
   const [modalCause, setModalCause]         = useState<DonationCard | null>(null);
   const [donationModalTarget, setDonationModalTarget] = useState<DonationModalTarget | null>(null);
   const [submittingInquiry, setSubmittingInquiry] = useState(false);
-  const [inquiryMessage, setInquiryMessage] = useState("");
   const [paymentLink, setPaymentLink] = useState("");
   const [fundBreakdown, setFundBreakdown] = useState<FundBreakdownItem[]>([]);
   const [aoyWinner, setAoyWinner] = useState<any>(null);
   const [alumniMode, setAlumniMode] = useState(false);
   const [alumniEmailInput, setAlumniEmailInput] = useState("");
-  const [alumniCheckMsg, setAlumniCheckMsg] = useState("");
   const [alumniCheckLoading, setAlumniCheckLoading] = useState(false);
   const queryDonationOpened = useRef(false);
 
   const handleAlumniCheck = async (action: 'check' | 'forgot_password') => {
     if (!alumniEmailInput) return;
     setAlumniCheckLoading(true);
-    setAlumniCheckMsg("");
+    let handled = false;
 
     const urlsToTry = [
       process.env.NEXT_PUBLIC_API_URL,
@@ -433,14 +433,24 @@ function DonatePageContent() {
         });
         const data = await res.json();
         if (res.ok || data.message) {
-          setAlumniCheckMsg(data.message);
+          await showAlert({
+            title: action === 'forgot_password' ? 'Reset request sent' : 'Login link sent',
+            message: data.message || 'Please check your email inbox for the next step.',
+            variant: 'success',
+          });
+          handled = true;
           break;
         } else {
-          setAlumniCheckMsg(data.error || "Verification failed");
+          await showAlert({ title: 'Verification failed', message: data.error || 'Verification failed.', variant: 'danger' });
+          handled = true;
+          break;
         }
       } catch {
         // try next
       }
+    }
+    if (!handled) {
+      await showAlert({ title: 'Connection failed', message: 'Unable to connect to the alumni verification server.', variant: 'danger' });
     }
     setAlumniCheckLoading(false);
   };
@@ -726,7 +736,6 @@ function DonatePageContent() {
   const openDonationModal = (target: DonationModalTarget) => {
     setDonationModalTarget(target);
     setSubmitted(false);
-    setInquiryMessage("");
     setPaymentLink("");
     const nextType = target.donationType || "lillah";
     setDonationType(nextType);
@@ -743,7 +752,6 @@ function DonatePageContent() {
     setDonationModalTarget(null);
     setSubmitted(false);
     setSubmittingInquiry(false);
-    setInquiryMessage("");
     setPaymentLink("");
   };
 
@@ -753,7 +761,7 @@ function DonatePageContent() {
 
     const amount = Number(form.amount);
     if (!Number.isFinite(amount) || amount < 100) {
-      setInquiryMessage("Please enter a donation amount of at least ₹100.");
+      showAlert({ title: 'Invalid donation amount', message: 'Please enter a donation amount of at least Rs. 100.', variant: 'danger' });
       return;
     }
 
@@ -771,7 +779,6 @@ function DonatePageContent() {
       "Madni Education Trust";
 
     setSubmittingInquiry(true);
-    setInquiryMessage("");
     setPaymentLink("");
 
     for (const baseUrl of publicApiBaseUrls) {
@@ -792,17 +799,19 @@ function DonatePageContent() {
           throw new Error(data.error || "Failed to submit donation enquiry.");
         }
 
-        setSubmitted(true);
         setPaymentLink(data.paymentLink || "");
-        setInquiryMessage(`✉️ Secure donation payment link has been sent to ${form.email}! Please check your email inbox to complete your donation.`);
         setSubmittingInquiry(false);
+        await showAlert({
+          title: 'Donation link sent',
+          message: `Secure donation payment link has been sent to ${form.email}. Please check your email inbox to complete your donation.`,
+          variant: 'success',
+        });
 
-        setTimeout(() => {
-          setSubmitted(false);
-          setForm({ name: "", email: "", phone: "", amount: "", type: "zakat", campaign: "", message: "" });
-          setInquiryMessage("");
-          setPaymentLink("");
-        }, 4500);
+        const nextPaymentLink = data.paymentLink || "";
+        setForm({ name: "", email: "", phone: "", amount: "", type: "zakat", campaign: "", message: "" });
+        setPaymentLink("");
+        setDonationModalTarget(null);
+        if (nextPaymentLink) window.location.href = nextPaymentLink;
         return;
       } catch (error: any) {
         if (baseUrl === publicApiBaseUrls[publicApiBaseUrls.length - 1]) {
@@ -810,7 +819,7 @@ function DonatePageContent() {
           const friendly = raw === "Failed to fetch"
             ? "Unable to connect to donation server. Please check your connection."
             : raw || "Could not submit donation enquiry. Please try again.";
-          setInquiryMessage(friendly);
+          showAlert({ title: 'Donation enquiry failed', message: friendly, variant: 'danger' });
         }
       }
     }
@@ -1547,7 +1556,7 @@ function DonatePageContent() {
                     Jazakallah Khair!
                   </h3>
                   <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 16, color: "#4A4A4A", lineHeight: 1.75, margin: "0 0 20px" }}>
-	                    {inquiryMessage || "Your enquiry has been received. We have sent a secure payment link to your email."}
+		                    Your enquiry has been received. We have sent a secure payment link to your email.
 	                  </p>
 	                  {paymentLink && (
 	                    <a href={paymentLink} style={{ display: "inline-block", background: "#1A6B5A", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 14, padding: "10px 22px", borderRadius: 9999, textDecoration: "none", marginBottom: 16 }}>
@@ -1612,18 +1621,6 @@ function DonatePageContent() {
                         style={iStyle}
                         className="form-input"
                       />
-
-                      {alumniCheckMsg && (
-                        <div style={{
-                          padding: "14px 16px", borderRadius: 14,
-                          background: alumniCheckMsg.includes("not registered") ? "#FEF2F2" : "#ECFDF5",
-                          border: `1px solid ${alumniCheckMsg.includes("not registered") ? "#FCA5A5" : "#A7F3D0"}`,
-                          color: alumniCheckMsg.includes("not registered") ? "#991B1B" : "#065F46",
-                          fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, fontWeight: 600, lineHeight: 1.5
-                        }}>
-                          {alumniCheckMsg}
-                        </div>
-                      )}
 
                       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
                         <button
@@ -1756,13 +1753,7 @@ function DonatePageContent() {
 	                      className="form-input"
 	                    />
 
-	                    {inquiryMessage && (
-	                      <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#DC2626", lineHeight: 1.5, margin: 0 }}>
-	                        {inquiryMessage}
-	                      </p>
-	                    )}
-
-	                    <button type="submit" disabled={submittingInquiry} className="pill-btn pill-btn-teal" style={{ width: "100%", justifyContent: "center", fontSize: 16, padding: "14px", opacity: submittingInquiry ? 0.65 : 1, cursor: submittingInquiry ? "wait" : "pointer" }}>
+		                    <button type="submit" disabled={submittingInquiry} className="pill-btn pill-btn-teal" style={{ width: "100%", justifyContent: "center", fontSize: 16, padding: "14px", opacity: submittingInquiry ? 0.65 : 1, cursor: submittingInquiry ? "wait" : "pointer" }}>
                       Submit Donation Enquiry →
                     </button>
 
@@ -2047,7 +2038,7 @@ function DonatePageContent() {
 	                  Donation enquiry submitted
 	                </h4>
 	                <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 15, color: "#6B7280", lineHeight: 1.7, margin: "0 0 20px" }}>
-		                  {inquiryMessage || "We have emailed the donor a secure Pay Now link for this amount."}
+			                  We have emailed the donor a secure Pay Now link for this amount.
 		                </p>
 		                {paymentLink && (
 		                  <a href={paymentLink} style={{ display: "inline-block", background: "#F5A623", color: "#fff", fontFamily: "var(--font-dm-sans-var),sans-serif", fontWeight: 700, fontSize: 14, padding: "10px 22px", borderRadius: 9999, textDecoration: "none", marginBottom: 16 }}>
@@ -2083,11 +2074,6 @@ function DonatePageContent() {
 		                  style={{ ...iStyle, resize: "vertical" }}
 		                  className="form-input"
 		                />
-		                {inquiryMessage && (
-		                  <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 13, color: "#DC2626", lineHeight: 1.5, margin: 0 }}>
-		                    {inquiryMessage}
-		                  </p>
-		                )}
 		                <button type="submit" disabled={submittingInquiry} className="pill-btn pill-btn-teal" style={{ width: "100%", justifyContent: "center", fontSize: 15, padding: "13px", border: "none", cursor: submittingInquiry ? "wait" : "pointer", opacity: submittingInquiry ? 0.65 : 1 }}>
 		                  {submittingInquiry ? "Sending Payment Link..." : "Submit Donation Enquiry"}
 		                </button>
@@ -2097,6 +2083,7 @@ function DonatePageContent() {
 	        </>
 	      )}
 
+	      {dialog}
 	      <Footer />
 
       {/* ══ STYLES ═══════════════════════════════════════════════════════════ */}

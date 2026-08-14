@@ -5,6 +5,7 @@ import Script from "next/script";
 import { useParams } from "next/navigation";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
+import { usePortalDialog } from "@/components/PortalDialog/PortalDialog";
 
 declare global {
   interface Window {
@@ -46,7 +47,8 @@ export default function DonationPaymentPage() {
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
   const [donorPan, setDonorPan] = useState("");
-  const [message, setMessage] = useState("");
+  const [loadError, setLoadError] = useState("");
+  const { dialog, showAlert } = usePortalDialog();
 
   const canPay = useMemo(() => {
     return Boolean(inquiry && inquiry.status !== "PAID" && !inquiry.expired);
@@ -56,7 +58,7 @@ export default function DonationPaymentPage() {
     const loadInquiry = async () => {
       if (!token) return;
       setLoading(true);
-      setMessage("");
+      setLoadError("");
 
       for (const baseUrl of publicApiBaseUrls) {
         try {
@@ -69,7 +71,9 @@ export default function DonationPaymentPage() {
           return;
         } catch (error: any) {
           if (baseUrl === publicApiBaseUrls[publicApiBaseUrls.length - 1]) {
-            setMessage(error?.message || "Donation link could not be loaded.");
+            const message = error?.message || "Donation link could not be loaded.";
+            setLoadError(message);
+            showAlert({ title: "Donation link unavailable", message, variant: "danger" });
           }
         }
       }
@@ -83,12 +87,15 @@ export default function DonationPaymentPage() {
   const handlePayNow = async () => {
     if (!token || !apiBaseUrl || !inquiry || !canPay) return;
     if (!window.Razorpay) {
-      setMessage("Payment checkout is still loading. Please try again in a moment.");
+      showAlert({
+        title: "Checkout loading",
+        message: "Payment checkout is still loading. Please try again in a moment.",
+        variant: "danger",
+      });
       return;
     }
 
     setPaying(true);
-    setMessage("");
 
     try {
       const orderRes = await fetch(`${apiBaseUrl}/donation-inquiries/${token}/create-order`, {
@@ -128,12 +135,15 @@ export default function DonationPaymentPage() {
             if (!verifyRes.ok) throw new Error(verifyData.error || "Payment verification failed.");
 
             setInquiry((current) => current ? { ...current, status: "PAID" } : current);
-            setMessage("✅ Payment successful! Jazakallah khair, your official 80G tax receipt has been emailed to you. Redirecting to homepage...");
-            setTimeout(() => {
+            showAlert({
+              title: "Payment successful",
+              message: "Jazakallah khair, your official 80G tax receipt has been emailed to you. Redirecting to homepage.",
+              variant: "success",
+            }).then(() => {
               window.location.href = "/";
-            }, 3000);
+            });
           } catch (error: any) {
-            setMessage(error?.message || "Payment verification failed.");
+            showAlert({ title: "Payment verification failed", message: error?.message || "Payment verification failed.", variant: "danger" });
           } finally {
             setPaying(false);
           }
@@ -145,7 +155,7 @@ export default function DonationPaymentPage() {
 
       razorpay.open();
     } catch (error: any) {
-      setMessage(error?.message || "Payment could not be completed.");
+      showAlert({ title: "Payment could not be completed", message: error?.message || "Payment could not be completed.", variant: "danger" });
     } finally {
       setPaying(false);
     }
@@ -247,18 +257,13 @@ export default function DonationPaymentPage() {
               )}
             </>
           ) : (
-            <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", color: "#B91C1C", margin: 0 }}>{message || "Donation link not found."}</p>
-          )}
-
-          {message && inquiry && (
-            <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", fontSize: 14, color: message.includes("successful") ? "#1A6B5A" : "#B91C1C", lineHeight: 1.6, margin: "18px 0 0" }}>
-              {message}
-            </p>
+            <p style={{ fontFamily: "var(--font-dm-sans-var),sans-serif", color: "#B91C1C", margin: 0 }}>{loadError || "Donation link not found."}</p>
           )}
         </div>
       </section>
 
       <Footer />
+      {dialog}
     </main>
   );
 }

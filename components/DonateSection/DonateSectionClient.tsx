@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePortalDialog } from "@/components/PortalDialog/PortalDialog";
 
 export type DonationIcon = "education" | "library" | "construction" | "event" | "check";
 
@@ -151,8 +152,6 @@ export default function DonateSectionClient({
   useEffect(() => {
     if (externalSelectedCause) {
       setSelectedCause(externalSelectedCause);
-      setPaymentMessage("");
-      setPaymentLink("");
       const zakat = externalSelectedCause.zakatNeeded ?? 0;
       const lillah = externalSelectedCause.lillahNeeded ?? 0;
       const totalNeeded = (zakat + lillah) || externalSelectedCause.suggestedAmount || 3000;
@@ -195,8 +194,7 @@ export default function DonateSectionClient({
   const [selectionMode, setSelectionMode] = useState<"full" | "zakat" | "lillah">("full");
   const [amount, setAmount] = useState<number>(3000);
   const [paymentLoading, setPaymentLoading] = useState(false);
-  const [paymentMessage, setPaymentMessage] = useState("");
-  const [paymentLink, setPaymentLink] = useState("");
+  const { dialog, showAlert } = usePortalDialog();
 
   // Receipt State
   const [receipt, setReceipt] = useState<{
@@ -299,18 +297,24 @@ export default function DonateSectionClient({
     const finalEmail = donorType === "alumni" ? alumniEmail : donorEmail;
 
     if (!finalName || !finalEmail) {
-      alert("Please fill in your name and email.");
+      showAlert({
+        title: "Name and email required",
+        message: "Please fill in your name and email before creating the donation request.",
+        variant: "danger",
+      });
       return;
     }
 
     if (!amount || amount < 100) {
-      setPaymentMessage("Please enter a donation amount of at least Rs. 100.");
+      showAlert({
+        title: "Donation amount too low",
+        message: "Please enter a donation amount of at least Rs. 100.",
+        variant: "danger",
+      });
       return;
     }
 
     setPaymentLoading(true);
-    setPaymentMessage("");
-    setPaymentLink("");
 
     const paymentType =
       selectedCause?.category === "construction" ? "construction" :
@@ -344,15 +348,14 @@ export default function DonateSectionClient({
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || "Unable to create donation payment link.");
 
-        setPaymentLink(data.paymentLink || "");
-        setPaymentMessage(`✉️ Secure donation payment link has been sent to ${finalEmail}! Please check your email inbox to complete your donation.`);
         setPaymentLoading(false);
-
-        // Auto-close modal after 3.5 seconds so user reads confirmation message
-        setTimeout(() => {
+        showAlert({
+          title: "Donation link sent",
+          message: `Secure donation payment link has been sent to ${finalEmail}. Please check your email inbox to complete your donation.`,
+          variant: "success",
+        }).then(() => {
           closeModal();
-          setPaymentMessage("");
-        }, 3500);
+        });
         return;
       } catch (err: any) {
         if (baseUrl === publicApiBaseUrls[publicApiBaseUrls.length - 1]) {
@@ -360,7 +363,7 @@ export default function DonateSectionClient({
           const friendlyMessage = rawErr === "Failed to fetch"
             ? "Unable to connect to donation server. Please check your internet connection or try again."
             : rawErr || "Unable to create donation payment link.";
-          setPaymentMessage(friendlyMessage);
+          showAlert({ title: "Donation link failed", message: friendlyMessage, variant: "danger" });
         }
       }
     }
@@ -765,17 +768,6 @@ export default function DonateSectionClient({
                   />
                 </div>
 
-                {paymentMessage && (
-                  <div style={{ background: paymentLink ? "#EAF4F0" : "#FEF2F2", color: paymentLink ? "#1A6B5A" : "#B91C1C", borderRadius: 10, padding: "8px 10px", fontSize: 12, fontWeight: 700, lineHeight: 1.4 }}>
-                    {paymentMessage}
-                    {paymentLink && (
-                      <a href={paymentLink} style={{ display: "inline-block", marginLeft: 6, color: "#1A6B5A", textDecoration: "underline" }}>
-                        Open Pay Now
-                      </a>
-                    )}
-                  </div>
-                )}
-
                 <button
                   type="submit"
                   disabled={paymentLoading}
@@ -825,6 +817,7 @@ export default function DonateSectionClient({
   }
 
   return (
+    <>
     <section id="donate" style={{ background: "var(--amber-pale)", padding: "96px 0" }}>
       <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px" }}>
         <div className="fade-in" style={{ textAlign: "center" }}>
@@ -1145,8 +1138,6 @@ export default function DonateSectionClient({
                   <button
                     onClick={() => {
                       setSelectedCause(cat);
-                      setPaymentMessage("");
-                      setPaymentLink("");
                       const zakat = cat.zakatNeeded ?? 0;
                       const lillah = cat.lillahNeeded ?? 0;
                       const totalNeeded = (zakat + lillah) || cat.suggestedAmount || 3000;
@@ -1552,17 +1543,6 @@ export default function DonateSectionClient({
                 />
               </div>
 
-              {paymentMessage && (
-                <div style={{ background: paymentLink ? "#EAF4F0" : "#FEF2F2", color: paymentLink ? "#1A6B5A" : "#B91C1C", borderRadius: 10, padding: "8px 10px", fontSize: 12, fontWeight: 700, lineHeight: 1.4 }}>
-                  {paymentMessage}
-                  {paymentLink && (
-                    <a href={paymentLink} style={{ display: "inline-block", marginLeft: 6, color: "#1A6B5A", textDecoration: "underline" }}>
-                      Open Pay Now
-                    </a>
-                  )}
-                </div>
-              )}
-
               <button
                 type="submit"
                 disabled={paymentLoading}
@@ -1897,5 +1877,7 @@ export default function DonateSectionClient({
 	        }
       `}</style>
     </section>
+    {dialog}
+    </>
   );
 }

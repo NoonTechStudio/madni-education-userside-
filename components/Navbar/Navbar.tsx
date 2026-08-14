@@ -11,6 +11,7 @@ const navLinks = [
   { label: "About Us", href: "/about" },
   { label: "School Life", href: "/school-life" },
   { label: "Career Board", href: "/career-board" },
+  { label: "CSR", href: "/csr" },
   { label: "Insights", href: "/insights" },
   { label: "Donate", href: "/donate" },
   { label: "Contact", href: "/contact" },
@@ -101,6 +102,18 @@ const moreTabs = [
         strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="8" r="4" />
         <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+      </svg>
+    ),
+  },
+  {
+    label: "CSR",
+    href: "/csr",
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M16 11V7a4 4 0 00-8 0v4" />
+        <rect x="5" y="11" width="14" height="10" rx="2" />
+        <path d="M12 15v2" />
       </svg>
     ),
   },
