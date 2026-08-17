@@ -190,6 +190,7 @@ export default function DonateSectionClient({
   const [donorEmail, setDonorEmail] = useState("");
   const [donorPhone, setDonorPhone] = useState("");
   const [donorPan, setDonorPan] = useState("");
+  const [wants80G, setWants80G] = useState(false);
   const [fundType, setFundType] = useState<"zakat" | "lillah">("zakat");
   const [selectionMode, setSelectionMode] = useState<"full" | "zakat" | "lillah">("full");
   const [amount, setAmount] = useState<number>(3000);
@@ -305,6 +306,18 @@ export default function DonateSectionClient({
       return;
     }
 
+    if (wants80G) {
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if (!donorPan || !panRegex.test(donorPan.trim().toUpperCase())) {
+        showAlert({
+          title: "Compulsory PAN Number Required for 80G",
+          message: "You have requested an 80G Tax Exemption Certificate. Please enter a valid 10-character Income Tax PAN Number (e.g. ABCDE1234F) to proceed.",
+          variant: "danger",
+        });
+        return;
+      }
+    }
+
     if (!amount || amount < 100) {
       showAlert({
         title: "Donation amount too low",
@@ -334,7 +347,8 @@ export default function DonateSectionClient({
             name: finalName,
             email: finalEmail,
             phone: donorPhone || "Not provided",
-            pan: donorPan,
+            pan: donorPan ? donorPan.toUpperCase() : undefined,
+            wants80G,
             amount,
             type: paymentType,
             campaign,
@@ -1337,6 +1351,38 @@ export default function DonateSectionClient({
                 </div>
               </div>
             )}
+
+            {/* 80G TAX CERTIFICATE CHECKBOX & COMPULSORY PAN FIELD */}
+            <div style={{ background: "#FFF8EC", padding: "10px 14px", borderRadius: 12, border: "1px solid #F5A623", marginBottom: 12 }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 12, fontWeight: 700, color: "#92400E" }}>
+                <input
+                  type="checkbox"
+                  checked={wants80G}
+                  onChange={(e) => setWants80G(e.target.checked)}
+                  style={{ width: 16, height: 16, accentColor: "#F5A623", cursor: "pointer" }}
+                />
+                <span>Request 80G Tax Exemption Certificate (Income Tax Benefit)</span>
+              </label>
+
+              {wants80G && (
+                <div style={{ marginTop: 8 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#92400E", display: "block", marginBottom: 3 }}>
+                    PAN Card Number * <span style={{ color: "#D97706", fontWeight: 800 }}>(COMPULSORY FOR 80G CLAIM)</span>
+                  </label>
+                  <input
+                    required={wants80G}
+                    placeholder="e.g. ABCDE1234F"
+                    maxLength={10}
+                    value={donorPan}
+                    onChange={(e) => setDonorPan(e.target.value.toUpperCase())}
+                    style={{ width: "100%", padding: "7px 10px", border: "1.5px solid #F5A623", borderRadius: 8, fontSize: 13, fontWeight: 700, textTransform: "uppercase", background: "#fff" }}
+                  />
+                  <p style={{ fontSize: 10, color: "#78350F", margin: "3px 0 0 0" }}>
+                    🔒 Superadmin & School Subadmin will be notified with your PAN to issue official 80G certificate.
+                  </p>
+                </div>
+              )}
+            </div>
 
             {/* FUND TYPE & AMOUNT */}
             <form onSubmit={handleCompletePayment} style={{ display: "flex", flexDirection: "column", gap: 10 }}>

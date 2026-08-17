@@ -274,8 +274,8 @@ export default function SchoolDetail({ data }: { data?: SchoolDataType }) {
   } | null>(null);
   const [donateModalForm, setDonateModalForm] = useState({ name: "", email: "", phone: "", amount: "", message: "" });
   const [donateModalSubmitting, setDonateModalSubmitting] = useState(false);
-  const donateModalSuccess = "";
-  const donateModalPayLink = "";
+  const [donateModalSuccess, setDonateModalSuccess] = useState("");
+  const [donateModalPayLink, setDonateModalPayLink] = useState("");
   const { dialog, showAlert } = usePortalDialog();
 
   const handleDonateModalSubmit = async (e: React.FormEvent) => {
