@@ -39,15 +39,6 @@ const fallbackSchools: School[] = [
     image: "/images/schools/school1.jpeg",
   },
   {
-    slug: "markaz-public-school",
-    name: "Markaz Public School (English Medium)",
-    location: "Junabazar, Karjan, Gujarat",
-    desc: "Classes Pre-Primary to Std.12 (Science & Commerce) | 300 students | Est. 2007",
-    chips: ["300 Students", "98% Pass Rate", "Est. 2007"],
-    bgColor: "linear-gradient(135deg,#fde8c0,#f5c972)",
-    image: "/images/schools/school2.jpeg",
-  },
-  {
     slug: "ms-high-school-gujarati",
     name: "M.S. High School (Eng–Guj Medium)",
     location: "Karachiya, Gujarat",
@@ -55,6 +46,15 @@ const fallbackSchools: School[] = [
     chips: ["400 Students", "New in 2024", "Growing Fast"],
     bgColor: "linear-gradient(135deg,#d8e8ff,#a0c0f0)",
     image: "/images/schools/school3.png",
+  },
+  {
+    slug: "markaz-public-school",
+    name: "Markaz Public School (English Medium)",
+    location: "Junabazar, Karjan, Gujarat",
+    desc: "Classes Pre-Primary to Std.12 (Science & Commerce) | 300 students | Est. 2007",
+    chips: ["300 Students", "98% Pass Rate", "Est. 2007"],
+    bgColor: "linear-gradient(135deg,#fde8c0,#f5c972)",
+    image: "/images/schools/school2.jpeg",
   },
 ];
 
@@ -85,6 +85,19 @@ async function getSchools(): Promise<School[]> {
     if (!Array.isArray(dbSchools) || dbSchools.length === 0) {
       return fallbackSchools;
     }
+
+    // Fixed display order: Sabri High School → M.S. English → M.S. Gujarati → Markaz
+    const displayOrder = (schoolName: string): number => {
+      const n = (schoolName || "").toLowerCase();
+      if (n.includes("sabri")) return 0;
+      if (n.includes("markaz")) return 3;
+      if (n.includes("english")) return 1;
+      if (n.includes("gujarati") || n.includes("m.s") || n.includes("m. s") || n.includes("ms high")) return 2;
+      return 99;
+    };
+    dbSchools = [...dbSchools].sort(
+      (a: any, b: any) => displayOrder(a?.schoolName) - displayOrder(b?.schoolName)
+    );
 
     const gradients = [
       "linear-gradient(135deg,#c5e8df,#8dcfc0)",
