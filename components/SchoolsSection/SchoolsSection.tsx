@@ -28,6 +28,18 @@ interface School {
   image: string;
 }
 
+// Shape of a school record returned by the public API
+interface ApiSchool {
+  schoolName?: string;
+  medium?: string;
+  address?: string;
+  totalStandards?: number;
+  currentStudentsNo?: number;
+  establishYear?: number;
+  isHaveRTE?: boolean;
+  imageUrls?: string[];
+}
+
 const fallbackSchools: School[] = [
   {
     slug: "sabri-high-school",
@@ -68,7 +80,7 @@ async function getSchools(): Promise<School[]> {
       "http://127.0.0.1:3000/api/public",
     ].filter(Boolean);
 
-    let dbSchools: any = null;
+    let dbSchools: ApiSchool[] | null = null;
 
     for (const baseUrl of urlsToTry) {
       try {
@@ -96,7 +108,7 @@ async function getSchools(): Promise<School[]> {
       return 99;
     };
     dbSchools = [...dbSchools].sort(
-      (a: any, b: any) => displayOrder(a?.schoolName) - displayOrder(b?.schoolName)
+      (a, b) => displayOrder(a?.schoolName ?? "") - displayOrder(b?.schoolName ?? "")
     );
 
     const gradients = [
@@ -113,7 +125,7 @@ async function getSchools(): Promise<School[]> {
       "/images/schools/school3.png"
     ];
 
-    return dbSchools.map((s: any, i: number) => {
+    return dbSchools.map((s: ApiSchool, i: number) => {
       const name = s.schoolName + (s.medium ? ` (${s.medium} Medium)` : "");
       const location = s.address || "Gujarat, India";
       const desc = `Classes Pre-Primary to Std.${s.totalStandards || 12} | ${s.currentStudentsNo || 0} students | Est. ${s.establishYear || 2024}`;
